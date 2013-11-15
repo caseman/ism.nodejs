@@ -13,17 +13,17 @@ var debug = function(){
 
 var CURSOR = 'red' // 13
 var TILES = {
-  SNOW : 15
-
-, DEEP_SEA : 18
-, COASTAL_SEA : 20
+  ice : 15
+, ocean : 18
+, coast : 20
 , RIVER : 21
 
 , FOREST : 28
 , RAINFOREST : 35
-, GRASS : 40
+, plain : 40
 
-, MOUNTAIN : 139
+, hill : 144
+, mountain: 139
 
 , DESERT : 179
 }
@@ -33,14 +33,8 @@ var TILES = {
 var MAP = []
 
 var loadMap = function(cb){
-  // TESTMAP
-  for (var y = 0; y < (ymax + 10); y++){
-    var row = []
-    for (var x =0; x< (xmax + 10); x++){
-      row.push(Object.keys(TILES)[parseInt(Math.random() * Object.keys(TILES).length)])
-    }
-    MAP.push(row)
-  }
+  var _test_map = require('./data/testmap.json')
+  MAP = _test_map
   cb()
 }
 
@@ -64,6 +58,7 @@ var renderMap = function(){
     charm.position(0,y+1)
     for (var x = 0; x<viewportx; x++){
       var pos = MAP[y][x]
+      if (! TILES[pos]) throw "No terrain color for: " + pos
       charm.background(TILES[pos]).write(' ')
     }
   }
@@ -77,12 +72,12 @@ var renderCursor = function(pos, cb){
     return cb(null, _CURSOR_POS);
 
   charm.position(_CURSOR_POS[1], _CURSOR_POS[0])
-  charm.background(TILES[MAP[_CURSOR_POS[0]][_CURSOR_POS[1]]]).write('/') // TODO tiledata
+  charm.background(TILES[MAP[_CURSOR_POS[0]][_CURSOR_POS[1]]]).write(' ') // TODO tiledata
   _CURSOR_POS = pos
   charm.position(_CURSOR_POS[1], _CURSOR_POS[0])
   charm.background(CURSOR).write('X')
 
-  debug("CURSOR:", _CURSOR_POS)
+  debug("CURSOR:", _CURSOR_POS, " --> ", MAP[pos[0]][pos[1]])
 
   return cb(null, pos)
 }
@@ -103,7 +98,7 @@ var render = function(){
   renderCursor([0,0])
 }
 
-
+charm.reset()
 loadMap(render)
 
 

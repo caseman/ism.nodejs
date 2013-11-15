@@ -1,0 +1,23 @@
+{
+  "name": "ism",
+  "version": "0.0.0",
+  "description": "ism ===",
+  "main": "client.js",
+  "dependencies": {
+    "keypress": "~0.2.1",
+    "charm": "~0.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/caseman/ism.git"
+  },
+  "author": "",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/caseman/ism/issues"
+  }
+}
