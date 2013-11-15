@@ -6,10 +6,9 @@ var xmax = process.stdout.columns || 80
 
 
 
+var CURSOR = 'red' // 13
 var TILES = {
-  CURSOR : 13
-
-, SNOW : 15
+  SNOW : 15
 
 , DEEP_SEA : 18
 , COASTAL_SEA : 20
@@ -47,7 +46,6 @@ var objects = {
 
 
 
-charm.reset()
 /*
 charm.position(0, 0)
 for (var i=0; i<256; i++){
@@ -56,8 +54,7 @@ for (var i=0; i<256; i++){
 }
 */
 
-var render = function(){
-  console.log('render')
+var renderMap = function(){
   for (var y = 0; y<ymax; y++){
     charm.position(0,y+1)
     for (var x = 0; x<xmax; x++){
@@ -68,5 +65,39 @@ var render = function(){
 }
 
 
+var renderCursor = (function(){
+  var _CURSOR_POS = [0, 0]
+
+  return function(pos, cb){
+    cb = cb || function(){}
+    if (!pos)
+      return cb(null, _CURSOR_POS);
+
+    charm.position(_CURSOR_POS[0], _CURSOR_POS[1])
+    charm.background(TILES[MAP[_CURSOR_POS[0]][_CURSOR_POS[1]]]).write(' ') // TODO tiledata
+    _CURSOR_POS = pos
+    charm.position(_CURSOR_POS[0], _CURSOR_POS[1])
+    charm.background(CURSOR).write('X')
+
+    return cb(null, pos)
+  }
+})()
+
+
+var render = function(){
+  renderMap()
+  renderCursor([0,0])
+  setTimeout(render, 1000)
+}
+
+
 loadMap(render)
+
+process.stdin.on('data', function(chunk){
+  console.log("!!", chunk)
+
+
+})
+process.stdin.resume();
+process.stdin.setEncoding('utf8');
 
