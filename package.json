@@ -1,6 +1,6 @@
 {
   "name": "ism",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "ism ===",
   "main": "client.js",
   "dependencies": {
@@ -15,7 +15,9 @@
     "type": "git",
     "url": "git://github.com/caseman/ism.git"
   },
-  "bin" : {"ism" : "node client.js"},
+  "bin": {
+    "ism": "node client.js"
+  },
   "author": "",
   "license": "BSD",
   "bugs": {
