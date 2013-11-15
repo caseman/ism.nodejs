@@ -1,0 +1,18 @@
+{
+  "cursor" : "red"
+, "ice" : 15
+, "ocean" : 18
+, "coast" : 20
+, "river" : 21
+
+, "forest" : 28
+, "rainforest" : 35
+, "plain" : 40
+
+, "hill" : 144
+, "mountain": 139
+
+, "desert" : 179
+}
+
+
