@@ -15,6 +15,7 @@
     "type": "git",
     "url": "git://github.com/caseman/ism.git"
   },
+  "bin" : {"ism" : "node client.js"},
   "author": "",
   "license": "BSD",
   "bugs": {
