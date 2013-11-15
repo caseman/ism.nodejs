@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var charm = require('charm')()
 charm.pipe(process.stdout)
 

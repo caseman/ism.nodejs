@@ -16,7 +16,7 @@
     "url": "git://github.com/caseman/ism.git"
   },
   "bin": {
-    "ism": "node client.js"
+    "ism": "client.js"
   },
   "author": "",
   "license": "BSD",
