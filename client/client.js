@@ -25,7 +25,7 @@ var debug = function(){
 
 
 var loadMap = function(cb){
-  var _test_map = require('./data/testmap.json')
+  var _test_map = require('../data/testmap.json')
   MAP = _test_map
 
   // TEST SPRITES
@@ -175,12 +175,25 @@ keyHandlers = {
 , right : function(){moveCursor([0, 1])}
 }
 
+var keys = ''
 
-var handleKey = function(key){
-  if (keyHandlers[key.name])
-    keyHandlers[key.name]()
-  else
-    debug("No key for", key.name)
+var handleKey = function(key, ch){
+  if (key && key.name){
+    keys += key.name
+  } else {
+    keys += ch
+  }
+
+  if (keyHandlers[keys]){
+    keyHandlers[keys]()
+    keys = ''
+  }
+  else{
+    setTimeout(function(){
+      debug("No key for", keys)
+      keys = '' 
+    }, 500)
+  }
 }
 
 var keypress = require('keypress')
