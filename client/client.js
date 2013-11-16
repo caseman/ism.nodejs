@@ -209,7 +209,7 @@ keypress(process.stdin);
 
 process.stdin.on('keypress', function (ch, key) {
   if (key && key.ctrl && key.name == 'c') {
-    process.stdin.pause();
+    process.exit();
   }
   handleKey(key, ch);
 });
