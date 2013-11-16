@@ -63,6 +63,32 @@ var renderSidePane = function(){
   charm.background('yellow').foreground('black').write("Turn: ")
   charm.position(xmax - side_pane , 2)
   charm.write(("     " + '0').slice(-side_pane - 1)) 
+  charm.position(xmax - side_pane , 3)
+  charm.write("------")
+  charm.position(xmax - side_pane , 4)
+  charm.write("August")
+  charm.position(xmax - side_pane , 5)
+  charm.write("3500BC")
+}
+
+
+var renderStatusBar = function(pos){
+  charm.position(0 , ymax - status_bar)
+  charm.background('yellow')
+  var out = ""
+  out += "[" + pos.join(',') +"]"
+  out += (' ' + MAP[pos[0]][pos[1]])
+
+  var sprite = SPRITES[pos[0] + ',' + pos[1]]
+  out += (' - ' + (sprite ? sprite[2] : ' - '))
+  out += (' [Strong NW Wind, 5 degrees C] ')
+
+  charm.write(out)
+
+  for (var x = out.length; x < xmax; x++){
+    charm.write(' ')
+  }
+
 }
 
 var moveViewport = function(diff){
@@ -99,7 +125,7 @@ var renderCursor = function(pos, cb){
   charm.position(viewport_curs[1], viewport_curs[0])
   charm.background(TILES['cursor']).write('X')
 
-  debug("CURSOR:", _CURSOR_POS, " --> ", MAP[pos[0]][pos[1]], SPRITES[pos[0] + ',' + pos[1]])
+  renderStatusBar(pos)
 
   return cb(null, pos)
 }
