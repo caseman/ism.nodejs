@@ -21,6 +21,9 @@ var SPRITES = {}
 
 var debug = function(){
   charm.position(0, ymax).write(Array.prototype.slice.call(arguments, 0).join(', '))
+  setTimeout(function(){
+    charm.position(0, ymax).write("                                                       ")
+  }, 3000)
 }
 
 
@@ -176,6 +179,7 @@ keyHandlers = {
 }
 
 var keys = ''
+ , keyint
 
 var handleKey = function(key, ch){
   if (key && key.name){
@@ -183,13 +187,15 @@ var handleKey = function(key, ch){
   } else {
     keys += ch
   }
+  if (keyint)
+    clearInterval(keyint)
 
   if (keyHandlers[keys]){
     keyHandlers[keys]()
     keys = ''
   }
   else{
-    setTimeout(function(){
+    keyint = setTimeout(function(){
       debug("No key for", keys)
       keys = '' 
     }, 500)
