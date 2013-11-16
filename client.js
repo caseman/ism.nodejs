@@ -10,12 +10,14 @@ var xmax = process.stdout.columns || 80 // Physical 'screen' size'
   , viewporty = ymax - status_bar // viewport is most of screen, minus bottom status area and x pane
   , viewportx = xmax - side_pane
 
-var _CURSOR_POS = [0, 0] // Y, X --> MAP position
+var _CURSOR_POS = [10, 10] // Y, X --> MAP position
   , _VIEWPORT_OFFSET = [0, 0] // Y, X --> Viewport offset into map
   , TILES = require('./tiles')
   , OBJECTS = require('./objects')
 
 var MAP = []
+var SPRITES = {}
+
 
 var debug = function(){
   charm.position(0, ymax).write(Array.prototype.slice.call(arguments, 0).join(', '))
@@ -25,24 +27,42 @@ var debug = function(){
 var loadMap = function(cb){
   var _test_map = require('./data/testmap.json')
   MAP = _test_map
+
+  // TEST SPRITES
+  SPRITES["5,10"] = OBJECTS['trees']
+
   cb()
+}
+
+var getSprite= function(pos){
+  var spr =  SPRITES[pos[0] + ',' + pos[1]]
+  if (! spr) return ' '
+  return spr[0]
 }
 
 var renderMap = function(){
   // ! no error checking for viewport in here...
   var offset = _VIEWPORT_OFFSET
 
-  for (var y = 0; y<viewporty; y++){
+  for (var y = 1; y<viewporty; y++){
     charm.position(0,y)
-    for (var x = 0; x<viewportx; x++){
+    for (var x = 1; x<viewportx; x++){
 
       var pos = [offset[0] + y, offset[1] + x]
         , tile = MAP[pos[0]][pos[1]]
 
       if (! TILES[tile]) throw "No terrain color for: " + pos
-      charm.background(TILES[tile]).write(' ') // TODO -> Lookup objects too
+      charm.background(TILES[tile]).write(getSprite(pos)) // TODO -> Lookup objects too
     }
   }
+}
+
+
+var renderSidePane = function(){
+  charm.position(xmax - side_pane , 1)
+  charm.background('yellow').foreground('black').write("Turn: ")
+  charm.position(xmax - side_pane , 2)
+  charm.write(("     " + '0').slice(-side_pane - 1)) 
 }
 
 var moveViewport = function(diff){
@@ -73,13 +93,13 @@ var renderCursor = function(pos, cb){
 
   var viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
-  charm.background(TILES[MAP[_CURSOR_POS[0]][_CURSOR_POS[1]]]).write(' ') // TODO tiledata
+  charm.background(TILES[MAP[_CURSOR_POS[0]][_CURSOR_POS[1]]]).write(getSprite(_CURSOR_POS))
   _CURSOR_POS = pos
   viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
   charm.background(TILES['cursor']).write('X')
 
-  debug("CURSOR:", _CURSOR_POS, " --> ", MAP[pos[0]][pos[1]])
+  debug("CURSOR:", _CURSOR_POS, " --> ", MAP[pos[0]][pos[1]], SPRITES[pos[0] + ',' + pos[1]])
 
   return cb(null, pos)
 }
@@ -109,6 +129,7 @@ var moveCursor = function(diff, cb){
 
 
 var render = function(){
+  renderSidePane()
   renderMap()
   renderCursor(_CURSOR_POS)
 }
@@ -132,6 +153,8 @@ keyHandlers = {
 var handleKey = function(key){
   if (keyHandlers[key.name])
     keyHandlers[key.name]()
+  else
+    debug("No key for", key.name)
 }
 
 var keypress = require('keypress')

@@ -1,2 +1,13 @@
-{ "warrior" : "w"}
+{ 
+
+  "warrior" : ["w"]
+, "settler" : ["s"]
+, "hunter" : ["h"]
+, "farmer" : ["f"]
+, "settlement-1" : ["^", 0]
+
+
+
+, "trees" : ["t", 10, "tree"]
+}
 
