@@ -1,0 +1,33 @@
+{
+
+  "width": 512
+, "height": 512
+
+, "landMassScale": 5
+, "equitorialMultiplier": 4
+, "coastComplexity": 10
+, "coastThreshold": 0.02
+, "oceanLevel": 0.45
+
+, "hillScale": 60.0
+, "hillComplexity": 8
+, "hillThreshold": 0.21
+, "mountainFaultThreshold": 0.08
+, "mountainRuggednessThreshold": 0.4
+
+, "faultScale": 16
+, "faultComplexity": 3
+, "faultThreshold": 0.8
+, "faultErosionScale": 8
+, "faultErosionComplexity": 8
+
+, "moistureReach": 0.1
+, "rainfallInfluence": 0.03
+, "rainfallHillFactor": 0.03
+, "rainfallMountainFactor": 0.1
+, "rainfallKernelRadius": 3
+
+, "iceThreshold": 1.3
+, "snowThreshold": 0.25
+
+}
