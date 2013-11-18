@@ -6,12 +6,13 @@ var mapConfig = require('./map');
 var TILE_COLORS = {
     "ocean": "0 20 150\n",
     "coast": "64 64 255\n",
-    "lake": "72 72 255\n",
-    "plain": "32 150 64\n",
+    "lake": "72 72 255\n", 
+    "flat": "32 150 64\n", 
     "hill": "100 100 0\n",
     "mountain": "150 150 180\n",
     "ice": "180 180 255\n",
     "snow": "230 230 255\n",
+    "river": "100 100 255\n"
 }
 
 var map = new Map(mapConfig, function(progress) {
@@ -26,7 +27,8 @@ var f = fs.openSync('map.ppm', 'w');
 fs.writeSync(f, "P3 " + map.width + " " + map.height + " 255\n");
 for (var y = 0; y < map.height; y++) {
   for (var x = 0; x < map.width; x++) {
-      var color = TILE_COLORS[map.tiles[x][y].terrain];
+      var tile = map.tiles[x][y];
+      var color = TILE_COLORS[tile.biome] || TILE_COLORS[tile.terrain]
       fs.writeSync(f, color);
   }
 }
