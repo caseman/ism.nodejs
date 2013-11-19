@@ -28,6 +28,7 @@
 , "marshRainThreshold": 10
 , "riverRainThreshold": 0.5
 , "riverStartProbability": 0.01
+, "riverFlowFactor": 1
 
 , "iceThreshold": 1.3
 , "snowThreshold": 0.25
