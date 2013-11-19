@@ -7,3 +7,28 @@
 ```
 npm install -g ism && ism
 ```
+
+
+
+# Vaporware - Ideas for the game:
+
+
+
+## Weather
+
+### Maritime
+- Ships can sail far faster across the wind or down wind than upwind (as they have to tack)
+- Ships attacking from an upwind position have a tactical advantage
+- Establishing trade routes along trade winds is far faster for trade.
+
+### Rain / Fog
+- Rain can cause flooding which bogs down heavy units
+- Flooding reduces farm yield and can cause famine
+- Rain / Fog reduces visibility adding to a tactical advantage
+
+
+### Cold / Heat
+
+- Extreme cold will sap strength from units (Don't try and besiege russia in winter...)
+- Some units can only survive in certain temperature ranges (Elephants crossing alps etc.)
+- Temperatures drop in winter and rise in summer. (Don't start wars in winter)
