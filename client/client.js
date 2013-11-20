@@ -176,6 +176,14 @@ keyHandlers = {
 , down : function(){moveCursor([1, 0])}
 , left : function(){moveCursor([0, -1])}
 , right : function(){moveCursor([0, 1])}
+, k : function(){moveCursor([-1, 0])}
+, j : function(){moveCursor([1, 0])}
+, h : function(){moveCursor([0, -1])}
+, l : function(){moveCursor([0, 1])}
+, y : function(){moveCursor([-1, -1])}
+, u : function(){moveCursor([-1, 1])}
+, b : function(){moveCursor([1, -1])}
+, n : function(){moveCursor([1, 1])}
 }
 
 var keys = ''
