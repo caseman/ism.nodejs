@@ -1,18 +1,29 @@
 {
-  "cursor" : "red"
-, "ice" : 15
-, "ocean" : 18
-, "coast" : 20
-, "river" : 21
+  "cursor" : ["red", "◆", "black"]
+, "glacier" : [123, "⋚", 195]
+, "ocean" : [18, "≋", 19]
+, "coast" : [20, "≋", 21]
+, "river" : [26, "≋", 33]
 
-, "forest" : 28
-, "rainforest" : 35
-, "plain" : 40
+, "forest" : [28, "⥉", 22]
+, "hill-forest" : [28, "⩋", 22]
+, "jungle" : [29, "❢", 23]
+, "hill-jungle" : [29, "⩋", 23]
+, "plains" : [136, "'", 58]
+, "hill-plains" : [136, "⩋", 58]
+, "grassland" : [34, "⩛", 28]
+, "hill-grassland" : [34, "⩋", 28]
+, "marsh": [95, "⩛", 30]
 
-, "hill" : 144
-, "mountain": 139
+, "hill" : [143, "⩋", 106]
+, "mountain": [243, "▴", 247]
+, "mountain-tundra": [243, "▴", 254]
+, "mountain-ice": [51, "▴", 81]
+, "tundra": [254, ".", 15]
+, "hill-tundra": [254, "⩋", 15]
 
-, "desert" : 179
+, "desert" : [179, ".", 3]
+, "hill-desert" : [179, "⩋", 3]
 }
 
 

@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+var argv = require('optimist')
+    .usage('Usage: $0')
+    .demand('m').alias('m', 'map')
+    .describe('m', 'Load the world map from a file')
+    .argv;
+var fs = require('fs');
+var map = require('../lib/map');
 var charm = require('charm')()
 charm.pipe(process.stdout)
 
@@ -15,7 +22,7 @@ var _CURSOR_POS = [10, 10] // Y, X --> MAP position
   , TILES = require('./tiles')
   , OBJECTS = require('./objects')
 
-var MAP = []
+var MAP = {}
 var SPRITES = {}
 
 
@@ -26,21 +33,21 @@ var debug = function(){
   }, 3000)
 }
 
-
-var loadMap = function(cb){
-  var _test_map = require('../data/testmap.json')
-  MAP = _test_map
-
-  // TEST SPRITES
-  SPRITES["5,10"] = OBJECTS['trees']
-
-  cb()
-}
-
 var getSprite= function(pos){
   var spr =  SPRITES[pos[0] + ',' + pos[1]]
   if (! spr) return ' '
   return spr[0]
+}
+
+var renderTile = function(tile) {
+    var colorspec;
+    if (tile.biome) colorspec = TILES[tile.terrain + '-' + tile.biome]
+    if (!colorspec) colorspec = TILES[tile.biome] || TILES[tile.terrain]
+    if (!colorspec) throw "No color for tile: " + JSON.stringify(tile)
+    charm
+        .background(colorspec[0])
+        .foreground(colorspec[2])
+        .write(colorspec[1])
 }
 
 var renderMap = function(){
@@ -52,10 +59,10 @@ var renderMap = function(){
     for (var x = 1; x<viewportx; x++){
 
       var pos = [offset[0] + y, offset[1] + x]
-        , tile = MAP[pos[0]][pos[1]]
+        , tile = MAP.tiles[pos[0]][pos[1]]
 
-      if (! TILES[tile]) throw "No terrain color for: " + pos
-      charm.background(TILES[tile]).write(getSprite(pos)) // TODO -> Lookup objects too
+      renderTile(tile);
+      //charm.background(TILES[tile]).write(getSprite(pos)) // TODO -> Lookup objects too
     }
   }
 }
@@ -79,8 +86,10 @@ var renderStatusBar = function(pos){
   charm.position(0 , ymax - status_bar)
   charm.background('yellow')
   var out = ""
+  var tile = MAP.tiles[pos[0]][pos[1]];
   out += "[" + pos.join(',') +"]"
-  out += (' ' + MAP[pos[0]][pos[1]])
+  out += (' ' + tile.terrain)
+  if (tile.biome) out += (' ' + tile.biome)
 
   var sprite = SPRITES[pos[0] + ',' + pos[1]]
   out += (' - ' + (sprite ? sprite[2] : ' - '))
@@ -91,7 +100,6 @@ var renderStatusBar = function(pos){
   for (var x = out.length; x < xmax; x++){
     charm.write(' ')
   }
-
 }
 
 var moveViewport = function(diff){
@@ -102,7 +110,7 @@ var moveViewport = function(diff){
   if (newOffset[0] < 0 || newOffset[1] < 0){
     return;
   }
-  if ((newOffset[0] + viewporty >= MAP.length) || (newOffset[1] + viewportx >= MAP[0].length)){
+  if ((newOffset[0] + viewporty >= MAP.height) || (newOffset[1] + viewportx >= MAP.width)){
     return;
   }
 
@@ -120,13 +128,14 @@ var renderCursor = function(pos, cb){
   if (!pos)
     return cb(null, _CURSOR_POS);
 
+  var cursor = TILES.cursor;
   var viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
-  charm.background(TILES[MAP[_CURSOR_POS[0]][_CURSOR_POS[1]]]).write(getSprite(_CURSOR_POS))
+  renderTile(MAP.tiles[_CURSOR_POS[0]][_CURSOR_POS[1]])
   _CURSOR_POS = pos
   viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
-  charm.background(TILES['cursor']).write('X')
+  charm.background(TILES.cursor[0]).foreground(TILES.cursor[2]).write(TILES.cursor[1])
 
   renderStatusBar(pos)
 
@@ -164,8 +173,6 @@ var render = function(){
 }
 
 charm.reset()
-loadMap(render)
-
 
 
 /// ==== Keys ===
@@ -210,6 +217,7 @@ var handleKey = function(key, ch){
   }
 }
 
+
 var keypress = require('keypress')
   , tty = require('tty');
 
@@ -228,7 +236,18 @@ if (typeof process.stdin.setRawMode == 'function') {
   tty.setRawMode(true);
 }
 
-process.stdin.resume();
+map.readMapFromStream(
+    fs.createReadStream(argv.map), 
+    function(map) {
+        MAP = map;
+        _CURSOR_POS = [Math.floor(MAP.width / 2), 
+                       Math.floor(MAP.height / 2)];
+        _VIEWPORT_OFFSET = [Math.floor(_CURSOR_POS[0] - 20), 
+                            Math.floor(_CURSOR_POS[1] - 20)];
+        render();
+        process.stdin.resume();
+    }
+);
 
 
 
