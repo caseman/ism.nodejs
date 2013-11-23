@@ -59,10 +59,9 @@ var renderMap = function(){
     for (var x = 1; x<viewportx; x++){
 
       var pos = [offset[0] + y, offset[1] + x]
-        , tile = MAP.tiles[pos[0]][pos[1]]
+        , tile = MAP.tiles[pos[1]][pos[0]]
 
       renderTile(tile);
-      //charm.background(TILES[tile]).write(getSprite(pos)) // TODO -> Lookup objects too
     }
   }
 }
@@ -86,7 +85,7 @@ var renderStatusBar = function(pos){
   charm.position(0 , ymax - status_bar)
   charm.background('yellow')
   var out = ""
-  var tile = MAP.tiles[pos[0]][pos[1]];
+  var tile = MAP.tiles[pos[1]][pos[0]];
   out += "[" + pos.join(',') +"]"
   out += (' ' + tile.terrain)
   if (tile.biome) out += (' ' + tile.biome)
@@ -128,10 +127,9 @@ var renderCursor = function(pos, cb){
   if (!pos)
     return cb(null, _CURSOR_POS);
 
-  var cursor = TILES.cursor;
   var viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
-  renderTile(MAP.tiles[_CURSOR_POS[0]][_CURSOR_POS[1]])
+  renderTile(MAP.tiles[_CURSOR_POS[1]][_CURSOR_POS[0]])
   _CURSOR_POS = pos
   viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
@@ -145,8 +143,8 @@ var renderCursor = function(pos, cb){
 var moveCursor = function(diff, cb){
   var curs = _CURSOR_POS
     , pos = []
-  pos[0] = Math.max(curs[0] + diff[0], 0)
-  pos[1] = Math.max(curs[1] + diff[1], 0)
+  pos[0] = Math.min(Math.max(curs[0] + diff[0], 0), MAP.height - 1)
+  pos[1] = Math.min(Math.max(curs[1] + diff[1], 0), MAP.width - 1)
   var viewport_curs = mapToViewport(pos)
   // Check on map : TODO
 
@@ -240,10 +238,10 @@ map.readMapFromStream(
     fs.createReadStream(argv.map), 
     function(map) {
         MAP = map;
-        _CURSOR_POS = [Math.floor(MAP.width / 2), 
-                       Math.floor(MAP.height / 2)];
-        _VIEWPORT_OFFSET = [Math.floor(_CURSOR_POS[0] - 20), 
-                            Math.floor(_CURSOR_POS[1] - 20)];
+        _CURSOR_POS = [Math.floor(MAP.height / 2), 
+                       Math.floor(MAP.width / 2)];
+        _VIEWPORT_OFFSET = [Math.floor(_CURSOR_POS[0] - ymax / 2), 
+                            Math.floor(_CURSOR_POS[1] - xmax / 2)];
         render();
         process.stdin.resume();
     }
