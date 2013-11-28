@@ -1,7 +1,7 @@
 var assert = require('assert');
 
 suite('genUid', function() {
-    var genUid = require('../lib/ismutil').genUid;
+    var genUid = require('../lib/uid').genUid;
 
     test('uids are sufficiently long', function(done) {
         genUid(function(uid) {
