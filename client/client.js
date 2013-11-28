@@ -44,10 +44,12 @@ var renderTile = function(tile) {
     if (tile.biome) colorspec = TILES[tile.terrain + '-' + tile.biome]
     if (!colorspec) colorspec = TILES[tile.biome] || TILES[tile.terrain]
     if (!colorspec) throw "No color for tile: " + JSON.stringify(tile)
+    var glyph = tile.startingLocation ? '⤊' : colorspec[1];
+    var color = tile.startingLocation ? 'black' : colorspec[2];
     charm
         .background(colorspec[0])
-        .foreground(colorspec[2])
-        .write(colorspec[1])
+        .foreground(color)
+        .write(glyph)
 }
 
 var renderMap = function(){
@@ -238,6 +240,10 @@ map.readMapFromStream(
     fs.createReadStream(argv.map), 
     function(map) {
         MAP = map;
+        for (var i in MAP.startLocations) {
+            var startLoc = map.startLocations[i];
+            map.tiles[startLoc[0]][startLoc[1]].startingLocation = true;
+        }
         _CURSOR_POS = [Math.floor(MAP.height / 2), 
                        Math.floor(MAP.width / 2)];
         _VIEWPORT_OFFSET = [Math.floor(_CURSOR_POS[0] - ymax / 2), 
