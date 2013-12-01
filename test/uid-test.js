@@ -22,6 +22,7 @@ suite('genUid', function() {
             var uid = genUid();
             assert(uid, 'genUid() generated empty uid');
             assert(!(uid in uids), 'genUid() generated duplicate uid');
+            uids[uid] = true;
         }
     });
 });
