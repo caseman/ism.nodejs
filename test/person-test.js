@@ -82,4 +82,10 @@ suite('createPerson', function() {
         assert.equal(traitCount(dude), 3, 'should have three bonus trait');
     });
 
+    test('Person starts with full hp and stamina', function() {
+        var dude = createPerson({}, 0);
+        assert.equal(dude.hp, dude.maxHp, 'should start with max hp');
+        assert.equal(dude.stamina, dude.maxStamina, 'should start with max hp');
+    });
+
 });
