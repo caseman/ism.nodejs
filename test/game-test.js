@@ -11,7 +11,7 @@ suite('createGame', function() {
 
     test('turn begins null', function() {
         var game = createGame({});
-        assert.equal(game.turn, null, 'version not null');
+        assert.equal(game.turn, null, 'turn not null');
     });
 
     test('games have unique ids', function() {
