@@ -39,13 +39,13 @@ var getSprite= function(pos){
   return spr[0]
 }
 
-var renderTile = function(tile) {
+var renderTile = function(tile, color) {
     var colorspec;
     if (tile.biome) colorspec = TILES[tile.terrain + '-' + tile.biome]
     if (!colorspec) colorspec = TILES[tile.biome] || TILES[tile.terrain]
     if (!colorspec) throw "No color for tile: " + JSON.stringify(tile)
     var glyph = tile.startingLocation ? '⤊' : colorspec[1];
-    var color = tile.startingLocation ? 'black' : colorspec[2];
+    var color = color || tile.startingLocation ? 'black' : colorspec[2];
     charm
         .background(colorspec[0])
         .foreground(color)
@@ -124,14 +124,29 @@ var mapToViewport = function(pos){
   return [pos[0] - _VIEWPORT_OFFSET[0], pos[1] - _VIEWPORT_OFFSET[1]]
 }
 
+var saw = [];
+
 var renderCursor = function(pos, cb){
   cb = cb || function(){}
   if (!pos)
     return cb(null, _CURSOR_POS);
 
+  saw.forEach(function(tile) {
+    charm.position(tile.x - _VIEWPORT_OFFSET[1], tile.y - _VIEWPORT_OFFSET[0]);
+    renderTile(tile);
+  });
+  saw = [];
+  map.sightFrom(MAP, [pos[1], pos[0]], 3, function(tile) {
+    charm.position(tile.x - _VIEWPORT_OFFSET[1], tile.y - _VIEWPORT_OFFSET[0]);
+    renderTile(tile, 'black');
+    saw.push(tile);
+  });
+
+  /*
   var viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
   renderTile(MAP.tiles[_CURSOR_POS[1]][_CURSOR_POS[0]])
+  */
   _CURSOR_POS = pos
   viewport_curs = mapToViewport(_CURSOR_POS)
   charm.position(viewport_curs[1], viewport_curs[0])
