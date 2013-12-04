@@ -6,7 +6,7 @@
 , "landMassScale": 5
 , "equitorialMultiplier": 4
 , "coastComplexity": 10
-, "coastThreshold": 0.02
+, "coastThreshold": 0.015
 , "oceanLevel": 0.45
 
 , "hillScale": 60.0
