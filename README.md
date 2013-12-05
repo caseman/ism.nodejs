@@ -11,7 +11,7 @@ npm install -g ism && ism
 ## Create a Test Map and Browse Around
 
 ```
-node script/dump-map.js -c map.json test.map
+node script/dump-map.js -c map-config/default.json test.map
 node client/client.js --map test.map
 ```
 
