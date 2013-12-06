@@ -1,3 +1,5 @@
+[![Build Status](https://ism.stridercd.com/caseman/ism/badge)](https://ism.stridercd.com/caseman/ism/)
+
 # ism
 
 ### Build a civilisation in an ascii world.
