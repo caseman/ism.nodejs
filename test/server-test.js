@@ -165,11 +165,40 @@ suite('server', function() {
         assert.deepEqual(this.testServer.clientConns[cid], this.testConn);
     });
 
-     test('new client idempotent', function() {
+    test('new client idempotent', function() {
         var cid = this.testServer.newClient(this.testConn);
         assert(cid, 'cid not empty');
         assert.equal(cid, this.testServer.newClient(this.testConn), 'returned same cid');
         assert.deepEqual(this.testServer.clientConns[cid], this.testConn);
+    });
+
+    test('send to connection', function() {
+        this.testServer.send(this.testConn, {says:'wat'});
+        var reply = getReply(this);
+        assert.equal(reply.says, 'wat');
+    });
+
+    test('send to cid', function() {
+        var cid = this.testServer.newClient(this.testConn);
+        this.testServer.send(cid, {says:'huh'});
+        var reply = getReply(this);
+        assert.equal(reply.says, 'huh');
+    });
+
+    test('sendError to connection with msg', function() {
+        this.testServer.sendError(this.testConn, 'testError', {says:'wat', uid:'543'});
+        assert.deepEqual(getReply(this), {says:'error', error:'testError', re:'543'});
+    });
+
+    test('sendError to connection without msg', function() {
+        this.testServer.sendError(this.testConn, 'testYetAgain');
+        assert.deepEqual(getReply(this), {says:'error', error:'testYetAgain'});
+    });
+
+    test('sendError to cid', function() {
+        var cid = this.testServer.newClient(this.testConn);
+        this.testServer.sendError(cid, 'cidError', {says:'wat', uid:'000'});
+        assert.deepEqual(getReply(this), {says:'error', error:'cidError', re:'000'});
     });
 
 });
