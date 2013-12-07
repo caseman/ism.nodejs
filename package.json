@@ -8,14 +8,18 @@
     "charm": "~0.1.2",
     "noisejs": "~2.1.0",
     "optimist": "~0.6.0",
-    "JSONStream": "~0.7.1"
+    "JSONStream": "~0.7.1",
+    "sockjs": "~0.3.8",
+    "sockjs-client": "~0.1.3"
   },
   "devDependencies": {
     "mocha": "~1.14.0",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "sinon": "~1.7.3"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --check-leaks --ui=tdd --timeout=1000 test/*"
+    "test": "./node_modules/.bin/mocha --check-leaks --ui=tdd --timeout=1000 test/*",
+    "dtest": "./node_modules/.bin/mocha --debug-brk --check-leaks --ui=tdd --timeout=1000 test/*"
   },
   "repository": {
     "type": "git",
