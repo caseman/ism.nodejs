@@ -17,7 +17,8 @@
   "devDependencies": {
     "mocha": "~1.14.0",
     "chai": "~1.8.1",
-    "sinon": "~1.7.3"
+    "sinon": "~1.7.3",
+    "memdown": "~0.6.0"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --check-leaks --ui=tdd --timeout=1000 test/*.js",
