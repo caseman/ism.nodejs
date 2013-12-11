@@ -27,6 +27,7 @@ suite('Game persistence', function() {
     test('createGame', function(done) {
         var db = testDb()
         game.createGame(db, map, {}, function(err, theGame) {
+            assert(!err, err);
             assert.strictEqual(theGame.db, db);
             assert(theGame.info.version);
             assert.equal(theGame.map.width, 16);
@@ -73,6 +74,21 @@ suite('Game persistence', function() {
                     done();
                 }
             );
+        });
+    });
+
+    test('createGame and loadGame', function(done) {
+        var db = testDb();
+        game.createGame(db, map, {}, function(createErr, createdGame) {
+            assert(!createErr, createErr);
+            game.loadGame(db, createdGame.uid, function(loadErr, loadedGame) {
+                assert(!loadErr, loadErr);
+                assert.deepEqual(createdGame.info, loadedGame.info);
+                assert.deepEqual(createdGame.map, loadedGame.map);
+                assert.deepEqual(createdGame.turn, loadedGame.turn);
+                assert.deepEqual(createdGame.tiles, loadedGame.tiles);
+                done();
+            });
         });
     });
 
