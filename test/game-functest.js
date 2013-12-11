@@ -26,7 +26,7 @@ suite('Game persistence', function() {
 
     test('createGame', function(done) {
         var db = testDb()
-        game.createGame(db, map, {}, function(theGame) {
+        game.createGame(db, map, {}, function(err, theGame) {
             assert.strictEqual(theGame.db, db);
             assert(theGame.info.version);
             assert.equal(theGame.map.width, 16);

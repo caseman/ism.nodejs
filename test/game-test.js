@@ -1,24 +1,33 @@
-var assert = require('assert');
+var assert = require('assert')
+  , level = require('level')
+  , memdown = require('memdown');
 
-/*
+
+var testDb = function() {
+    return level({db:memdown, valueEncoding:'json'});
+}
+var testMap = function() {
+    return {width: 0, height: 0}
+}
+
 suite('createGame', function() {
     var createGame = require('../lib/game').createGame;
 
     test('version matches package', function() {
-        var game = createGame({});
-        assert(testGame.version, 'version was empty');
-        assert.equal(testGame.version, require('../package.json').version, 'version no match');
+        var testGame = createGame(testDb(), testMap());
+        assert(testGame.info.version, 'version was empty');
+        assert.equal(testGame.info.version, require('../package.json').version);
     });
 
     test('turn begins null', function() {
-        var game = createGame({});
-        assert.equal(testGame.turn, null, 'turn not null');
+        var testGame = createGame(testDb(), testMap());
+        assert.strictEqual(testGame.turn.number, undefined);
     });
 
     test('games have unique ids', function() {
         var uids = {};
         for (var i = 0; i < 100; i++) {
-            var game = createGame({});
+            var testGame = createGame(testDb(), testMap());
             assert(testGame.uid, 'Game uid empty');
             assert(!(testGame.uids in uids), 'Game uid not unique');
             uids[testGame.uid] = true;
@@ -26,7 +35,6 @@ suite('createGame', function() {
     });
 
 });
-*/
 
 suite('game object placement', function() {
     var Game = require('../lib/game').Game;
