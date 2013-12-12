@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-var opt = require('optimist')
+var db = require('./lib/db')
+  , opt = require('optimist')
     .usage('Start an ism game server\nUsage: $0')
     .alias('h', 'host')
     .describe('h', 'host name or address to listen on')
@@ -13,7 +14,16 @@ var opt = require('optimist')
     .describe('debug', 'Debug logging of all client/server activity')
     .boolean('debug')
     .describe('version', 'Output the software version and exit')
-    .boolean('version');
+    .boolean('version')
+    .alias('d', 'database')
+    .describe('d', 'path to game database directory (will be created on start)');
+
+if (db.defaultPath()) {
+    opt.default('d', db.defaultPath())
+} else {
+    opt.demand('d')
+}
+
 var argv = opt.argv;
 
 if (argv.version) {
@@ -31,7 +41,8 @@ if (argv.help) {
 var logging = require('./lib/logging');
 logging.configure(argv.verbose || argv.debug, argv.debug);
 
-var Server = require('./lib/server').Server;
-var ism = new Server;
+var Server = require('./lib/server').Server
+  , db = db.open(argv.database)
+  , ism = new Server(db);
 ism.start(argv.port, argv.host);
 
