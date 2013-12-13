@@ -17,7 +17,7 @@ var testDb = function() {
 
 var dbGet = function(game, subKey) {
     return function(cb) {
-        game.db.get(key('g', game, subKey), cb);
+        game.db.get(key('g', subKey, game), cb);
     }
 }
 
@@ -41,7 +41,7 @@ suite('Game persistence', function() {
                   , turn: dbGet(theGame, 'turn')
                   , tiles: function(cb) {
                         var count = 0
-                          , startKey = key('g', theGame, 'tile~')
+                          , startKey = key('g', 'tile', theGame) + '~'
                           , stream = db.createValueStream({start: startKey, end: startKey + '~'})
 
                         stream
