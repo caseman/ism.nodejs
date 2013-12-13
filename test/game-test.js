@@ -11,17 +11,17 @@ var testMap = function() {
     return {width: 0, height: 0}
 }
 
-suite('createGame', function() {
-    var createGame = require('../lib/game').createGame;
+suite('game.create', function() {
+    var game = require('../lib/game');
 
     test('version matches package', function() {
-        var testGame = createGame(testDb(), testMap());
+        var testGame = game.create(testDb(), testMap());
         assert(testGame.info.version, 'version was empty');
         assert.equal(testGame.info.version, require('../package.json').version);
     });
 
     test('turn begins null', function() {
-        var testGame = createGame(testDb(), testMap());
+        var testGame = game.create(testDb(), testMap());
         assert.strictEqual(testGame.info.turnNumber, null);
         assert.strictEqual(testGame.info.turnTime, null);
     });
@@ -29,7 +29,7 @@ suite('createGame', function() {
     test('games have unique ids', function() {
         var uids = {};
         for (var i = 0; i < 100; i++) {
-            var testGame = createGame(testDb(), testMap());
+            var testGame = game.create(testDb(), testMap());
             assert(testGame.uid, 'Game uid empty');
             assert(!(testGame.uids in uids), 'Game uid not unique');
             uids[testGame.uid] = true;
@@ -182,9 +182,9 @@ suite('game.list', function() {
         var db = testDb()
           , map = testMap();
         async.series([
-            function(cb) {game.createGame(db, map, null, cb)}
-          , function(cb) {game.createGame(db, map, null, cb)}
-          , function(cb) {game.createGame(db, map, null, cb)}
+            function(cb) {game.create(db, map, null, cb)}
+          , function(cb) {game.create(db, map, null, cb)}
+          , function(cb) {game.create(db, map, null, cb)}
           ]
         , function(err, games) {
             assert(!err, err);
@@ -215,7 +215,7 @@ suite('game.list', function() {
           ];
 
         var createGame = function(num, cb) {
-            game.createGame(db, map, null, function(err, game) {
+            game.create(db, map, null, function(err, game) {
                 game.info.testid = num;
                 game.info.created = info[num].created;
                 game.info.turnTime = info[num].turnTime;

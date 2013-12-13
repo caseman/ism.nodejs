@@ -24,9 +24,9 @@ var dbGet = function(game, subKey) {
 suite('Game persistence', function() {
     var map = new Map(mapConfig);
 
-    test('createGame', function(done) {
+    test('game.create', function(done) {
         var db = testDb()
-        game.createGame(db, map, {}, function(err, theGame) {
+        game.create(db, map, {}, function(err, theGame) {
             assert(!err, err);
             assert.strictEqual(theGame.db, db);
             assert(theGame.info.version);
@@ -74,11 +74,11 @@ suite('Game persistence', function() {
         });
     });
 
-    test('createGame and loadGame', function(done) {
+    test('create game and load game', function(done) {
         var db = testDb();
-        game.createGame(db, map, {}, function(createErr, createdGame) {
+        game.create(db, map, {}, function(createErr, createdGame) {
             assert(!createErr, createErr);
-            game.loadGame(db, createdGame.uid, function(loadErr, loadedGame) {
+            game.load(db, createdGame.uid, function(loadErr, loadedGame) {
                 assert(!loadErr, loadErr);
                 assert.deepEqual(createdGame.info, loadedGame.info);
                 assert.deepEqual(createdGame.map, loadedGame.map);
