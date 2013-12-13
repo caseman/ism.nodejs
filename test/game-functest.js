@@ -37,9 +37,7 @@ suite('Game persistence', function() {
 
             async.series({
                     info: dbGet(theGame, 'info')
-                  , map: dbGet(theGame, 'map')
-                  , turn: dbGet(theGame, 'turn')
-                  , tiles: function(cb) {
+                  , map: dbGet(theGame, 'map')                  , tiles: function(cb) {
                         var count = 0
                           , startKey = key('g', 'tile', theGame) + '~'
                           , stream = db.createValueStream({start: startKey, end: startKey + '~'})
@@ -70,7 +68,6 @@ suite('Game persistence', function() {
                     assert(!err, 'Error: ' + err);
                     assert.deepEqual(data.info, theGame.info);
                     assert.deepEqual(data.map, theGame.map);
-                    assert.deepEqual(data.turn, theGame.turn);
                     done();
                 }
             );

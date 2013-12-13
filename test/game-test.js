@@ -1,4 +1,5 @@
 var assert = require('assert')
+  , async = require('async')
   , level = require('level')
   , memdown = require('memdown');
 
@@ -21,7 +22,8 @@ suite('createGame', function() {
 
     test('turn begins null', function() {
         var testGame = createGame(testDb(), testMap());
-        assert.strictEqual(testGame.turn.number, undefined);
+        assert.strictEqual(testGame.info.turnNumber, null);
+        assert.strictEqual(testGame.info.turnTime, null);
     });
 
     test('games have unique ids', function() {
@@ -159,6 +161,93 @@ suite('game object placement', function() {
     });
 });
 
+suite('game.list', function() {
+    var game = require('../lib/game')
+      , assertContainsGame = function(list, game) {
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].uid == game.uid) return true;
+            }
+            return false;
+        }
+
+    test('empty db returns empty list', function(done) {
+        game.list(testDb(), function(err, list) {
+            assert(!err, err);
+            assert.deepEqual(list, []);
+            done();
+        });
+    });
+
+    test('all games returned', function(done) {
+        var db = testDb()
+          , map = testMap();
+        async.series([
+            function(cb) {game.createGame(db, map, null, cb)}
+          , function(cb) {game.createGame(db, map, null, cb)}
+          , function(cb) {game.createGame(db, map, null, cb)}
+          ]
+        , function(err, games) {
+            assert(!err, err);
+            assert.equal(games.length, 3);
+
+            game.list(db, function(err, list) {
+                assert(!err, err);
+                assert.equal(list.length, 3);
+                assertContainsGame(list, games[0]);
+                assertContainsGame(list, games[1]);
+                assertContainsGame(list, games[2]);
+                done();
+            });
+        });
+    });
+
+    test('games returned in reverse chrono order', function(done) {
+        var db = testDb()
+          , map = testMap();
+
+        var info = [
+            {created:'Thu, 12 Dec 2013 03:29:17 GMT'}
+          , {created:'Fri, 13 Dec 2013 22:29:10 GMT'}
+          , {created:'Wed, 11 Dec 2013 12:29:10 GMT', 
+             turnTime:'Thu, 12 Dec 2013 01:29:17 GMT'}
+          , {created:'Thu, 12 Dec 2013 00:00:00 GMT', 
+             turnTime:'Sat, 14 Dec 2013 02:29:10 GMT'}
+          ];
+
+        var createGame = function(num, cb) {
+            game.createGame(db, map, null, function(err, game) {
+                game.info.testid = num;
+                game.info.created = info[num].created;
+                game.info.turnTime = info[num].turnTime;
+                game.save();
+                cb(err, game);
+            });
+        }
+
+        async.series([
+            function(cb) {createGame(0, cb)}
+          , function(cb) {createGame(1, cb)}
+          , function(cb) {createGame(2, cb)}
+          , function(cb) {createGame(3, cb)}
+          ]
+        , function(err, games) {
+            assert(!err, err);
+            assert.equal(games.length, 4);
+
+            game.list(db, function(err, list) {
+                assert(!err, err);
+                assert.equal(list.length, 4);
+                assert.equal(list[0].testid, 3);
+                assert.equal(list[1].testid, 1);
+                assert.equal(list[2].testid, 0);
+                assert.equal(list[3].testid, 2);
+                done();
+            });
+        });
+    });
+
+});
+
 suite('object types and events', function() {
     var game = require('../lib/game');
 
@@ -287,6 +376,5 @@ suite('object types and events', function() {
             testGame.sendEventToLocation('meow', [0, 0]);
         });
     });
-
 
 });
