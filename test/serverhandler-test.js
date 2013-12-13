@@ -9,12 +9,14 @@ var MockConn = function() {
 }
 
 var before = function() {
+    this.sinon = sinon.sandbox.create();
     this.server = new Server;
-    this.serverMock = sinon.mock(this.server);
+    this.serverMock = this.sinon.mock(this.server);
     this.conn = new MockConn;
 }
 var after = function() {
     this.serverMock.verify();
+    this.sinon.restore();
 }
 
 suite('general handler', function() {
@@ -83,3 +85,35 @@ suite('hi handler', function() {
 
 });
 
+suite('games handler', function() {
+    var handle = require('../lib/serverhandler').handle
+      , game = require('../lib/game');
+
+    this.beforeEach(before);
+    this.afterEach(after);
+
+    test('returns game list', function() {
+        var games = [{uid:1}, {uid:2}, {uid:3}];
+        this.sinon.stub(game, 'list', function(db, cb) {
+            cb(null, games);
+        });
+        this.serverMock.expects('sendError').never();
+        this.serverMock.expects('send').once()
+            .withArgs(this.conn, {says:'games', re:'451', list:games});
+
+        var handled = handle(this.server, this.conn, {says:'games', uid:'451'});
+        assert(handled);
+    });
+
+    test('reports error', function() {
+        this.sinon.stub(game, 'list', function(db, cb) {
+            cb(new Error('Yipes!'));
+        });
+        var msg = {says:'games', uid:'890'}
+        this.serverMock.expects('sendError').once()
+            .withArgs(this.conn, 'unexpectedError', msg);
+        var handled = handle(this.server, this.conn, msg);
+        assert(handled);
+    });
+
+});
