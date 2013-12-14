@@ -38,6 +38,59 @@ suite('game.create', function() {
 
 });
 
+suite('map tiles', function() {
+    var Game = require('../lib/game').Game
+      , testGame = new Game(null, '1', {map: {width: 32, height: 32}});
+    for (var y = 0; y < 32; y++) {
+        for (var x = 0; x < 32; x++) {
+            var col = testGame.tiles[x];
+            if (!col) col = testGame.tiles[x] = [];
+            col[y] = {x: x, y: y};
+        }
+    }
+
+    test('tile() returns tiles', function() {
+        for (var y = 0; y < 32; y++) {
+            for (var x = 0; x < 32; x++) {
+                var tile = testGame.tile(x, y);
+                assert.equal(tile.x, x);
+                assert.equal(tile.y, y);
+            }
+        }
+    });
+
+    test('tile() returns tiles', function() {
+        for (var y = 0; y < 32; y++) {
+            for (var x = 0; x < 32; x++) {
+                var tile = testGame.tile(x, y);
+                assert.equal(tile.x, x);
+                assert.equal(tile.y, y);
+            }
+        }
+    });
+
+    test('tile() wraps x', function() {
+        for (var y = 0; y < 32; y++) {
+            for (var x = 0; x < 32; x++) {
+                assert.deepEqual(testGame.tile(x + 32, y), {x: x, y: y});
+                assert.deepEqual(testGame.tile(x - 32, y), {x: x, y: y});
+            }
+        }
+    });
+
+    test('tile() does not wraps y', function() {
+        for (var y = 0; y < 32; y++) {
+            for (var x = 0; x < 32; x++) {
+                assert.deepEqual(testGame.tile(x, y - 32), undefined);
+                assert.deepEqual(testGame.tile(x + 32, y - 32), undefined);
+                assert.deepEqual(testGame.tile(x, y + 32), undefined);
+                assert.deepEqual(testGame.tile(x - 32, y + 32), undefined);
+            }
+        }
+    });
+
+});
+
 suite('game object placement', function() {
     var Game = require('../lib/game').Game;
 
@@ -219,7 +272,7 @@ suite('game.list', function() {
                 game.info.testid = num;
                 game.info.created = info[num].created;
                 game.info.turnTime = info[num].turnTime;
-                game.save();
+                game.saveInfo();
                 cb(err, game);
             });
         }
@@ -272,7 +325,7 @@ suite('object types and events', function() {
         var testGame = new game.Game;
         game._clearObjectTypes();
         game.defineObjectType('test', {});
-        var obj = testGame.createObject('test', [5,8]);
+        var obj = testGame.createObject('test', {location: [5,8]});
         assert.deepEqual(testGame.objects[obj.uid], obj);
         assert.deepEqual(obj.location, [5,8]);
     });
@@ -328,11 +381,11 @@ suite('object types and events', function() {
             }
         });
         var objs = [
-            testGame.createObject('slicer', [1, 2]),
-            testGame.createObject('slicer', [1, 2]),
-            testGame.createObject('dicer', [1, 2]),
-            testGame.createObject('dicer', [5, 6]),
-            testGame.createObject('slicer', [5, 6])
+            testGame.createObject('slicer', {location: [1, 2]}),
+            testGame.createObject('slicer', {location: [1, 2]}),
+            testGame.createObject('dicer', {location: [1, 2]}),
+            testGame.createObject('dicer', {location: [5, 6]}),
+            testGame.createObject('slicer', {location: [5, 6]})
         ];
 
         testGame.sendEventToLocation('slice', [1, 2], 'yeah');
