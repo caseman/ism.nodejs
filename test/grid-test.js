@@ -102,3 +102,47 @@ suite('visitRayTrace', function() {
 
 });
 
+suite('visitRandomWalk', function() {
+    var visitRandomWalk = require('../lib/grid').visitRandomWalk;
+
+    test('calls visit function with unique location until it returns false', function() {
+        var seen = {}
+          , count = 0
+          , remaining = 200;
+        visitRandomWalk(0, 0, function(x, y) {
+            var key = x + ',' + y;
+            assert(!seen[key]);
+            seen[key] = true;
+            count++;
+            return --remaining > 0;
+        });
+        assert.equal(count, 200);
+    });
+
+    test('always visits starting location first', function() {
+        var starts = [[1,4], [-20,56], [500,500], [36,-1024], [1,0]]
+          , visits = 0;
+        starts.forEach(function(loc) {
+            visitRandomWalk(loc[0], loc[1], function(x, y) {
+                assert.deepEqual([x, y], loc);
+                visits++;
+                return false;
+            });
+        });
+        assert.equal(visits, starts.length);
+    });
+
+    test('maxVisits honored', function() {
+        var expectedVisits = [2, 30, 1, 100];
+        expectedVisits.forEach(function(expectedVisits) {
+            var visits = 0;
+            visitRandomWalk(0, 0, expectedVisits, function(x, y) {
+                visits++;
+                return true;
+            });
+            assert.equal(visits, expectedVisits);
+        });
+    });
+
+});
+
