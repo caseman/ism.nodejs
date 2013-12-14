@@ -1,4 +1,4 @@
-var assert = require('assert');
+var assert = require('chai').assert;
 var sinon = require('sinon');
 var Server = require('../lib/server').Server;
 
@@ -117,3 +117,80 @@ suite('games handler', function() {
     });
 
 });
+
+suite('createGame handler', function() {
+    var handle = require('../lib/serverhandler').handle
+      , game = require('../lib/game')
+      , map = require('../lib/map');
+
+    this.beforeEach(before);
+    this.afterEach(after);
+
+    test('makes a game', function() {
+        var testMap = {}
+          , testGame = {info:{uid: 999}}
+          , mapParams = {width: 1024, height: 1024};
+        this.sinon.stub(game, 'create', function(db, map, params, cb) {
+            assert.strictEqual(map, testMap);
+            cb(null, testGame);
+        });
+        this.sinon.stub(map, 'create', function(params, progressCb) {
+            assert.deepEqual(params, mapParams);
+            assert.isFunction(progressCb);
+            return testMap;
+        });
+        this.serverMock.expects('sendError').never();
+        this.serverMock.expects('send').once()
+            .withArgs(this.conn, {says:'game', re:'261', game:testGame.info});
+
+        var handled = handle(this.server, this.conn, 
+            {says:'createGame', uid:'261', mapParams:mapParams});
+        assert(handled);
+    });
+
+    test('rejects huge maps', function() {
+        var msg = {says:'createGame', uid:'105', mapParams:{width:10000, height:10000}};
+        this.serverMock.expects('sendError').once()
+            .withArgs(this.conn, 'mapTooLarge', msg);
+        var handled = handle(this.server, this.conn, msg);
+        assert(handled);
+    });
+
+    /* can't test this until map creation is async
+    test('map can time out', function(done) {
+        var msg = {says:'createGame', uid:'105', mapParams:{width:1000, height:1000}}
+          , server = this.server
+          , conn = this.conn;
+        this.sinon.stub(map, 'create', function(params, progressCb) {
+            while (true) progressCb();
+        });
+        this.server.timeout = 1;
+        this.serverMock.expects('sendError').once()
+            .withArgs(this.conn, 'timeout', msg);
+        setImmediate(function() {
+            var handled = handle(server, conn, msg);
+            assert(handled);
+            done();
+        });
+    });
+    */
+
+    test('has an error', function() {
+        var testGame = {info:{uid: 999}}
+          , mapParams = {width: 100, height: 100};
+        this.sinon.stub(game, 'create', function(db, map, params, cb) {
+            cb(new Error('owww'));
+        });
+        this.sinon.stub(map, 'create', function(params, progressCb) {
+            return {};
+        });
+
+        var msg = {says:'createGame', uid:'105', mapParams:{width:512, height:512}};
+        this.serverMock.expects('sendError').once()
+            .withArgs(this.conn, 'unexpectedError', msg);
+        var handled = handle(this.server, this.conn, msg);
+        assert(handled);
+    });
+
+});
+

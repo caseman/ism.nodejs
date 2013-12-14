@@ -98,6 +98,38 @@ suite('server', function() {
             this.testServer, this.testConn, {"says": "yay", "uid": "999"}));
     });
 
+    test('server handles timeout exception in handler', function() {
+        this.handleStub.throws(new Error('timeout'));
+
+        this.testConn.emit('data', '{"says": "foobar", "uid": "3434"}');
+        assert(this.handleStub.calledOnce, 'handler was called');
+        assert(this.handleStub.threw(), 'handler threw');
+        assert.deepEqual(getReply(this), {says:'error', error:'timeout', re:'3434'})
+
+        // Server should process next message just fine
+        this.handleStub.reset();
+        this.handleStub.returns(true);
+        this.testConn.emit('data', '{"says": "yay", "uid": "999"}');
+        assert(this.handleStub.calledWith(
+            this.testServer, this.testConn, {"says": "yay", "uid": "999"}));
+    });
+
+    test('server handles unknown connection exception in handler', function() {
+        this.handleStub.throws(new Error('unknownConnection'));
+
+        this.testConn.emit('data', '{"says": "foobar", "uid": "2056"}');
+        assert(this.handleStub.calledOnce, 'handler was called');
+        assert(this.handleStub.threw(), 'handler threw');
+        assert.deepEqual(getReply(this), {says:'error', error:'unknownConnection', re:'2056'})
+
+        // Server should process next message just fine
+        this.handleStub.reset();
+        this.handleStub.returns(true);
+        this.testConn.emit('data', '{"says": "yay", "uid": "999"}');
+        assert(this.handleStub.calledWith(
+            this.testServer, this.testConn, {"says": "yay", "uid": "999"}));
+    });
+
     test('server tolerates exception writing back', function() {
         this.testConn.write.throws();
         this.handleStub.returns(false);
@@ -199,6 +231,25 @@ suite('server', function() {
         var cid = this.testServer.newClient(this.testConn);
         this.testServer.sendError(cid, 'cidError', {says:'wat', uid:'000'});
         assert.deepEqual(getReply(this), {says:'error', error:'cidError', re:'000'});
+    });
+
+    test('cid from client connection', function() {
+        var cid = this.testServer.newClient(this.testConn);
+        assert.equal(this.testServer.cidForConn(this.testConn), cid);
+        assert.equal(this.testServer.cidForConn(new MockConn), undefined);
+    });
+
+    test('require cid from client with cid', function() {
+        var cid = this.testServer.newClient(this.testConn);
+        assert.equal(this.testServer.requireCid(this.testConn), cid);
+    });
+
+    test('require cid from unknown client', function() {
+        var server = this.testServer
+          , conn = this.testConn;
+        assert.throws(function() {
+            server.requireCid(conn);
+        }, /unknownConnection/);
     });
 
 });
