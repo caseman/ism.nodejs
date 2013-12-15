@@ -128,7 +128,7 @@ suite('createGame handler', function() {
 
     test('makes a game', function() {
         var testMap = {}
-          , testGame = {info:{uid: 999}}
+          , testGame = {uid:999, info:{uid: 999}}
           , mapParams = {width: 1024, height: 1024};
         this.sinon.stub(game, 'create', function(db, map, params, cb) {
             assert.strictEqual(map, testMap);
@@ -146,6 +146,7 @@ suite('createGame handler', function() {
         var handled = handle(this.server, this.conn, 
             {says:'createGame', uid:'261', mapParams:mapParams});
         assert(handled);
+        assert.strictEqual(this.server.games[testGame.uid], testGame);
     });
 
     test('rejects huge maps', function() {
