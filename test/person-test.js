@@ -136,6 +136,28 @@ suite('placePerson', function() {
         assert.equal(places, expectedPlaces);
     });
 
+    test('will not place on tile with another person', function() {
+        var places = 0
+          , expectedPlaces = 0;
+
+        testGame.objectsAtLocation = function(loc) {
+            if ((loc.x + loc.y) % 3) return [{type:'person'}]
+            return []
+        }
+        testGame.placeObject = function(obj, tile) {
+            assert.strictEqual(obj, testPerson);
+            assert.deepEqual(testGame.objectsAtLocation(tile), []);
+            places++;
+        }
+
+        for (var i = 0; i < 100; i++) {
+            var placed = person.placePerson(testPerson, testGame, [i, i*2]);
+            if (placed) expectedPlaces++;
+        }
+        assert(expectedPlaces > 0);
+        assert.equal(places, expectedPlaces);
+    });
+
     test('will not cross ocean from location', function() {
         var places = 0
           , expectedPlaces = 0;
