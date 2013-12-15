@@ -1,11 +1,18 @@
-var assert = require('assert');
+var assert = require('assert')
+  , sinon = require('sinon')
+  , testGame = sinon.mock();
 
-suite('createPerson', function() {
-    var createPerson = require('../lib/person').createPerson;
-    var regularJoe = createPerson({}, 0);
+testGame.createObject = function(type, props) {
+    props.type = type;
+    return props;
+}
+
+suite('person.create', function() {
+    var person = require('../lib/person')
+      , regularJoe = person.create(testGame, 0);
 
     var traitCount = function(person) {
-        return Object.keys(person.bonusTraits).length
+        return Object.keys(person.bonusTraits).length;
     }
 
     test('Regular joe has no bonus traits', function() {
@@ -14,7 +21,7 @@ suite('createPerson', function() {
 
     test('Intelligent folks have higher intellect', function() {
         do {
-            var smarty = createPerson({}, 1);
+            var smarty = person.create(testGame, 1);
             assert.equal(traitCount(smarty), 1, 'should have one bonus trait');
         } while (!smarty.bonusTraits.intelligent);
         assert(smarty.intellect > regularJoe.intellect);
@@ -22,7 +29,7 @@ suite('createPerson', function() {
 
     test('Strong folks have higher stamina regen', function() {
         do {
-            var pumped = createPerson({}, 1);
+            var pumped = person.create(testGame, 1);
             assert.equal(traitCount(pumped), 1, 'should have one bonus trait');
         } while (!pumped.bonusTraits.strong);
         assert(pumped.staminaRegen > regularJoe.staminaRegen);
@@ -30,7 +37,7 @@ suite('createPerson', function() {
 
     test('Resilient folks have higher hp', function() {
         do {
-            var dude = createPerson({}, 1);
+            var dude = person.create(testGame, 1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.resilient);
         assert(dude.hp > regularJoe.hp);
@@ -38,7 +45,7 @@ suite('createPerson', function() {
 
     test('Healthy folks have higher hp regen', function() {
         do {
-            var dude = createPerson({}, 1);
+            var dude = person.create(testGame, 1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.healthy);
         assert(dude.hpRegen > regularJoe.hpRegen);
@@ -46,7 +53,7 @@ suite('createPerson', function() {
 
     test('Fast folks have higher stamina and speed', function() {
         do {
-            var dude = createPerson({}, 1);
+            var dude = person.create(testGame, 1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.fast);
         assert(dude.maxSpeed > regularJoe.maxSpeed);
@@ -55,7 +62,7 @@ suite('createPerson', function() {
 
     test('Perceptive folks have higher sight', function() {
         do {
-            var dude = createPerson({}, 1);
+            var dude = person.create(testGame, 1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.perceptive);
         assert(dude.sight > regularJoe.sight);
@@ -63,7 +70,7 @@ suite('createPerson', function() {
 
     test('Crafty folks have higher craftiness', function() {
         do {
-            var dude = createPerson({}, 1);
+            var dude = person.create(testGame, 1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.crafty);
         assert(dude.craftiness > regularJoe.craftiness);
@@ -71,21 +78,106 @@ suite('createPerson', function() {
 
     test('Charismatic folks have higher influence', function() {
         do {
-            var dude = createPerson({}, 1);
+            var dude = person.create(testGame, 1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.charismatic);
         assert(dude.influence > regularJoe.influence);
     });
 
     test('Multiple bonus traits', function() {
-        var dude = createPerson({}, 3);
+        var dude = person.create(testGame, 3);
         assert.equal(traitCount(dude), 3, 'should have three bonus trait');
     });
 
     test('Person starts with full hp and stamina', function() {
-        var dude = createPerson({}, 0);
+        var dude = person.create(testGame, 0);
         assert.equal(dude.hp, dude.maxHp, 'should start with max hp');
         assert.equal(dude.stamina, dude.maxStamina, 'should start with max hp');
     });
 
 });
+
+var tile = testGame.tile = function(x, y) {
+    var terrains = ['ocean', 'flat', 'mountain', 'hill']
+      , biomes = ['desert', 'forest', 'plains', 'grassland', 'taiga', 'river']
+      , terrain = terrains[Math.floor((x + y) / biomes.length) % terrains.length]
+      , hasBiome = terrain == 'flat' || terrain == 'hill'
+      , biome = hasBiome ? biomes[(x + y) % biomes.length] : undefined;
+    return {
+        x: x
+      , y: y
+      , terrain: terrain
+      , biome: biome
+      , isLand: terrain != 'ocean'
+    };
+}
+
+suite('placePerson', function() {
+    var person = require('../lib/person')
+    , testPerson = person.create(testGame, 0);
+
+    test('places people on suitable terrain only', function() {
+        var places = 0
+          , expectedPlaces = 0
+          , goodBiomes = {grassland:true, plains:true, forest:true, taiga:true};
+
+        testGame.objectsAtLocation = function(loc) {return []}
+        testGame.placeObject = function(obj, tile) {
+            assert.strictEqual(obj, testPerson);
+            assert(goodBiomes[tile.biome]);
+            places++;
+        }
+
+        for (var i = 0; i < 100; i++) {
+            var placed = person.placePerson(testPerson, testGame, [i, i*2]);
+            if (placed) expectedPlaces++;
+        }
+        assert(expectedPlaces > 0);
+        assert.equal(places, expectedPlaces);
+    });
+
+    test('will not cross ocean from location', function() {
+        var places = 0
+          , expectedPlaces = 0;
+
+        testGame.objectsAtLocation = function(loc) {return []}
+        testGame.tile = function(x, y) {
+            if (x == 100) {
+                return {
+                    terrain: 'ocean'
+                  , x: x
+                  , y: y
+                  , isLand: false
+                };
+            } else {
+                return {
+                    terrain: 'flat'
+                  , biome: 'plains'
+                  , x: x
+                  , y: y
+                  , isLand: false
+                };
+            }
+        }
+
+        testGame.placeObject = function(obj, tile) {
+            assert.strictEqual(obj, testPerson);
+            assert(tile.x > 100);
+            places++;
+        }
+        for (var i = 0; i < 100; i++) {
+            var placed = person.placePerson(testPerson, testGame, [101, i*2]);
+            if (placed) expectedPlaces++;
+        }
+        assert(expectedPlaces > 0);
+        assert.equal(places, expectedPlaces);
+
+        testGame.tile = tile;
+    });
+
+});
+
+
+
+
+

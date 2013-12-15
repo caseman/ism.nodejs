@@ -116,6 +116,17 @@ suite('game object placement', function() {
         assert.deepEqual(testGame.objectsAtLocation([3, 6]), []);
     });
 
+    test('place an object using tile type location', function() {
+        var testGame = new Game;
+        var obj = {uid:'366'}
+          , loc = {x: 0, y: 42};
+        testGame.placeObject(obj, loc);
+        assert.deepEqual(obj.location, [0, 42]);
+        assert.deepEqual(testGame.objects['366'], obj);
+        assert.deepEqual(testGame.objectsAtLocation(loc), [obj]);
+        assert.deepEqual(testGame.objectsAtLocation([0, 42]), [obj]);
+    });
+
     test('place multiple objects', function() {
         var testGame = new Game;
         var uid = 0;
