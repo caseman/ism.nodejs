@@ -171,20 +171,28 @@ suite('placePerson', function() {
                   , y: y
                   , isLand: false
                 };
+            } else if (x == 101) {
+                return {
+                    terrain: 'flat'
+                  , biome: 'desert'
+                  , x: x
+                  , y: y
+                  , isLand: true
+                };
             } else {
                 return {
                     terrain: 'flat'
                   , biome: 'plains'
                   , x: x
                   , y: y
-                  , isLand: false
+                  , isLand: true
                 };
             }
         }
 
         testGame.placeObject = function(obj, tile) {
             assert.strictEqual(obj, testPerson);
-            assert(tile.x > 100);
+            assert(tile.x > 101);
             places++;
         }
         for (var i = 0; i < 100; i++) {
