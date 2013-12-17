@@ -42,7 +42,7 @@ suite('nation', function() {
         var testPerson = {type:'person', uid:'2578'};
         this.game.info = {turnNumber: 99};
         this.personMock.expects('create').once().returns(testPerson);
-        this.personMock.expects('placePerson').once().returns(true);
+        this.personMock.expects('place').once().returns(true);
         this.gameMock.expects('saveObject').once().withArgs(testPerson);
         nation.spawn(this.game, testNation, [8,9]);
         assert.equal(testPerson.nationUid, testNation.uid);

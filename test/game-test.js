@@ -1,7 +1,9 @@
 var assert = require('assert')
   , async = require('async')
   , level = require('level')
-  , memdown = require('memdown');
+  , memdown = require('memdown')
+  , sinon = require('sinon')
+  , object = require('../lib/object');
 
 
 var testDb = function() {
@@ -106,7 +108,7 @@ suite('game object placement', function() {
     });
 
     test('place an object and retrieve', function() {
-        var testGame = new Game;
+        var testGame = new Game(testDb());
         var obj = {uid:'123'};
         testGame.placeObject(obj, [4, 6]);
         assert.deepEqual(obj.location, [4, 6]);
@@ -117,7 +119,7 @@ suite('game object placement', function() {
     });
 
     test('place an object using tile type location', function() {
-        var testGame = new Game;
+        var testGame = new Game(testDb());
         var obj = {uid:'366'}
           , loc = {x: 0, y: 42};
         testGame.placeObject(obj, loc);
@@ -128,7 +130,7 @@ suite('game object placement', function() {
     });
 
     test('place multiple objects', function() {
-        var testGame = new Game;
+        var testGame = new Game(testDb());
         var uid = 0;
         for (var y = 0; y < 5; y++) {
             for (var x = 0; x < 5; x++) {
@@ -147,7 +149,7 @@ suite('game object placement', function() {
     });
 
     test('place and remove objects', function() {
-        var testGame = new Game;
+        var testGame = new Game(testDb());
         var objs = [{uid:'1'}, {uid:'2'}, {uid:'3'}, {uid:'4'}]
         testGame.placeObject(objs[0], [1, 1]);
         testGame.placeObject(objs[1], [1, 1]);
@@ -179,7 +181,7 @@ suite('game object placement', function() {
     });
 
     test('object removal is idempotent', function() {
-        var testGame = new Game;
+        var testGame = new Game(testDb());
         var obj = {uid:'123'};
         testGame.placeObject(obj, [4, 6]);
         testGame.removeObject(obj);
@@ -189,7 +191,7 @@ suite('game object placement', function() {
     });
 
     test('move objects', function() {
-        var testGame = new Game;
+        var testGame = new Game(testDb());
         var objs = [{uid:'1'}, {uid:'2'}, {uid:'3'}, {uid:'4'}]
         testGame.placeObject(objs[0], [1, 1]);
         testGame.placeObject(objs[1], [1, 1]);
@@ -223,6 +225,140 @@ suite('game object placement', function() {
         assert.deepEqual(testGame.objectsAtLocation([5, 3]), [objs[1], objs[2]]);
         assert.deepEqual(testGame.objectsAtLocation([4, 3]), [objs[3]]);
     });
+    
+    test('send event to location', function() {
+        var testGame = new Game(testDb());
+        object.define('slicer', {
+            slice: function(aGame, val) {
+                assert.strictEqual(aGame, testGame);
+                this.slicing = val;
+            }
+        });
+        object.define('dicer', {
+            dice: function(aGame, val) {
+                assert.strictEqual(aGame, testGame);
+                this.dicing = val;
+            }
+        });
+        var objs = [
+            object.create('slicer', {location: [1, 2]})
+          , object.create('slicer', {location: [1, 2]})
+          , object.create('dicer', {location: [1, 2]})
+          , object.create('dicer', {location: [5, 6]})
+          , object.create('slicer', {location: [5, 6]})
+        ];
+        objs.forEach(function(obj) {testGame.placeObject(obj)});
+
+        testGame.sendEventToLocation('slice', [1, 2], 'yeah');
+        assert.deepEqual(objs.map(function(o) {return o.slicing}),
+            ['yeah', 'yeah', undefined, undefined, undefined]);
+
+        testGame.sendEventToLocation('dice', [1, 2], 'bleah');
+        assert.deepEqual(objs.map(function(o) {return o.dicing}),
+            [undefined, undefined, 'bleah', undefined, undefined]);
+
+        testGame.sendEventToLocation('slice', [5, 6], 'man');
+        assert.deepEqual(objs.map(function(o) {return o.slicing}),
+            ['yeah', 'yeah', undefined, undefined, 'man']);
+
+        testGame.sendEventToLocation('slice', [3, 6], 'woot');
+        assert.deepEqual(objs.map(function(o) {return o.slicing}),
+            ['yeah', 'yeah', undefined, undefined, 'man']);
+
+        testGame.sendEventToLocation('dice', [5, 6], 'wah');
+        assert.deepEqual(objs.map(function(o) {return o.dicing}),
+            [undefined, undefined, 'bleah', 'wah', undefined]);
+
+        testGame.sendEventToLocation('dice', [5, 5], 'sorry');
+        assert.deepEqual(objs.map(function(o) {return o.dicing}),
+            [undefined, undefined, 'bleah', 'wah', undefined]);
+    });
+
+    test('send event to all objects', function() {
+        var testGame = new Game(testDb());
+        object.define('doer', {
+            doit: function (aGame, how) {
+                assert.strictEqual(aGame, testGame);
+                this.done = how;
+            }
+        });
+        var objs = [
+            object.create('doer', {location: [2,8]}),
+            object.create('doer'),
+            object.create('doer', {location: [7,7]}),
+            object.create('doer', {location: [0, 100]})
+        ];
+        objs.forEach(function(obj) {
+            if (obj.location) testGame.placeObject(obj);
+        });
+
+        testGame.sendEventToAll('doit', 'right');
+        assert.equal(objs[0].done, 'right');
+        assert.equal(objs[1].done, undefined);
+        assert.equal(objs[2].done, 'right');
+        assert.equal(objs[3].done, 'right');
+    });
+
+});
+
+suite('game persistence', function() {
+    var game = require('../lib/game');
+
+    this.beforeEach(function() {
+        this.db = {};
+        this.db.put = sinon.spy();
+        this.testGame = new game.Game(this.db, '11223344');
+    });
+
+    test('save game info', function() {
+        var info = this.testGame.info = {hells: 'yeah'};
+        this.testGame.saveInfo();
+        assert(this.db.put.calledOnce);
+        var args = this.db.put.firstCall.args;
+        assert.notEqual(args[0].indexOf('~' + this.testGame.uid), -1, args[0]);
+        assert.deepEqual(args[1], info);
+    });
+
+    test('save object', function() {
+        var obj = {uid: '530298'};
+        this.testGame.saveObject(obj);
+        assert(this.db.put.calledOnce);
+        var args = this.db.put.firstCall.args;
+        assert.notEqual(args[0].indexOf('~' + this.testGame.uid), -1, args[0]);
+        assert.notEqual(args[0].indexOf('~' + obj.uid), -1, args[0]);
+        assert.deepEqual(args[1], obj);
+    });
+
+    test('saveObject emits event', function(done) {
+        var testObj = {uid: '2340598'};
+        this.testGame.on('objectChanged', function(obj) {
+            assert.strictEqual(obj, testObj);
+            done();
+        });
+        this.testGame.saveObject(testObj);
+    });
+
+    test('save nation', function() {
+        var testNation = {uid: '850234'};
+        this.testGame.saveNation(testNation);
+        assert.strictEqual(this.testGame.nations[testNation.uid], testNation);
+        assert(this.db.put.calledOnce);
+        var args = this.db.put.firstCall.args;
+        assert.notEqual(args[0].indexOf('~' + this.testGame.uid), -1, args[0]);
+        assert.notEqual(args[0].indexOf('~' + testNation.uid), -1, args[0]);
+        assert.deepEqual(args[1], testNation);
+    });
+
+    test('saveNation emits event', function(done) {
+        var testNation = {uid: '345987098'};
+        this.testGame.on('nationChanged', function(nation) {
+            assert.strictEqual(nation, testNation);
+            done();
+        });
+        this.testGame.saveNation(testNation);
+    });
+
+
 });
 
 suite('game.list', function() {
@@ -307,137 +443,6 @@ suite('game.list', function() {
                 assert.equal(list[3].testid, 2);
                 done();
             });
-        });
-    });
-
-});
-
-suite('object types and events', function() {
-    var game = require('../lib/game');
-
-    test('cannot define same type twice', function() {
-        game._clearObjectTypes();
-        game.defineObjectType('same', {});
-        assert.throws(function() {
-            game.defineObjectType('same', {});
-        });
-    });
-
-    test('create object with type', function() {
-        var testGame = new game.Game;
-        game._clearObjectTypes();
-        game.defineObjectType('test', {});
-        var obj = testGame.createObject('test');
-        assert.equal(obj.type, 'test', 'Object should have a type');
-        assert(obj.uid, 'Object should have a uid');
-    });
-
-    test('create object with location', function() {
-        var testGame = new game.Game;
-        game._clearObjectTypes();
-        game.defineObjectType('test', {});
-        var obj = testGame.createObject('test', {location: [5,8]});
-        assert.deepEqual(testGame.objects[obj.uid], obj);
-        assert.deepEqual(obj.location, [5,8]);
-    });
-
-    test('send event to objects', function() {
-        var testGame = new game.Game;
-        game._clearObjectTypes();
-        game.defineObjectType('test1', {
-            event1: function(aGame, val) {
-                assert.deepEqual(aGame, testGame);
-                this.event1 = val;
-            },
-            event2: function(aGame, x, y) {
-                this.where = [x, y];
-            }
-        });
-        game.defineObjectType('test2', {
-            event2: function(aGame, x, y) {
-                this.where = [x + 1, y + 1];
-            }
-        });
-        var objs = [
-            testGame.createObject('test1'),
-            testGame.createObject('test2'),
-            testGame.createObject('test1'),
-            testGame.createObject('test2')
-        ];
-
-        testGame.sendEvent('event1', objs, 42);
-        assert.equal(objs[0].event1, 42);
-        assert.equal(objs[1].event1, undefined);
-        assert.equal(objs[2].event1, 42);
-        assert.equal(objs[3].event1, undefined);
-
-        testGame.sendEvent('event2', objs, 3, 9);
-        assert.deepEqual(objs[0].where, [3, 9]);
-        assert.deepEqual(objs[1].where, [4, 10]);
-        assert.deepEqual(objs[2].where, [3, 9]);
-        assert.deepEqual(objs[3].where, [4, 10]);
-    });
-
-    test('send event to objects', function() {
-        var testGame = new game.Game;
-        game._clearObjectTypes();
-        game.defineObjectType('slicer', {
-            slice: function(aGame, val) {
-                this.slicing = val;
-            }
-        });
-        game.defineObjectType('dicer', {
-            dice: function(aGame, val) {
-                this.dicing = val;
-            }
-        });
-        var objs = [
-            testGame.createObject('slicer', {location: [1, 2]}),
-            testGame.createObject('slicer', {location: [1, 2]}),
-            testGame.createObject('dicer', {location: [1, 2]}),
-            testGame.createObject('dicer', {location: [5, 6]}),
-            testGame.createObject('slicer', {location: [5, 6]})
-        ];
-
-        testGame.sendEventToLocation('slice', [1, 2], 'yeah');
-        assert.deepEqual(objs.map(function(o) {return o.slicing}),
-            ['yeah', 'yeah', undefined, undefined, undefined]);
-
-        testGame.sendEventToLocation('dice', [1, 2], 'bleah');
-        assert.deepEqual(objs.map(function(o) {return o.dicing}),
-            [undefined, undefined, 'bleah', undefined, undefined]);
-
-        testGame.sendEventToLocation('slice', [5, 6], 'man');
-        assert.deepEqual(objs.map(function(o) {return o.slicing}),
-            ['yeah', 'yeah', undefined, undefined, 'man']);
-
-        testGame.sendEventToLocation('slice', [3, 6], 'woot');
-        assert.deepEqual(objs.map(function(o) {return o.slicing}),
-            ['yeah', 'yeah', undefined, undefined, 'man']);
-
-        testGame.sendEventToLocation('dice', [5, 6], 'wah');
-        assert.deepEqual(objs.map(function(o) {return o.dicing}),
-            [undefined, undefined, 'bleah', 'wah', undefined]);
-
-        testGame.sendEventToLocation('dice', [5, 5], 'sorry');
-        assert.deepEqual(objs.map(function(o) {return o.dicing}),
-            [undefined, undefined, 'bleah', 'wah', undefined]);
-    });
-
-
-    test('Unknown event to objects throws', function() {
-        var testGame = new game.Game;
-        game._clearObjectTypes();
-        assert.throws(function() {
-            testGame.sendEvent('gawrsh', []);
-        });
-    });
-
-    test('Unknown event to location throws', function() {
-        var testGame = new game.Game;
-        game._clearObjectTypes();
-        assert.throws(function() {
-            testGame.sendEventToLocation('meow', [0, 0]);
         });
     });
 

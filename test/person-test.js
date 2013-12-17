@@ -9,7 +9,7 @@ testGame.createObject = function(type, props) {
 
 suite('person.create', function() {
     var person = require('../lib/person')
-      , regularJoe = person.create(testGame, 0);
+      , regularJoe = person.create(0);
 
     var traitCount = function(person) {
         return Object.keys(person.bonusTraits).length;
@@ -21,7 +21,7 @@ suite('person.create', function() {
 
     test('Intelligent folks have higher intellect', function() {
         do {
-            var smarty = person.create(testGame, 1);
+            var smarty = person.create(1);
             assert.equal(traitCount(smarty), 1, 'should have one bonus trait');
         } while (!smarty.bonusTraits.intelligent);
         assert(smarty.intellect > regularJoe.intellect);
@@ -29,7 +29,7 @@ suite('person.create', function() {
 
     test('Strong folks have higher stamina regen', function() {
         do {
-            var pumped = person.create(testGame, 1);
+            var pumped = person.create(1);
             assert.equal(traitCount(pumped), 1, 'should have one bonus trait');
         } while (!pumped.bonusTraits.strong);
         assert(pumped.staminaRegen > regularJoe.staminaRegen);
@@ -37,7 +37,7 @@ suite('person.create', function() {
 
     test('Resilient folks have higher hp', function() {
         do {
-            var dude = person.create(testGame, 1);
+            var dude = person.create(1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.resilient);
         assert(dude.hp > regularJoe.hp);
@@ -45,7 +45,7 @@ suite('person.create', function() {
 
     test('Healthy folks have higher hp regen', function() {
         do {
-            var dude = person.create(testGame, 1);
+            var dude = person.create(1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.healthy);
         assert(dude.hpRegen > regularJoe.hpRegen);
@@ -53,7 +53,7 @@ suite('person.create', function() {
 
     test('Fast folks have higher stamina and speed', function() {
         do {
-            var dude = person.create(testGame, 1);
+            var dude = person.create(1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.fast);
         assert(dude.maxSpeed > regularJoe.maxSpeed);
@@ -62,7 +62,7 @@ suite('person.create', function() {
 
     test('Perceptive folks have higher sight', function() {
         do {
-            var dude = person.create(testGame, 1);
+            var dude = person.create(1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.perceptive);
         assert(dude.sight > regularJoe.sight);
@@ -70,7 +70,7 @@ suite('person.create', function() {
 
     test('Crafty folks have higher craftiness', function() {
         do {
-            var dude = person.create(testGame, 1);
+            var dude = person.create(1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.crafty);
         assert(dude.craftiness > regularJoe.craftiness);
@@ -78,19 +78,19 @@ suite('person.create', function() {
 
     test('Charismatic folks have higher influence', function() {
         do {
-            var dude = person.create(testGame, 1);
+            var dude = person.create(1);
             assert.equal(traitCount(dude), 1, 'should have one bonus trait');
         } while (!dude.bonusTraits.charismatic);
         assert(dude.influence > regularJoe.influence);
     });
 
     test('Multiple bonus traits', function() {
-        var dude = person.create(testGame, 3);
+        var dude = person.create(3);
         assert.equal(traitCount(dude), 3, 'should have three bonus trait');
     });
 
     test('Person starts with full hp and stamina', function() {
-        var dude = person.create(testGame, 0);
+        var dude = person.create(0);
         assert.equal(dude.hp, dude.maxHp, 'should start with max hp');
         assert.equal(dude.stamina, dude.maxStamina, 'should start with max hp');
     });
@@ -112,9 +112,9 @@ var tile = testGame.tile = function(x, y) {
     };
 }
 
-suite('placePerson', function() {
+suite('place', function() {
     var person = require('../lib/person')
-    , testPerson = person.create(testGame, 0);
+      , testPerson = person.create(0);
 
     test('places people on suitable terrain only', function() {
         var places = 0
@@ -129,7 +129,7 @@ suite('placePerson', function() {
         }
 
         for (var i = 0; i < 100; i++) {
-            var placed = person.placePerson(testPerson, testGame, [i, i*2]);
+            var placed = person.place(testPerson, testGame, [i, i*2]);
             if (placed) expectedPlaces++;
         }
         assert(expectedPlaces > 0);
@@ -151,7 +151,7 @@ suite('placePerson', function() {
         }
 
         for (var i = 0; i < 100; i++) {
-            var placed = person.placePerson(testPerson, testGame, [i, i*2]);
+            var placed = person.place(testPerson, testGame, [i, i*2]);
             if (placed) expectedPlaces++;
         }
         assert(expectedPlaces > 0);
@@ -196,7 +196,7 @@ suite('placePerson', function() {
             places++;
         }
         for (var i = 0; i < 100; i++) {
-            var placed = person.placePerson(testPerson, testGame, [101, i*2]);
+            var placed = person.place(testPerson, testGame, [101, i*2]);
             if (placed) expectedPlaces++;
         }
         assert(expectedPlaces > 0);
