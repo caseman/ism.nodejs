@@ -6,6 +6,7 @@ var argv = require('optimist')
     .argv;
 var fs = require('fs');
 var map = require('../lib/map');
+var person = require('../lib/person');
 var charm = require('charm')()
 charm.pipe(process.stdout)
 
@@ -136,7 +137,7 @@ var renderCursor = function(pos, cb){
     renderTile(tile);
   });
   saw = [];
-  map.sightFrom(MAP, [pos[1], pos[0]], 3, function(tile) {
+  person.sightFrom(MAP, [pos[1], pos[0]], 3, function(tile) {
     charm.position(tile.x - _VIEWPORT_OFFSET[1], tile.y - _VIEWPORT_OFFSET[0]);
     renderTile(tile, 'black');
     saw.push(tile);
