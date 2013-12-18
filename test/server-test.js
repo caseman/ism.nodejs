@@ -3,22 +3,28 @@ var util = require('util');
 var events = require('events');
 var sinon = require('sinon');
 
+var MockConn = function() {
+    this.remoteAddress = '1.2.3.4',
+    this.remotePort = 5557,
+    this.write = sinon.stub();
+}
+util.inherits(MockConn, events.EventEmitter);
+
 suite('server', function() {
-    var Server = require('../lib/server.js').Server;
+    var server = require('../lib/server');
     var handler = require('../lib/serverhandler');
 
-    var MockConn = function() {
-        this.remoteAddress = '1.2.3.4',
-        this.remotePort = 5557,
-        this.write = sinon.stub();
-    }
-    util.inherits(MockConn, events.EventEmitter);
-
     this.beforeEach(function() {
+        var test = this;
         this.sinon = sinon.sandbox.create();
-        this.testServer = new Server;
-        this.testConn = new MockConn;
-        this.testServer.sockjsServer.emit('connection', this.testConn);
+        db = {get: sinon.spy(), put: sinon.spy()};
+        this.server = new server.Server(db);
+        this.conn = new MockConn;
+        this.createClientStub = this.sinon.stub(server, 'createClient', function(conn) {
+            test.client = new server.Client(conn);
+            return test.client;
+        });
+        this.server.sockjsServer.emit('connection', this.conn);
         this.handleStub = this.sinon.stub(handler, 'handle');
     });
 
@@ -27,25 +33,25 @@ suite('server', function() {
     });
 
     function getReply(test) {
-        return JSON.parse(test.testConn.write.lastCall.args[0]);
+        assert(test.conn.write.called, 'expected server to reply');
+        return JSON.parse(test.conn.write.lastCall.args[0]);
     }
 
     test('parse message and call handler', function() {
         this.handleStub.returns(true);
 
-        this.testConn.emit('data', '{"says": "foobar", "uid": "1234"}');
+        this.conn.emit('data', '{"says": "foobar", "uid": "1234"}');
 
         assert(this.handleStub.calledOnce, 'handler was called');
         assert(this.handleStub.calledWith(
-            this.testServer, this.testConn, {"says": "foobar", "uid": "1234"}));
-        assert(!this.testConn.write.called, 'Server should not write back');
+            this.server, this.client, {"says": "foobar", "uid": "1234"}));
+        assert(!this.conn.write.called, 'Server should not write back');
     });
 
     test('unparsable message', function() {
-        this.testConn.emit('data', '{This is not pudding');
+        this.conn.emit('data', '{This is not pudding');
 
         assert(!this.handleStub.called, 'handler should not be called');
-        assert(this.testConn.write.calledOnce, 'server should write back');
         var reply = getReply(this);
         assert.equal(reply.says, 'error', 'write back should be an error');
         assert.equal(reply.error, 'badMessage');
@@ -54,7 +60,7 @@ suite('server', function() {
     test('unhandled message', function() {
         this.handleStub.returns(false);
 
-        this.testConn.emit('data', '{"says": "boo", "uid": "1234"}');
+        this.conn.emit('data', '{"says": "boo", "uid": "1234"}');
         assert(this.handleStub.calledOnce, 'handler was called');
         var reply = getReply(this);
         assert.equal(reply.says, 'error', 'write back should be an error');
@@ -63,7 +69,7 @@ suite('server', function() {
     });
 
     test('message missing "says"', function() {
-        this.testConn.emit('data', '{"uid": "1111"}');
+        this.conn.emit('data', '{"uid": "1111"}');
         assert(!this.handleStub.called, 'handler not called');
         var reply = getReply(this);
         assert.equal(reply.says, 'error', 'write back should be an error');
@@ -72,7 +78,7 @@ suite('server', function() {
     });
 
     test('message missing "uid"', function() {
-        this.testConn.emit('data', '{"says": "buhbye"}');
+        this.conn.emit('data', '{"says": "buhbye"}');
         assert(!this.handleStub.called, 'handler not called');
         var reply = getReply(this);
         assert.equal(reply.says, 'error', 'write back should be an error');
@@ -82,7 +88,7 @@ suite('server', function() {
     test('server tolerates exception in handler', function() {
         this.handleStub.throws();
 
-        this.testConn.emit('data', '{"says": "foobar", "uid": "5678"}');
+        this.conn.emit('data', '{"says": "foobar", "uid": "5678"}');
         assert(this.handleStub.calledOnce, 'handler was called');
         assert(this.handleStub.threw(), 'handler threw');
         var reply = getReply(this);
@@ -93,15 +99,15 @@ suite('server', function() {
         // Server should process next message just fine
         this.handleStub.reset();
         this.handleStub.returns(true);
-        this.testConn.emit('data', '{"says": "yay", "uid": "999"}');
+        this.conn.emit('data', '{"says": "yay", "uid": "999"}');
         assert(this.handleStub.calledWith(
-            this.testServer, this.testConn, {"says": "yay", "uid": "999"}));
+            this.server, this.client, {"says": "yay", "uid": "999"}));
     });
 
     test('server handles timeout exception in handler', function() {
         this.handleStub.throws(new Error('timeout'));
 
-        this.testConn.emit('data', '{"says": "foobar", "uid": "3434"}');
+        this.conn.emit('data', '{"says": "foobar", "uid": "3434"}');
         assert(this.handleStub.calledOnce, 'handler was called');
         assert(this.handleStub.threw(), 'handler threw');
         assert.deepEqual(getReply(this), {says:'error', error:'timeout', re:'3434'})
@@ -109,15 +115,15 @@ suite('server', function() {
         // Server should process next message just fine
         this.handleStub.reset();
         this.handleStub.returns(true);
-        this.testConn.emit('data', '{"says": "yay", "uid": "999"}');
+        this.conn.emit('data', '{"says": "yay", "uid": "999"}');
         assert(this.handleStub.calledWith(
-            this.testServer, this.testConn, {"says": "yay", "uid": "999"}));
+            this.server, this.client, {"says": "yay", "uid": "999"}));
     });
 
     test('server handles unknown connection exception in handler', function() {
         this.handleStub.throws(new Error('unknownConnection'));
 
-        this.testConn.emit('data', '{"says": "foobar", "uid": "2056"}');
+        this.conn.emit('data', '{"says": "foobar", "uid": "2056"}');
         assert(this.handleStub.calledOnce, 'handler was called');
         assert(this.handleStub.threw(), 'handler threw');
         assert.deepEqual(getReply(this), {says:'error', error:'unknownConnection', re:'2056'})
@@ -125,25 +131,25 @@ suite('server', function() {
         // Server should process next message just fine
         this.handleStub.reset();
         this.handleStub.returns(true);
-        this.testConn.emit('data', '{"says": "yay", "uid": "999"}');
+        this.conn.emit('data', '{"says": "yay", "uid": "999"}');
         assert(this.handleStub.calledWith(
-            this.testServer, this.testConn, {"says": "yay", "uid": "999"}));
+            this.server, this.client, {"says": "yay", "uid": "999"}));
     });
 
     test('server tolerates exception writing back', function() {
-        this.testConn.write.throws();
+        this.conn.write.throws();
         this.handleStub.returns(false);
 
-        this.testConn.emit('data', '{"says": "hiss", "uid": "1234"}');
+        this.conn.emit('data', '{"says": "hiss", "uid": "1234"}');
         assert(this.handleStub.calledOnce, 'handler was called');
-        assert(this.testConn.write.calledOnce, 'server attempted to write back');
+        assert(this.conn.write.calledOnce, 'server attempted to write back');
 
         // Server should process next message just fine
-        this.testConn.write.reset();
+        this.conn.write.reset();
         this.handleStub.returns(true);
-        this.testConn.emit('data', '{"says": "yay", "uid": "897"}');
+        this.conn.emit('data', '{"says": "yay", "uid": "897"}');
         assert(this.handleStub.calledWith(
-            this.testServer, this.testConn, {"says": "yay", "uid": "897"}));
+            this.server, this.client, {"says": "yay", "uid": "897"}));
     });
 
     test('start server', function() {
@@ -155,102 +161,117 @@ suite('server', function() {
             server.listen = sinon.spy();
             return server;
         });
-        this.testServer.start(1234, '1.2.3.4');
-        assert(this.testServer.httpServer.listen.calledOnce, 'listen was called');
-        assert(this.testServer.httpServer.listen.calledWith(1234, '1.2.3.4'));
+        this.server.start(1234, '1.2.3.4');
+        assert(this.server.httpServer.listen.calledOnce, 'listen was called');
+        assert(this.server.httpServer.listen.calledWith(1234, '1.2.3.4'));
     });
 
-    test('register client', function() {
-        var succeeded = this.testServer.registerClient('656', this.testConn);
+    test('register client with cid', function() {
+        var succeeded = this.server.registerClient(this.client, '656');
         assert(succeeded, 'registration succeeded');
-        assert.deepEqual(this.testServer.clientConns['656'], this.testConn);
+        assert.equal(this.client.cid, '656');
+        assert.deepEqual(this.server.clients['656'], this.client);
     });
 
     test('register client allowed once per cid', function() {
-        var conn1 = 'foo', conn2 = 'bar';
-        var succeeded1 = this.testServer.registerClient('777', conn1);
-        var succeeded2 = this.testServer.registerClient('777', conn2);
+        var client1 = {conn:{}}, client2 = {conn:{}};
+        var succeeded1 = this.server.registerClient(client1, '777');
+        var succeeded2 = this.server.registerClient(client2, '777');
         assert(succeeded1, 'registration 1 succeeded');
         assert(!succeeded2, 'registration 2 failed');
-        assert.deepEqual(this.testServer.clientConns['777'], conn1);
+        assert.strictEqual(this.server.clients['777'], client1);
     });
 
-    test('registered client removed when connection closes', function() {
-        this.testServer.registerClient('555', this.testConn);
-        assert.deepEqual(this.testServer.clientConns['555'], this.testConn);
-        this.testConn.emit('close');
-        assert.equal(this.testServer.clientConns['555'], undefined);
+    test('registered client connection cleared when connection closes', function() {
+        this.server.registerClient(this.client, '555');
+        assert(this.server.clients['555'].conn);
+        this.conn.emit('close');
+        assert(!this.server.clients['555'].conn);
     });
 
     test('cid can be reused after reconnecting', function() {
-        this.testServer.registerClient('512', this.testConn);
-        this.testConn.emit('close');
-        assert.equal(this.testServer.clientConns['512'], undefined);
-        var succeeded = this.testServer.registerClient('512', this.testConn);
+        this.server.registerClient(this.client, '512');
+        this.conn.emit('close');
+        assert(!this.server.clients['512'].conn);
+        var succeeded = this.server.registerClient('512', this.client);
         assert(succeeded, 'registration succeeded');
-        assert.deepEqual(this.testServer.clientConns['512'], this.testConn);
+        assert.deepEqual(this.server.clients['512'], this.client);
     });
 
+/*
+    test('reused cid inherits open game', function() {
+        this.client.game = {uid:'435098'};
+        this.server.registerClient('512', this.client);
+        this.conn.emit('close');
+        var newClient = {};
+        this.server.registerClient('512', newClient);
+        assert.equal(newClient.cid, this.client.cid);
+        assert.strictEqual(newClient.game, this.client.game);
+    });
+*/
+
     test('new client cid', function() {
-        var cid = this.testServer.newClient(this.testConn);
+        this.server.registerClient(this.client);
+        var cid = this.client.cid;
         assert(cid, 'cid not empty');
-        assert.deepEqual(this.testServer.clientConns[cid], this.testConn);
+        assert.strictEqual(this.server.clients[cid], this.client);
     });
 
     test('new client idempotent', function() {
-        var cid = this.testServer.newClient(this.testConn);
+        this.server.registerClient(this.client);
+        var cid = this.client.cid;
         assert(cid, 'cid not empty');
-        assert.equal(cid, this.testServer.newClient(this.testConn), 'returned same cid');
-        assert.deepEqual(this.testServer.clientConns[cid], this.testConn);
+        this.server.registerClient(this.client)
+        assert.equal(this.client.cid, cid);
+        assert.strictEqual(this.server.clients[cid], this.client);
     });
 
-    test('send to connection', function() {
-        this.testServer.send(this.testConn, {says:'wat'});
-        var reply = getReply(this);
-        assert.equal(reply.says, 'wat');
+    test('require registered with registered client', function() {
+        var cid = this.server.registerClient(this.client);
+        this.server.requireRegisteredClient(this.client)
     });
 
-    test('send to cid', function() {
-        var cid = this.testServer.newClient(this.testConn);
-        this.testServer.send(cid, {says:'huh'});
-        var reply = getReply(this);
-        assert.equal(reply.says, 'huh');
-    });
-
-    test('sendError to connection with msg', function() {
-        this.testServer.sendError(this.testConn, 'testError', {says:'wat', uid:'543'});
-        assert.deepEqual(getReply(this), {says:'error', error:'testError', re:'543'});
-    });
-
-    test('sendError to connection without msg', function() {
-        this.testServer.sendError(this.testConn, 'testYetAgain');
-        assert.deepEqual(getReply(this), {says:'error', error:'testYetAgain'});
-    });
-
-    test('sendError to cid', function() {
-        var cid = this.testServer.newClient(this.testConn);
-        this.testServer.sendError(cid, 'cidError', {says:'wat', uid:'000'});
-        assert.deepEqual(getReply(this), {says:'error', error:'cidError', re:'000'});
-    });
-
-    test('cid from client connection', function() {
-        var cid = this.testServer.newClient(this.testConn);
-        assert.equal(this.testServer.cidForConn(this.testConn), cid);
-        assert.equal(this.testServer.cidForConn(new MockConn), undefined);
-    });
-
-    test('require cid from client with cid', function() {
-        var cid = this.testServer.newClient(this.testConn);
-        assert.equal(this.testServer.requireCid(this.testConn), cid);
-    });
-
-    test('require cid from unknown client', function() {
-        var server = this.testServer
-          , conn = this.testConn;
+    test('require registered with unknown client', function() {
+        var server = this.server
+          , client = this.client;
         assert.throws(function() {
-            server.requireCid(conn);
+            server.requireRegisteredClient(client);
         }, /unknownConnection/);
     });
 
 });
 
+suite('server client', function() {
+    var server = require('../lib/server');
+
+    this.beforeEach(function() {
+        this.conn = new MockConn;
+        this.client = new server.Client(this.conn);
+    });
+
+    function getReply(test) {
+        assert(test.conn.write.called, 'expected server to reply');
+        return JSON.parse(test.conn.write.lastCall.args[0]);
+    }
+
+    test('construction', function() {
+        assert.strictEqual(this.client.conn, this.conn);
+        assert(!this.client.cid);
+    });
+
+    test('send', function() {
+        this.client.send({says:'wat'});
+        assert.deepEqual(getReply(this), {says:'wat'});
+    });
+
+    test('sendError with msg', function() {
+        this.client.sendError('testError', {says:'wat', uid:'543'});
+        assert.deepEqual(getReply(this), {says:'error', error:'testError', re:'543'});
+    });
+
+    test('sendError without msg', function() {
+        this.client.sendError('testYetAgain');
+        assert.deepEqual(getReply(this), {says:'error', error:'testYetAgain'});
+    });
+
+});

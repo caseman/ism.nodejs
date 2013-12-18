@@ -8,14 +8,24 @@ var MockConn = function() {
     this.close = sinon.stub();
 }
 
+var MockClient = function(conn) {
+    this.conn = conn;
+    this.send = function(){};
+    this.sendError = function(){};
+}
+
 var before = function() {
     this.sinon = sinon.sandbox.create();
-    this.server = new Server;
+    var db = {get: sinon.spy()};
+    this.server = new Server(db);
     this.serverMock = this.sinon.mock(this.server);
     this.conn = new MockConn;
+    this.client = new MockClient(this.conn);
+    this.clientMock = this.sinon.mock(this.client);
 }
 var after = function() {
     this.serverMock.verify();
+    this.clientMock.verify();
     this.sinon.restore();
 }
 
@@ -26,8 +36,8 @@ suite('general handler', function() {
     this.afterEach(after);
 
     test('unhandled msg returns false', function() {
-        this.serverMock.expects('send').never();
-        var handled = handle(this.server, this.conn, {says:'whyioughtta', uid:'123'});
+        this.clientMock.expects('send').never();
+        var handled = handle(this.server, this.client, {says:'whyioughtta', uid:'123'});
         assert(!handled);
         assert(!this.conn.close.called);
     });
@@ -41,43 +51,43 @@ suite('hi handler', function() {
     this.afterEach(after);
 
     test('successful with new client', function() {
-        this.serverMock.expects('newClient').once().withArgs(this.conn).returns('321');
-        this.serverMock.expects('sendError').never();
-        this.serverMock.expects('send').once()
-            .withArgs(this.conn, {says:'hi', cid:'321', re:'012'});
+        this.clientMock.expects('sendError').never();
+        var send = this.clientMock.expects('send').once();
 
-        var handled = handle(this.server, this.conn, 
+        var handled = handle(this.server, this.client, 
             {says:'hi', clientVersion:version, uid:'012'});
         assert(handled);
         assert(!this.conn.close.called, 'Connection should not be closed');
+        var reply = send.firstCall.args[0];
+        assert.equal(reply.says, 'hi');
+        assert.equal(reply.re, '012');
+        assert(reply.cid);
     });
 
     test('sends error with mismatched client version and closes conn', function() {
         var msg = {says:'hi', clientVersion:'whateva', uid:'42'}
-        this.serverMock.expects('sendError').once()
-            .withArgs(this.conn, 'incompatibleClientVersion', msg);
-        var handled = handle(this.server, this.conn, msg);
+        this.clientMock.expects('sendError').once()
+            .withArgs('incompatibleClientVersion', msg);
+        var handled = handle(this.server, this.client, msg);
         assert(handled);
         assert(this.conn.close.called, 'Connection should be closed');
     });
 
     test('sends error when no cid issued and closes conn', function() {
-        this.serverMock.expects('newClient').once().withArgs(this.conn).returns(undefined);
+        this.serverMock.expects('registerClient').once().withArgs(this.client).returns(false);
         var msg = {says:'hi', clientVersion:version, uid:'96'}
-        this.serverMock.expects('sendError').once()
-            .withArgs(this.conn, 'noNewConnections', msg);
-        var handled = handle(this.server, this.conn, msg);
+        this.clientMock.expects('sendError').once().withArgs('cidInUse', msg);
+        var handled = handle(this.server, this.client, msg);
         assert(handled);
         assert(this.conn.close.called, 'Connection should be closed');
     });
 
     test('successful with reconnecting client', function() {
-        this.serverMock.expects('registerClient').once().withArgs('888', this.conn).returns(true);
-        this.serverMock.expects('sendError').never();
-        this.serverMock.expects('send').once()
-            .withArgs(this.conn, {says:'ok', re:'357'});
+        this.clientMock.expects('sendError').never();
+        this.clientMock.expects('send').once()
+            .withArgs({says:'hi', cid:'888', re:'357'});
 
-        var handled = handle(this.server, this.conn, 
+        var handled = handle(this.server, this.client, 
             {says:'hi', clientVersion:version, cid:'888', uid:'357'});
         assert(handled);
         assert(!this.conn.close.called, 'Connection should not be closed');
@@ -97,11 +107,11 @@ suite('games handler', function() {
         this.sinon.stub(game, 'list', function(db, cb) {
             cb(null, games);
         });
-        this.serverMock.expects('sendError').never();
-        this.serverMock.expects('send').once()
-            .withArgs(this.conn, {says:'games', re:'451', list:games});
+        this.clientMock.expects('sendError').never();
+        this.clientMock.expects('send').once()
+            .withArgs({says:'games', re:'451', list:games});
 
-        var handled = handle(this.server, this.conn, {says:'games', uid:'451'});
+        var handled = handle(this.server, this.client, {says:'games', uid:'451'});
         assert(handled);
     });
 
@@ -110,9 +120,9 @@ suite('games handler', function() {
             cb(new Error('Yipes!'));
         });
         var msg = {says:'games', uid:'890'}
-        this.serverMock.expects('sendError').once()
-            .withArgs(this.conn, 'unexpectedError', msg);
-        var handled = handle(this.server, this.conn, msg);
+        this.clientMock.expects('sendError').once()
+            .withArgs('unexpectedError', msg);
+        var handled = handle(this.server, this.client, msg);
         assert(handled);
     });
 
@@ -139,11 +149,11 @@ suite('createGame handler', function() {
             assert.isFunction(progressCb);
             return testMap;
         });
-        this.serverMock.expects('sendError').never();
-        this.serverMock.expects('send').once()
-            .withArgs(this.conn, {says:'game', re:'261', game:testGame.info});
+        this.clientMock.expects('sendError').never();
+        this.clientMock.expects('send').once()
+            .withArgs({says:'game', re:'261', game:testGame.info});
 
-        var handled = handle(this.server, this.conn, 
+        var handled = handle(this.server, this.client, 
             {says:'createGame', uid:'261', mapParams:mapParams});
         assert(handled);
         assert.strictEqual(this.server.games[testGame.uid], testGame);
@@ -151,9 +161,9 @@ suite('createGame handler', function() {
 
     test('rejects huge maps', function() {
         var msg = {says:'createGame', uid:'105', mapParams:{width:10000, height:10000}};
-        this.serverMock.expects('sendError').once()
-            .withArgs(this.conn, 'mapTooLarge', msg);
-        var handled = handle(this.server, this.conn, msg);
+        this.clientMock.expects('sendError').once()
+            .withArgs('mapTooLarge', msg);
+        var handled = handle(this.server, this.client, msg);
         assert(handled);
     });
 
@@ -161,13 +171,13 @@ suite('createGame handler', function() {
     test('map can time out', function(done) {
         var msg = {says:'createGame', uid:'105', mapParams:{width:1000, height:1000}}
           , server = this.server
-          , conn = this.conn;
+          , conn = this.client;
         this.sinon.stub(map, 'create', function(params, progressCb) {
             while (true) progressCb();
         });
         this.server.timeout = 1;
-        this.serverMock.expects('sendError').once()
-            .withArgs(this.conn, 'timeout', msg);
+        this.clientMock.expects('sendError').once()
+            .withArgs('timeout', msg);
         setImmediate(function() {
             var handled = handle(server, conn, msg);
             assert(handled);
@@ -187,9 +197,9 @@ suite('createGame handler', function() {
         });
 
         var msg = {says:'createGame', uid:'105', mapParams:{width:512, height:512}};
-        this.serverMock.expects('sendError').once()
-            .withArgs(this.conn, 'unexpectedError', msg);
-        var handled = handle(this.server, this.conn, msg);
+        this.clientMock.expects('sendError').once()
+            .withArgs('unexpectedError', msg);
+        var handled = handle(this.server, this.client, msg);
         assert(handled);
     });
 
