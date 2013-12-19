@@ -22,12 +22,6 @@ suite('game.create', function() {
         assert.equal(testGame.info.version, require('../package.json').version);
     });
 
-    test('turn begins null', function() {
-        var testGame = game.create(testDb(), testMap());
-        assert.strictEqual(testGame.info.turnNumber, null);
-        assert.strictEqual(testGame.info.turnTime, null);
-    });
-
     test('games have unique ids', function() {
         var uids = {};
         for (var i = 0; i < 100; i++) {
@@ -358,6 +352,116 @@ suite('game persistence', function() {
         this.testGame.saveNation(testNation);
     });
 
+    test('choose nation chooses each once', function() {
+        var nations = [
+                {uid: "0498503"}
+              , {uid: "3457987"}
+              , {uid: "43987539458"}
+              , {uid: "294387"}
+            ]
+          , all = {}
+          , seen = {}
+          , testGame = this.testGame;
+        nations.forEach(function(nat) {
+            testGame.nations[nat.uid] = nat;
+            all[nat.uid] = nat;
+        });
+        for (var count = 0; count < nations.length; count++) {
+            var client = {cid: "c" + count}
+              , nation = this.testGame.chooseNationForClient(client);
+            assert(nation);
+            assert(!seen[nation.uid]);
+            seen[nation.uid] = true;
+            assert(all[nation.uid]);
+            assert.equal(nation.playerType, 'remote');
+            assert.equal(nation.playerClient, client.cid);
+        }
+        client = {uid:"3498454"};
+        assert(!this.testGame.chooseNationForClient(client),
+            "should return nothing when all nations are chosen");
+        assert(!client.playerType);
+        assert(!client.playerClient);
+    });
+
+});
+
+suite('game turns', function() {
+    var game = require('../lib/game');
+
+    test('turn begins null', function() {
+        var testGame = game.create(testDb(), testMap());
+        assert.strictEqual(testGame.info.turnNumber, null);
+        assert.strictEqual(testGame.info.turnTime, null);
+    });
+
+    test('started true first turn and after', function() {
+        var testGame = game.create(testDb(), testMap());
+        assert(!testGame.started());
+        testGame.beginNextTurn()
+        assert(testGame.started());
+        testGame.beginNextTurn()
+        testGame.beginNextTurn()
+        assert(testGame.started());
+    });
+
+    test('turn advances one per', function() {
+        var testGame = game.create(testDb(), testMap());
+        assert.equal(testGame.beginNextTurn(), 1);
+        assert.equal(testGame.beginNextTurn(), 2);
+        assert.equal(testGame.beginNextTurn(), 3);
+        assert.equal(testGame.beginNextTurn(), 4);
+        assert.equal(testGame.info.turnNumber, 4);
+    });
+
+    test('next turn advances turn time', function() {
+        var testGame = game.create(testDb(), testMap());
+        testGame.beginNextTurn();
+        assert(testGame.info.turnTime);
+        var turnTime = new Date(testGame.info.turnTime);
+        assert.notEqual(turnTime, 'Invalid Date');
+        assert.equal(turnTime.toUTCString(), testGame.info.turnTime);
+    });
+
+    test('next turn saves game info', function() {
+        var testGame = game.create(testDb(), testMap());
+        testGame.saveInfo = sinon.spy();
+        testGame.beginNextTurn();
+        assert(testGame.saveInfo.calledOnce);
+    });
+
+    test('next turn emits turnBegins event', function(done) {
+        var testGame = game.create(testDb(), testMap());
+        testGame.on('turnBegins', function() {
+            assert.strictEqual(this, testGame);
+            done();
+        });
+        testGame.beginNextTurn();
+    });
+
+    test('next turn sends turnBegins to all objects', function() {
+        var testGame = game.create(testDb(), testMap());
+        object.define('turner', {
+            turnBegins: function (aGame) {
+                assert.strictEqual(aGame, testGame);
+                this.turn = aGame.info.turnNumber;
+            }
+        });
+        var objs = [
+            object.create('turner', {location: [0,0]}),
+            object.create('turner', {location: [0,0]}),
+            object.create('turner', {location: [0,0]}),
+            object.create('turner', {location: [0,0]})
+        ];
+        objs.forEach(function(obj) {
+            testGame.placeObject(obj);
+        });
+        testGame.beginNextTurn();
+        assert(objs.every(function(obj) {return obj.turn == 1}));
+        testGame.beginNextTurn();
+        testGame.beginNextTurn();
+        testGame.beginNextTurn();
+        assert(objs.every(function(obj) {return obj.turn == 4}));
+    });
 
 });
 
