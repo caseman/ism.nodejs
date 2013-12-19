@@ -239,6 +239,37 @@ suite('server', function() {
         }, /unknownConnection/);
     });
 
+    test('loads game from db on demand', function(done) {
+        var game = require('../lib/game')
+          , server = this.server
+          , client = this.client
+          , testGame = {uid:"349808"};
+        this.sinon.stub(game, 'load', function(db, uid, cb) {
+            assert.strictEqual(db, server.db);
+            assert.equal(uid, testGame.uid);
+            cb(null, testGame);
+        });
+        server.game(testGame.uid, function(err, game) {
+            assert(!err, err);
+            assert.strictEqual(game, testGame);
+            assert.strictEqual(server.games[testGame.uid], testGame);
+            done();
+        });
+    });
+
+    test('loads game from cache when possible', function(done) {
+        var game = require('../lib/game')
+          , testGame = {uid:"3459083405"}
+          , loadStub = this.sinon.stub(game, 'load');
+        this.server.addGame(testGame);
+        this.server.game(testGame.uid, function(err, game) {
+            assert(!err, err);
+            assert.strictEqual(game, testGame);
+            assert(!loadStub.called);
+            done();
+        });
+    });
+
 });
 
 suite('server client', function() {
