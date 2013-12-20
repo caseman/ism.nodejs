@@ -68,4 +68,52 @@ suite('object types and events', function() {
         });
     });
 
+    test('default properties for client', function() {
+        object.define('defaultfc', {});
+        var obj = object.create('defaultfc', {
+            createdTurn: 2
+          , modifiedTurn: 5
+          , location: [15, 23]
+          , flimflam: 100
+          , justification: 0
+        });
+        var copy = object.clientCopy(obj);
+        assert.deepEqual(copy, {
+            uid: obj.uid
+          , type: 'defaultfc'
+          , createdTurn: 2
+          , modifiedTurn: 5
+          , location: [15, 23]
+        });
+    });
+
+    test('visible properties for client', function() {
+        object.define('visiblefc', {}, ['flux', 'crux']);
+        var obj = object.create('visiblefc', {
+            createdTurn: 10
+          , modifiedTurn: 10
+          , flux: 20
+          , buzz: 10
+        });
+        var copy = object.clientCopy(obj);
+        assert.deepEqual(copy, {
+            uid: obj.uid
+          , type: 'visiblefc'
+          , createdTurn: 10
+          , modifiedTurn: 10
+          , flux: 20
+        });
+        var obj2 = object.create('visiblefc', {
+            location: [5, 4]
+          , crux: 11
+        });
+        var copy2 = object.clientCopy(obj2);
+        assert.deepEqual(copy2, {
+            uid: obj2.uid
+          , type: 'visiblefc'
+          , location: [5, 4]
+          , crux: 11
+        });
+    });
+
 });
