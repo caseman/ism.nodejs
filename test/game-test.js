@@ -332,6 +332,22 @@ suite('game persistence', function() {
         this.testGame.saveObject(testObj);
     });
 
+    test('saveObject sets createdTurn and modifiedTurn', function() {
+        var testObj = {uid: '23123498'};
+        this.testGame.info.turnNumber = 11;
+        this.testGame.saveObject(testObj);
+        assert.equal(testObj.createdTurn, 11);
+        assert.equal(testObj.modifiedTurn, 11);
+    });
+
+    test('saveObject updates modifiedTurn', function() {
+        var testObj = {uid: '34095834', createdTurn: 5, modifiedTurn: 7};
+        this.testGame.info.turnNumber = 12;
+        this.testGame.saveObject(testObj);
+        assert.equal(testObj.createdTurn, 5);
+        assert.equal(testObj.modifiedTurn, 12);
+    });
+
     test('save nation', function() {
         var testNation = {uid: '850234'};
         this.testGame.saveNation(testNation);
