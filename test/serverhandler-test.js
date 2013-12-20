@@ -10,6 +10,7 @@ var MockConn = function() {
 
 var MockClient = function(conn) {
     this.conn = conn;
+    this.joinGame = function(){};
     this.send = function(){};
     this.sendError = function(){};
 }
@@ -199,6 +200,89 @@ suite('createGame handler', function() {
         var msg = {says:'createGame', uid:'105', mapParams:{width:512, height:512}};
         this.clientMock.expects('sendError').once()
             .withArgs('unexpectedError', msg);
+        var handled = handle(this.server, this.client, msg);
+        assert(handled);
+    });
+
+});
+
+suite('join handler', function() {
+    var handle = require('../lib/serverhandler').handle
+      , game = require('../lib/game')
+      , map = require('../lib/map');
+
+    this.beforeEach(before);
+    this.afterEach(after);
+
+    test('joins a game not started', function() {
+        var testGame = new game.Game(null, "345908309")
+          , gameMock = this.sinon.mock(testGame)
+          , nation = {uid:"2304958"};
+        this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
+        this.serverMock.expects('game').once().withArgs(testGame.uid).yields(null, testGame);
+        gameMock.expects('started').returns(false);
+        gameMock.expects('chooseNationForClient').once().withArgs(this.client).returns(nation);
+        this.clientMock.expects('joinGame').once().withArgs(testGame);
+        this.clientMock.expects('send').once().withArgs(
+            {says:'game', game:testGame.info, re:"579"});
+
+        var handled = handle(this.server, this.client, 
+            {says: 'join', game:testGame.uid, uid:"579"});
+        assert(handled);
+    });
+
+    test('joins a started game', function() {
+        var testGame = new game.Game(null, "2345098")
+          , gameMock = this.sinon.mock(testGame)
+          , nation = {uid:"23495873"}
+          , people = [{uid:1}, {uid:2}, {uid:3}];
+        nation.people = [1, 2, 3];
+        testGame.objects = {1:people[0], 2:people[1], 3:people[2]};
+        this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
+        this.serverMock.expects('game').once().withArgs(testGame.uid).yields(null, testGame);
+        gameMock.expects('started').returns(true);
+        gameMock.expects('chooseNationForClient').once().withArgs(this.client).returns(nation);
+        this.clientMock.expects('joinGame').once().withArgs(testGame);
+        this.clientMock.expects('send').once()
+            .withArgs({says:'game', game:testGame.info, re:"435"});
+        this.clientMock.expects('send').once()
+            .withArgs({says:'update', objects:people});
+
+        var handled = handle(this.server, this.client, 
+            {says: 'join', game:testGame.uid, uid:"435"});
+        assert(handled);
+    });
+
+    test('cannot join full game', function() {
+        var testGame = new game.Game(null, "2345979")
+          , gameMock = this.sinon.mock(testGame);
+        this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
+        this.serverMock.expects('game').once().withArgs(testGame.uid).yields(null, testGame);
+        gameMock.expects('chooseNationForClient').once().withArgs(this.client).returns(undefined);
+        var msg = {says: 'join', game:testGame.uid, uid:"289"};
+        this.clientMock.expects('sendError').once().withArgs('cannotJoin', msg);
+
+        var handled = handle(this.server, this.client, msg);
+        assert(handled);
+    });
+
+    test('requires a registered client', function() {
+        var testGame = new game.Game(null, "2345098");
+        this.client.cid = undefined;
+        this.serverMock.expects('game').never();
+        assert.throws(function() {
+            handle(this.server, this.client, {says: 'join', game:testGame.uid, uid:"999"});
+        });
+    });
+
+    test('has an error', function() {
+        var testGame = new game.Game(null, "2345979")
+          , gameMock = this.sinon.mock(testGame);
+        this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
+        this.serverMock.expects('game').once().withArgs(testGame.uid).yields(new Error, null);
+        var msg = {says: 'join', game:testGame.uid, uid:"4587"};
+        this.clientMock.expects('sendError').once().withArgs('unexpectedError', msg);
+
         var handled = handle(this.server, this.client, msg);
         assert(handled);
     });
