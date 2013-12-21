@@ -68,7 +68,7 @@ suite('object types and events', function() {
         });
     });
 
-    test('default properties for client', function() {
+    test('default properties for clientCopy', function() {
         object.define('defaultfc', {});
         var obj = object.create('defaultfc', {
             createdTurn: 2
@@ -87,7 +87,7 @@ suite('object types and events', function() {
         });
     });
 
-    test('visible properties for client', function() {
+    test('visible properties for clientCopy', function() {
         object.define('visiblefc', {}, ['flux', 'crux']);
         var obj = object.create('visiblefc', {
             createdTurn: 10
@@ -114,6 +114,10 @@ suite('object types and events', function() {
           , location: [5, 4]
           , crux: 11
         });
+    });
+
+    test('clientCopy null value', function() {
+        assert.strictEqual(object.clientCopy(undefined), null);
     });
 
 });
