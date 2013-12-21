@@ -2,13 +2,26 @@ var assert = require('assert');
 var util = require('util');
 var events = require('events');
 var sinon = require('sinon');
+var key = require('../lib/db').key;
 
 var MockConn = function() {
+    events.EventEmitter.call(this);
     this.remoteAddress = '1.2.3.4',
     this.remotePort = 5557,
     this.write = sinon.stub();
 }
 util.inherits(MockConn, events.EventEmitter);
+
+var MockDb = function() {
+    this.get = function(){};
+    this.put = function(){};
+}
+var MockGame = function(uid) {
+    events.EventEmitter.call(this);
+    this.uid = uid;
+    this.db = new MockDb;
+}
+util.inherits(MockGame, events.EventEmitter);
 
 suite('server', function() {
     var server = require('../lib/server');
@@ -17,7 +30,8 @@ suite('server', function() {
     this.beforeEach(function() {
         var test = this;
         this.sinon = sinon.sandbox.create();
-        db = {get: sinon.spy(), put: sinon.spy()};
+        db = new MockDb;
+        this.dbMock = this.sinon.mock(db);
         this.server = new server.Server(db);
         this.conn = new MockConn;
         this.createClientStub = this.sinon.stub(server, 'createClient', function(conn) {
@@ -29,6 +43,7 @@ suite('server', function() {
     });
 
     this.afterEach(function(){
+        this.dbMock.verify();
         this.sinon.restore();
     });
 
@@ -198,18 +213,6 @@ suite('server', function() {
         assert.deepEqual(this.server.clients['512'], this.client);
     });
 
-/*
-    test('reused cid inherits open game', function() {
-        this.client.game = {uid:'435098'};
-        this.server.registerClient('512', this.client);
-        this.conn.emit('close');
-        var newClient = {};
-        this.server.registerClient('512', newClient);
-        assert.equal(newClient.cid, this.client.cid);
-        assert.strictEqual(newClient.game, this.client.game);
-    });
-*/
-
     test('new client cid', function() {
         this.server.registerClient(this.client);
         var cid = this.client.cid;
@@ -270,6 +273,83 @@ suite('server', function() {
         });
     });
 
+    test('loads game for client id', function(done) {
+        var game = require('../lib/game')
+          , testGame = {uid:"345987345", nations:{}}
+          , testNation = {uid:"342598061"}
+          , loadStub = this.sinon.stub(game, 'load')
+          , cid = "2398234980";
+        testGame.nations[testNation.uid] = testNation;
+        this.server.addGame(testGame);
+        this.dbMock.expects('get')
+            .withArgs(key('player','client', cid))
+            .yields(null, {game:testGame.uid, nation:testNation.uid});
+        this.server.gameForClientId(cid, function(err, theGame) {
+            assert(!err, err);
+            assert.strictEqual(theGame, testGame);
+            done();
+        });
+    });
+
+    test('game for client id unknown cid', function(done) {
+        var cid = "345093845"
+          , notFoundErr = {notFound: true};
+        this.dbMock.expects('get')
+            .withArgs(key('player','client', cid))
+            .yields(notFoundErr);
+        this.server.gameForClientId(cid, function(err, theGame) {
+            assert(!err);
+            assert(!theGame);
+            done();
+        });
+    });
+
+    test('game for client id error loading player info', function(done) {
+        var cid = "23458754"
+          , dbErr = 'error';
+        this.dbMock.expects('get')
+            .withArgs(key('player','client', cid))
+            .yields(dbErr);
+        this.server.gameForClientId(cid, function(err, theGame) {
+            assert.strictEqual(err, dbErr);
+            assert(!theGame);
+            done();
+        });
+    });
+
+    test('game for client id error loading game', function(done) {
+        var cid = "23458754"
+          , dbErr = 'error';
+        this.dbMock.expects('get')
+            .withArgs(key('player','client', cid))
+            .yields(null, {game:"2309865", nation:"4510682"});
+        this.server.game = function(uid, cb) {cb(dbErr)};
+
+        this.server.gameForClientId(cid, function(err, theGame) {
+            assert.strictEqual(err, dbErr);
+            assert(!theGame);
+            done();
+        });
+    });
+
+    test('game for client id no matching nation', function(done) {
+        var game = require('../lib/game')
+          , testGame = {uid:"4350601", nations:{}}
+          , loadStub = this.sinon.stub(game, 'load')
+          , cid = "345096012";
+        this.server.addGame(testGame);
+        this.dbMock.expects('get')
+            .withArgs(key('player','client', cid))
+            .yields(null, {game:testGame.uid, nation:"435980651"});
+        this.server.gameForClientId(cid, function(err, theGame) {
+            assert(err);
+            assert(!theGame);
+            assert(err.toString().indexOf('Nation') != -1, err);
+            assert(err.toString().indexOf('not found') != -1, err);
+            done();
+        });
+    });
+
 });
 
 suite('server client', function() {
@@ -303,6 +383,88 @@ suite('server client', function() {
     test('sendError without msg', function() {
         this.client.sendError('testYetAgain');
         assert.deepEqual(getReply(this), {says:'error', error:'testYetAgain'});
+    });
+
+    test('closed clears conn', function() {
+        assert(this.client.conn);
+        this.client.closed();
+        assert(!this.client.conn);
+    });
+
+    test('join game', function() {
+        var testGame = new MockGame("56234098")
+          , testNation = {uid:"6309638", people:[1,2,3]};
+        this.client.cid = "3459806239";
+        var dbMock = sinon.mock(testGame.db);
+        dbMock.expects('put').withArgs(
+            key('player', 'client', this.client.cid)
+          , {game: testGame.uid, nation: testNation.uid});
+        var clientMock = sinon.mock(this.client);
+        clientMock.expects('sendUpdate').withArgs(testNation.people);
+
+        this.client.joinGame(testGame, testNation);
+        assert.strictEqual(this.client.game, testGame);
+        assert.strictEqual(this.client.nation, testNation);
+        dbMock.verify();
+        clientMock.verify();
+    });
+
+    test('after join game listens for object changes', function() {
+        var testGame = new MockGame("3450986")
+          , testNation = {uid:"3240965", people:[1,2,3]};
+        this.client.cid = "1956470";
+        var clientMock = sinon.mock(this.client);
+        clientMock.expects('sendUpdate').once();
+
+        this.client.joinGame(testGame, testNation);
+
+        var objs = [
+            {uid:"2347869", nationUid:testNation.uid}
+          , {uid:"4360495", nationUid:testNation.uid}
+          , {uid:"1691239", nationUid:"345983045"}
+        ];
+        testGame.emit('objectChanged', objs[0]);
+        testGame.emit('objectChanged', objs[1]);
+        testGame.emit('objectChanged', objs[2]);
+        clientMock.verify();
+        assert.strictEqual(this.client.updates[objs[0].uid], objs[0]);
+        assert.strictEqual(this.client.updates[objs[1].uid], objs[1]);
+    });
+
+    test('after object changes sends an update', function() {
+        var testGame = {info: 'INFO', objects:{}}
+          , testNation = {uid: "45601298"}
+          , clock = sinon.useFakeTimers();
+        this.client.game = testGame;
+        this.client.nation = testNation;
+
+        var objs = [
+            {uid:"4235096", type:'person', nationUid:testNation.uid}
+          , {uid:"0923487", type:'person', nationUid:testNation.uid}
+          , {uid:"8965892", type:'person', nationUid:"345983045"}
+        ];
+        objs.forEach(function(obj) {testGame.objects[obj.uid] = obj});
+        assert(!this.client.updateTask);
+        this.client.objectChanged(objs[0]);
+        var task = this.client.updateTask;
+        assert(task);
+        this.client.objectChanged(objs[1]);
+        assert.equal(this.client.updateTask, task);
+        this.client.objectChanged(objs[2]);
+        assert.equal(this.client.updateTask, task);
+        this.client.objectChanged(objs[0]);
+
+        assert(!this.conn.write.called);
+        clock.tick(this.client.UPDATE_TIMEOUT + 1);
+        var msg = getReply(this);
+        assert.equal(msg.says, 'update');
+        assert.equal(msg.game, testGame.info);
+        assert.equal(msg.objects.length, 2);
+        assert.deepEqual(this.client.updates, {});
+        assert(!this.client.updateTask);
+        assert(msg.objects[0].uid == objs[0].uid);
+
+        clock.restore();
     });
 
 });
