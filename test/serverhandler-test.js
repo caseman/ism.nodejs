@@ -77,19 +77,21 @@ suite('hi handler', function() {
     test('sends error when no cid issued and closes conn', function() {
         this.serverMock.expects('registerClient').once().withArgs(this.client).returns(false);
         var msg = {says:'hi', clientVersion:version, uid:'96'}
-        this.clientMock.expects('sendError').once().withArgs('cidInUse', msg);
+        this.clientMock.expects('sendError').once().withArgs('tooManyConnections', msg);
         var handled = handle(this.server, this.client, msg);
         assert(handled);
         assert(this.conn.close.called, 'Connection should be closed');
     });
 
     test('successful with reconnecting client', function() {
+        this.client.cid = '888';
+        this.server.clients[this.client.cid] = this.client;
         this.clientMock.expects('sendError').never();
         this.clientMock.expects('send').once()
-            .withArgs({says:'hi', cid:'888', re:'357'});
+            .withArgs({says:'hi', cid:this.client.cid, re:'357'});
 
         var handled = handle(this.server, this.client, 
-            {says:'hi', clientVersion:version, cid:'888', uid:'357'});
+            {says:'hi', clientVersion:version, cid:this.client.cid, uid:'357'});
         assert(handled);
         assert(!this.conn.close.called, 'Connection should not be closed');
     });
