@@ -293,6 +293,36 @@ suite('game object placement', function() {
         assert.equal(objs[3].done, 'right');
     });
 
+    test('see a tile sends events for objects placed', function() {
+        var testGame = new Game(testDb());
+        object.define('seer', {
+            sees: function (aGame, obj) {
+                this.seen[obj.uid] = true;
+            }
+        });
+        var seers = [
+            object.create('seer', {location: [2,8], seen:{}}),
+            object.create('seer', {location: [2,6], seen:{}})
+        ]
+        testGame.placeObject(seers[0]);
+        testGame.placeObject(seers[1]);
+        testGame.iSee(seers[0], [2,5]);
+        testGame.iSee(seers[0], [5,5]);
+        testGame.iSee(seers[1], [5,5]);
+
+        var things = [
+            object.create('seer', {location: [2,5], seen:{}}),
+            object.create('seer', {location: [5,5], seen:{}})
+        ]
+        testGame.placeObject(things[0]);
+        testGame.placeObject(things[1]);
+
+        assert(seers[0].seen[things[0].uid]);
+        assert(!seers[1].seen[things[0].uid]);
+        assert(seers[0].seen[things[1].uid]);
+        assert(seers[1].seen[things[1].uid]);
+    });
+
 });
 
 suite('game persistence', function() {
