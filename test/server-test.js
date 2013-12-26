@@ -19,6 +19,7 @@ var MockDb = function() {
 var MockGame = function(uid) {
     events.EventEmitter.call(this);
     this.uid = uid;
+    this.objects = {};
     this.db = new MockDb;
 }
 util.inherits(MockGame, events.EventEmitter);
