@@ -135,6 +135,13 @@ suite('client', function() {
         assert(this.testSockJs.write.calledWith(JSON.stringify(msg)));
     });
 
+    test('send with string', function() {
+        var uid = this.client.send('itsme');
+        var sent = this.getSent();
+        assert.equal(sent.says, 'itsme');
+        assert.equal(sent.uid, uid);
+    });
+
     test('send adds client cid and uid', function() {
         var msg = {says:'hey', params:'yeah'};
         this.client.cid = '12345';
@@ -153,46 +160,53 @@ suite('client', function() {
             assert.equal(err, 'testError');
             done();
         });
-        this.client.send({});
+        this.client.send('well');
     });
 
     test('reply calls reply handler', function() {
         var replyHandler = sinon.stub().returns(true)
           , msgHandler = sinon.spy()
-          , clientMsg = {says:'yo'}
-          , serverMsg = {says:'whoa'};
+          , serverMsg = {says:'yo'};
         this.client.on('msg:whoa', msgHandler);
-        var uid = this.client.send(clientMsg, replyHandler);
+        var uid = this.client.send('yo', replyHandler);
         serverMsg.re = uid;
         assert(!replyHandler.called);
         this.replyWith(serverMsg);
         assert(!msgHandler.called);
-        assert(replyHandler.calledWith(serverMsg));
-        assert(replyHandler.calledOn(this.client));
+        assert(replyHandler.calledWith(serverMsg), replyHandler.lastCall);
+        assert(replyHandler.calledOn(this.client), replyHandler.lastCall);
     });
 
     test('reply calls reply handler only once if handled', function() {
         var replyHandler = sinon.stub().returns(true)
-          , clientMsg = {says:'yo'}
-          , serverMsg = {says:'whoa'};
-        var uid = this.client.send(clientMsg, replyHandler);
+          , serverMsg = {says:'yo'};
+        var uid = this.client.send('yo', replyHandler);
         serverMsg.re = uid;
         assert(!replyHandler.called);
         this.replyWith(serverMsg);
         this.replyWith(serverMsg);
-        assert(replyHandler.calledOnce);
+        assert(replyHandler.calledOnce, replyHandler.lastCall);
+    });
+
+    test('reply does not call reply handler for non-matching reply', function() {
+        var replyHandler = sinon.stub().returns(true)
+          , serverMsg = {says:'whoa'};
+        var uid = this.client.send('yo', replyHandler);
+        serverMsg.re = uid;
+        this.replyWith(serverMsg);
+        assert(!replyHandler.called);
     });
 
     test('reply handler not cleared if it returns false', function() {
         var replyHandler = sinon.stub().returns(false)
           , clientMsg = {says:'yo'}
-          , serverMsg = {says:'whoa'};
+          , serverMsg = {says:'yo'};
         var uid = this.client.send(clientMsg, replyHandler);
         serverMsg.re = uid;
         assert(!replyHandler.called);
         this.replyWith(serverMsg);
         this.replyWith(serverMsg);
-        assert(replyHandler.calledTwice);
+        assert(replyHandler.calledTwice, replyHandler.callCount);
     });
 
     test('handshake sets cid', function(done) {

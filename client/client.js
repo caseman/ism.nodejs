@@ -47,11 +47,14 @@ function Client(port, host, cid) {
             client.emit('error', msg.error);
             return;
         }
-        if (msg.re && client.replyHandlers[msg.re]) {
-            var handled = client.replyHandlers[msg.re].call(client, msg);
-            if (handled) {
-                delete client.replyHandlers[msg.re];
-                return;
+        if (msg.says && msg.re) {
+            var handler = client.replyHandlers[[msg.says, msg.re]];
+            if (handler) {
+                var handled = handler.call(client, msg);
+                if (handled) {
+                    delete client.replyHandlers[[msg.says, msg.re]];
+                    return;
+                }
             }
         }
         client.emit('msg:' + (msg.says || 'unknown'), msg);
@@ -61,6 +64,9 @@ function Client(port, host, cid) {
         if (!this.connected) {
             log.info('Cannot send message, connection closed');
             return;
+        }
+        if (typeof msg == 'string') {
+            msg = {says: msg};
         }
         msg.uid = genUid();
         if (this.cid) msg.cid = this.cid;
@@ -74,20 +80,19 @@ function Client(port, host, cid) {
         }
         log.debug('Sent message', data);
         if (typeof replyHandler == 'function') {
-            this.replyHandlers[msg.uid] = replyHandler;
+            this.replyHandlers[[msg.says, msg.uid]] = replyHandler;
         }
         return msg.uid;
     }
 
     this.handshake = function handshake(cb) {
-        this.send({says:'hi'}, function(reply) {
-            if (reply.says == 'hi') {
-                this.cid = reply.cid;
-                cb.call(this);
-            }
+        this.send('hi', function(reply) {
+            this.cid = reply.cid;
+            cb.call(this);
             return true;
         });
     }
+
 }
 util.inherits(Client, events.EventEmitter);
 exports.Client = Client;
