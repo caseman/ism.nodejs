@@ -4,10 +4,11 @@ var events = require('events')
   , log = require('../lib/logging').log
   , genUid = require('../lib/uid').genUid;
 
-function Client(port, host) {
+function Client(port, host, cid) {
     events.EventEmitter.call(this);
 
     var client = this;
+    this.cid = cid;
     this.replyHandlers = {};
 
     this.url = 'http://' + host + ':' + port + '/ism';
@@ -47,7 +48,7 @@ function Client(port, host) {
             return;
         }
         if (msg.re && client.replyHandlers[msg.re]) {
-            var handled = client.replyHandlers[msg.re](client, msg);
+            var handled = client.replyHandlers[msg.re].call(client, msg);
             if (handled) {
                 delete client.replyHandlers[msg.re];
                 return;
@@ -62,6 +63,7 @@ function Client(port, host) {
             return;
         }
         msg.uid = genUid();
+        if (this.cid) msg.cid = this.cid;
         try {
             var data = JSON.stringify(msg);
             sock.write(data);
@@ -75,6 +77,16 @@ function Client(port, host) {
             this.replyHandlers[msg.uid] = replyHandler;
         }
         return msg.uid;
+    }
+
+    this.handshake = function handshake(cb) {
+        this.send({says:'hi'}, function(reply) {
+            if (reply.says == 'hi') {
+                this.cid = reply.cid;
+                cb.call(this);
+            }
+            return true;
+        });
     }
 }
 util.inherits(Client, events.EventEmitter);

@@ -16,12 +16,20 @@ suite('client', function() {
             .withArgs('http://ismhost:5557/ism').returns(this.testSockJs);
         this.client = client.create(5557, 'ismhost');
         this.client.connected = true;
+        this.replyWith = function(msg) {
+            this.testSockJs.emit('data', JSON.stringify(msg));
+        }
+        this.getSent = function() {
+            assert(this.testSockJs.write.called, 'nothing was sent');
+            return JSON.parse(this.testSockJs.write.lastCall.args[0])
+        }
     });
 
     this.afterEach(function() {
         this.sockjsMock.verify();
         this.sinon.restore();
     });
+
 
     test('create', function() {
         assert.instanceOf(this.client, client.Client);
@@ -85,7 +93,7 @@ suite('client', function() {
             assert.equal(errorMsg, 'someServerError');
             done();
         });
-        this.testSockJs.emit('data', '{"says":"error", "error":"someServerError"}');
+        this.replyWith({says:"error", error:"someServerError"});
     });
 
     test('emits msg: event', function(done) {
@@ -96,7 +104,7 @@ suite('client', function() {
             assert.deepEqual(msg, testMsg);
             done();
         });
-        this.testSockJs.emit('data', JSON.stringify(testMsg));
+        this.replyWith(testMsg);
     });
 
     test('emits msg:unknown event for incomplete msg', function(done) {
@@ -107,7 +115,7 @@ suite('client', function() {
             assert.deepEqual(msg, testMsg);
             done();
         });
-        this.testSockJs.emit('data', JSON.stringify(testMsg));
+        this.replyWith(testMsg);
     });
 
     test('emits msg:unknown event for incomplete msg', function(done) {
@@ -118,13 +126,22 @@ suite('client', function() {
             assert.deepEqual(msg, testMsg);
             done();
         });
-        this.testSockJs.emit('data', JSON.stringify(testMsg));
+        this.replyWith(testMsg);
     });
 
     test('send writes JSON to socket', function() {
         var msg = {says:'hey', params:'yeah'};
         this.client.send(msg);
         assert(this.testSockJs.write.calledWith(JSON.stringify(msg)));
+    });
+
+    test('send adds client cid and uid', function() {
+        var msg = {says:'hey', params:'yeah'};
+        this.client.cid = '12345';
+        var uid = this.client.send(msg);
+        var sent = this.getSent();
+        assert.equal(sent.uid, uid);
+        assert.equal(sent.cid, this.client.cid);
     });
 
     test('write error emits error event', function(done) {
@@ -140,44 +157,58 @@ suite('client', function() {
     });
 
     test('reply calls reply handler', function() {
-        var replyHandler = sinon.stub()
+        var replyHandler = sinon.stub().returns(true)
           , msgHandler = sinon.spy()
           , clientMsg = {says:'yo'}
           , serverMsg = {says:'whoa'};
-        replyHandler.returns(true);
         this.client.on('msg:whoa', msgHandler);
         var uid = this.client.send(clientMsg, replyHandler);
         serverMsg.re = uid;
         assert(!replyHandler.called);
-        this.testSockJs.emit('data', JSON.stringify(serverMsg));
+        this.replyWith(serverMsg);
         assert(!msgHandler.called);
-        assert(replyHandler.calledWith(this.client, serverMsg));
+        assert(replyHandler.calledWith(serverMsg));
+        assert(replyHandler.calledOn(this.client));
     });
 
     test('reply calls reply handler only once if handled', function() {
-        var replyHandler = sinon.stub()
+        var replyHandler = sinon.stub().returns(true)
           , clientMsg = {says:'yo'}
           , serverMsg = {says:'whoa'};
-        replyHandler.returns(true);
         var uid = this.client.send(clientMsg, replyHandler);
         serverMsg.re = uid;
         assert(!replyHandler.called);
-        this.testSockJs.emit('data', JSON.stringify(serverMsg));
-        this.testSockJs.emit('data', JSON.stringify(serverMsg));
+        this.replyWith(serverMsg);
+        this.replyWith(serverMsg);
         assert(replyHandler.calledOnce);
     });
 
     test('reply handler not cleared if it returns false', function() {
-        var replyHandler = sinon.stub()
+        var replyHandler = sinon.stub().returns(false)
           , clientMsg = {says:'yo'}
           , serverMsg = {says:'whoa'};
-        replyHandler.returns(false);
         var uid = this.client.send(clientMsg, replyHandler);
         serverMsg.re = uid;
         assert(!replyHandler.called);
-        this.testSockJs.emit('data', JSON.stringify(serverMsg));
-        this.testSockJs.emit('data', JSON.stringify(serverMsg));
+        this.replyWith(serverMsg);
+        this.replyWith(serverMsg);
         assert(replyHandler.calledTwice);
+    });
+
+    test('handshake sets cid', function(done) {
+        var test = this;
+        assert(!this.client.cid);
+
+        this.client.handshake(function() {
+            assert.strictEqual(this, test.client);
+            assert.equal(this.cid, '3498579834');
+            done();
+        });
+
+        var sent = this.getSent();
+        assert.equal(sent.says, 'hi');
+        assert(!sent.cid);
+        this.replyWith({says:'hi', cid:'3498579834', re:sent.uid});
     });
 
 });
