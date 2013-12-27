@@ -51,7 +51,7 @@ function Client(port, host, cid) {
             var handler = client.replyHandlers[[msg.says, msg.re]];
             if (handler) {
                 var handled = handler.call(client, msg);
-                if (handled) {
+                if (handled !== false) {
                     delete client.replyHandlers[[msg.says, msg.re]];
                     return;
                 }
@@ -89,7 +89,6 @@ function Client(port, host, cid) {
         this.send('hi', function(reply) {
             this.cid = reply.cid;
             cb.call(this);
-            return true;
         });
     }
 
