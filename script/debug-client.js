@@ -3,6 +3,7 @@ var logging = require('../lib/logging')
   , client = require('../client/client');
 
 logging.configure(true, true);
+logging.useStderr = true;
 
 var myClient = client.create(5557, '0.0.0.0');
 
