@@ -154,7 +154,7 @@ suite('createGame handler', function() {
         });
         this.clientMock.expects('sendError').never();
         this.clientMock.expects('send').once()
-            .withArgs({says:'game', re:'261', game:testGame.info});
+            .withArgs({says:'createGame', re:'261', game:testGame.info});
 
         var handled = handle(this.server, this.client, 
             {says:'createGame', uid:'261', mapParams:mapParams});
