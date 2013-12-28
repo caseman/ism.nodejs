@@ -2,6 +2,7 @@ var events = require('events')
   , util = require('util')
   , sockjs = require('sockjs-client')
   , log = require('../lib/logging').log
+  , clientVersion = require('../package.json').version
   , genUid = require('../lib/uid').genUid;
 
 function Client(port, host, cid) {
@@ -86,7 +87,7 @@ function Client(port, host, cid) {
     }
 
     this.handshake = function handshake(cb) {
-        this.send('hi', function(reply) {
+        this.send({says:'hi', clientVersion:clientVersion}, function(reply) {
             this.cid = reply.cid;
             cb.call(this);
         });

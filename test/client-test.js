@@ -225,4 +225,13 @@ suite('client', function() {
         this.replyWith({says:'hi', cid:'3498579834', re:sent.uid});
     });
 
+    test('handshake sends version', function() {
+        var version = require('../package.json').version;
+
+        this.client.handshake();
+        var sent = this.getSent();
+        assert.equal(sent.says, 'hi');
+        assert.equal(sent.clientVersion, version);
+    });
+
 });
