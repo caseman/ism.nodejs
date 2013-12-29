@@ -4,7 +4,7 @@ var assert = require('chai').assert
   , util = require('util');
 
 suite('client', function() {
-    var client = require('../client/client')
+    var client = require('../lib/client')
       , sockjs = require('sockjs-client');
 
     this.beforeEach(function() {
