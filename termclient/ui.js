@@ -10,6 +10,11 @@ var blessed = require('blessed')
  */
 exports.initScreen = function initScreen(options) {
     screen = exports.screen = blessed.screen(options);
+    if (process.platform == 'darwin') {
+        // MacOS terminfo only reports support for 8 colors for some reason
+        // Setting this manually will enable blessed to use all available colors
+        screen.tput.colors = 256;
+    }
 }
 
 /*
@@ -31,11 +36,16 @@ function combine() {
     for (var i in arguments) {
         var arg = arguments[i];
         for (var name in arg) {
-            result[name] = arg[name];
+            var val = arg[name];
+            if (typeof val == 'object' && name != 'parent') {
+                val = combine(result[name] || {}, val);
+            }
+            result[name] = val;
         }
     }
     return result;
 }
+exports.combine = combine;
 
 var buttonOptions = {
     mouse: true
@@ -43,7 +53,7 @@ var buttonOptions = {
   , padding: {left:1, right:1}
   , align: 'center'
   , style: {
-        bg: 7
+        bg: 31
       , focus: {bg: 6}
       , hover: {bg: 6}
     }
@@ -65,8 +75,8 @@ var dialogOptions = {
   , width: 'shrink'
   , height: 7
   , padding: {left:2, right:1}
-  , bg: 'black'
-  , border: {type:'line', bg:0}
+  , border: {type:'line', bg:17}
+  , style: {bg: 17, label: {bg: 17}}
 };
 
 function dialog(options, buttons, cb) {
@@ -74,9 +84,10 @@ function dialog(options, buttons, cb) {
     dialog.data.isDialog = true;
 
     var done = function(data) {
-        dialog.detach();
-        render();
-        cb(data);
+        if (cb(data) || !data) {
+            dialog.detach();
+            render();
+        }
     }
     dialog.on('submit', done);
     dialog.key('escape', done);
@@ -109,3 +120,36 @@ function dialog(options, buttons, cb) {
     return dialog;
 }
 exports.dialog = dialog;
+
+var inputOptions = {
+    inputOnFocus: true
+  , height: 1
+  , fg: 'white'
+  , bg: 'black'
+}
+
+function labeledInput(options, defaultValue) {
+    var placement = {
+        left: options.name.length + 4
+      , right: 3
+    };
+    var input = blessed.textbox(combine(inputOptions, placement, options));
+    if (defaultValue) input.setValue(defaultValue);
+    input.key('enter', function() {input.parent.focusNext()});
+
+    var textOptions = {
+        parent: input
+      , width: 'shrink'
+      , top: 0
+      , left: -input.name.length - 1
+      , content: input.name
+    }
+    if (input.parent) textOptions.style = combine(input.parent.style);
+    var label = blessed.text(textOptions);
+    label.on('mousedown', input.focus.bind(input));
+
+    return input;
+}
+exports.labeledInput = labeledInput;
+
+
