@@ -1,24 +1,19 @@
-var blessed = require('blessed')
-  , async = require('async')
+var async = require('async')
   , Ctor = require('../lib/ctor')
   , log = require('../lib/logging').log
-  , client = require('../lib/client');
+  , client = require('../lib/client')
+  , ui = require('./ui');
 
 App = Ctor(function() {
     this.init = function(options) {
         this.options = options || {};
-        this.screen = blessed.screen();
     }
 
     this.show = function(viewName) {
-        var screen = this.screen
-          , viewCtor = require('./' + viewName);
+        var viewCtor = require('./' + viewName);
 
         return function() {
-            var view = viewCtor.apply(null, arguments);
-            screen.append(view);
-            view.focus();
-            screen.render();
+            viewCtor.apply(null, arguments);
         }
     }
 
@@ -68,6 +63,7 @@ App = Ctor(function() {
 
     this.start = function() {
         this.starting = true;
+        ui.initScreen();
         this.connect();
     }
 
