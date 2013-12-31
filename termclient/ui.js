@@ -2,6 +2,7 @@
  * Various mixed blessings
  */
 var blessed = require('blessed')
+  , util = require('util')
   , screen
   , willRender = false;
 
@@ -152,4 +153,68 @@ function labeledInput(options, defaultValue) {
 }
 exports.labeledInput = labeledInput;
 
+var TILESPEC = require('./tilespec.json');
 
+function map(options, tiles) {
+    if (!(this instanceof map)) return new map(options, tiles);
+    blessed.box.call(this, options);
+    this.xOffset = options.xOffset || 0;
+    this.yOffset = options.yOffset || 0;
+    this.tiles = tiles;
+}
+util.inherits(map, blessed.box);
+
+map.prototype.render = function() {
+    this._emit('prerender');
+
+    var coords = this._getCoords(true);
+    if (!coords) return;
+
+    var lines = this.screen.lines
+      , xi = coords.xi
+      , xl = coords.xl
+      , yi = coords.yi
+      , yl = coords.yl
+      , x, y
+      , tx, ty
+      , cell
+      , tile
+      , fg, bg
+      , ch
+      , attr;
+
+    for (y = yi, ty = this.yOffset; y < yl; y++, ty++) {
+        if (!lines[y]) break;
+        for (x = xi, tx = this.xOffset; x < xl; x++, tx++) {
+            cell = lines[y][x];
+            tile = this.tiles[tx][ty];
+            if (!cell || !tile) break;
+
+            var tilespec = null;
+            if (tile.biome) tilespec = TILESPEC[tile.terrain + '-' + tile.biome];
+            if (!tilespec) tilespec = TILESPEC[tile.biome] || TILESPEC[tile.terrain] || [0, '?', 1];
+            ch = tile.startingLocation ? '⤊' : tilespec[1];
+            fg = tile.startingLocation ? 0 : tilespec[2];
+            bg = tilespec[0];
+            attr = this.sattr({}, fg, bg);
+
+            if (attr !== cell[0] || ch !== cell[1]) {
+                cell[0] = attr;
+                cell[1] = ch;
+                lines[y].dirty = true;
+            }
+        }
+    }
+
+    this.children.forEach(function(el) {
+        if (el.screen._ci !== -1) {
+          el.index = el.screen._ci++;
+        }
+        el.render();
+    });
+
+    this._emit('render', [coords]);
+
+    return coords;
+}
+exports.map = map;
