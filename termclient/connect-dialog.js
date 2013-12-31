@@ -9,7 +9,7 @@ module.exports = function ConnectDialog(options, cb) {
         }
       , ['Connect', 'Cancel']
       , function(data) {
-            if (data.Connect) {
+            if (data && data.Connect) {
                 if (!data.host) {
                     msgBox.style.fg = 'red';
                     msgBox.content = 'Host not specified.';
