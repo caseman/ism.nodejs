@@ -10,13 +10,19 @@ map.readMapFromStream(
   , function(map) {
         var uiMap = ui.map({
               parent: ui.screen
+            , name: 'testmap'
+            , keys: true
+            , vi: true
+            , scrollSpeed: 4
+            , mouse: true
             , width: ui.screen.width
             , height: ui.screen.height
             , xOffset: 200
             , yOffset: 200
             }
+          , map
           , map.tiles);
-        ui.screen.append(uiMap);
+        uiMap.focus();
         ui.render();
     }
 );

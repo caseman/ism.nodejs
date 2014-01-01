@@ -155,14 +155,48 @@ exports.labeledInput = labeledInput;
 
 var TILESPEC = require('./tilespec.json');
 
-function map(options, tiles) {
-    if (!(this instanceof map)) return new map(options, tiles);
+function map(options, mapInfo, tiles) {
+    if (!(this instanceof map)) return new map(options, mapInfo, tiles);
+    var self = this;
     blessed.box.call(this, options);
     this.xOffset = options.xOffset || 0;
     this.yOffset = options.yOffset || 0;
+    this.mapInfo = mapInfo;
     this.tiles = tiles;
+
+    if (options.keys && !options.ignoreKeys) {
+        this.on('keypress', function(ch, key) {
+            screen.log(JSON.stringify(ch), JSON.stringify(key));
+            var dx = 0
+              , dy = 0
+              , vi = options.vi && (key.ctrl || key.shift);
+            dy -= key.name === 'up'
+            dy -= vi && (key.name === 'k' || key.name === 'y' || key.name === 'u')
+            dy += key.name === 'down' || key.name === 'linefeed'
+            dy += vi && (key.name === 'j' || key.name === 'b' || key.name === 'n')
+
+            dx -= key.name === 'left' || key.name === 'backspace'
+            dx -= vi && (key.name === 'h' || key.name === 'y' || key.name === 'b')
+            dx += key.name === 'right' 
+            dx += vi && (key.name === 'l' || key.name === 'n' || key.name === 'u')
+
+            if (dx || dy) {
+                if (key.shift) {
+                    var xSpeed = Math.floor(self.width / 3)
+                      , ySpeed = Math.floor(self.height / 3);
+                    self.scroll(dx * xSpeed, dy * ySpeed);
+                } else {
+                    var scrollSpeed = self.options.scrollSpeed || 1;
+                    self.scroll(dx * scrollSpeed, dy * scrollSpeed);
+                }
+                self.screen.render();
+            }
+        });
+    }
+
 }
-util.inherits(map, blessed.box);
+map.prototype.__proto__ = blessed.box.prototype;
+//util.inherits(map, blessed.box);
 
 map.prototype.render = function() {
     this._emit('prerender');
@@ -171,6 +205,7 @@ map.prototype.render = function() {
     if (!coords) return;
 
     var lines = this.screen.lines
+      , mapWidth = this.mapInfo.width
       , xi = coords.xi
       , xl = coords.xl
       , yi = coords.yi
@@ -187,7 +222,7 @@ map.prototype.render = function() {
         if (!lines[y]) break;
         for (x = xi, tx = this.xOffset; x < xl; x++, tx++) {
             cell = lines[y][x];
-            tile = this.tiles[tx][ty];
+            tile = this.tiles[(tx + mapWidth) % mapWidth][ty];
             if (!cell || !tile) break;
 
             var tilespec = null;
@@ -216,5 +251,17 @@ map.prototype.render = function() {
     this._emit('render', [coords]);
 
     return coords;
+}
+
+map.prototype.scroll = function (dx, dy) {
+    this.xOffset += dx;
+    this.yOffset += dy;
+    while (this.xOffset < 0) this.xOffset += this.mapInfo.width;
+    while (this.xOffset >= this.mapInfo.width) this.xOffset -= this.mapInfo.width;
+    if (this.yOffset < 0) this.yOffset = 0;
+    if (this.yOffset + this.height > this.mapInfo.height) {
+        this.yOffset = this.mapInfo.height - this.height;
+        if (this.yOffset < 0) this.yOffset = Math.floor(this.yOffset / 2);
+    }
 }
 exports.map = map;
