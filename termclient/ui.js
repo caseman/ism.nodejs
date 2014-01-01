@@ -161,12 +161,13 @@ function map(options, mapInfo, tiles) {
     blessed.box.call(this, options);
     this.xOffset = options.xOffset || 0;
     this.yOffset = options.yOffset || 0;
+    this.scrollSpeed = options.scrollSpeed || 1;
     this.mapInfo = mapInfo;
     this.tiles = tiles;
 
     if (options.keys && !options.ignoreKeys) {
         this.on('keypress', function(ch, key) {
-            screen.log(JSON.stringify(ch), JSON.stringify(key));
+            //screen.log(JSON.stringify(ch), JSON.stringify(key));
             var dx = 0
               , dy = 0
               , vi = options.vi && (key.ctrl || key.shift);
@@ -186,7 +187,7 @@ function map(options, mapInfo, tiles) {
                       , ySpeed = Math.floor(self.height / 3);
                     self.scroll(dx * xSpeed, dy * ySpeed);
                 } else {
-                    var scrollSpeed = self.options.scrollSpeed || 1;
+                    var scrollSpeed = self.scrollSpeed
                     self.scroll(dx * scrollSpeed, dy * scrollSpeed);
                 }
                 self.screen.render();
@@ -203,6 +204,7 @@ map.prototype.render = function() {
 
     var coords = this._getCoords(true);
     if (!coords) return;
+    this.lpos = coords; // Needed for mouse support
 
     var lines = this.screen.lines
       , mapWidth = this.mapInfo.width
@@ -253,15 +255,91 @@ map.prototype.render = function() {
     return coords;
 }
 
-map.prototype.scroll = function (dx, dy) {
-    this.xOffset += dx;
-    this.yOffset += dy;
-    while (this.xOffset < 0) this.xOffset += this.mapInfo.width;
-    while (this.xOffset >= this.mapInfo.width) this.xOffset -= this.mapInfo.width;
-    if (this.yOffset < 0) this.yOffset = 0;
-    if (this.yOffset + this.height > this.mapInfo.height) {
-        this.yOffset = this.mapInfo.height - this.height;
-        if (this.yOffset < 0) this.yOffset = Math.floor(this.yOffset / 2);
+/*
+ * Scroll the map a relative amount
+ */
+map.prototype.scroll = function(dx, dy) {
+    this.scrollTo(this.xOffset + dx, this.yOffset + dy);
+}
+
+/*
+ * Scroll to an absolute position, or as close a possible to it
+ */
+map.prototype.scrollTo = function(xOffset, yOffset) {
+    while (xOffset < 0) xOffset += this.mapInfo.width;
+    while (xOffset >= this.mapInfo.width) xOffset -= this.mapInfo.width;
+    if (yOffset < 0) yOffset = 0;
+    if (yOffset + this.height > this.mapInfo.height) {
+        yOffset = this.mapInfo.height - this.height;
+        if (yOffset < 0) yOffset = Math.floor(yOffset / 2);
+    }
+    this.xOffset = xOffset;
+    this.yOffset = yOffset;
+}
+
+/*
+ * Return the tile at the element position specified if any
+ */
+map.prototype.tileAt = function(x, y) {
+    var tx = x + this.xOffset
+      , ty = y + this.yOffset
+      , mapWidth = this.mapInfo.width;
+    return this.tiles[(tx + mapWidth) % mapWidth][ty]; 
+}
+
+/*
+ * Scroll attempting to center the tile position
+ */
+map.prototype.scrollCentering = function(tileX, tileY) {
+    this.scrollTo(
+        tileX - Math.floor(this.width / 2)
+      , tileY - Math.floor(this.height / 2)
+    );
+}
+
+/*
+ * Scroll the minimum amount to reveal the tile position It will be positioned
+ * at least scrollSpeed from the edge of the map view if possible. If it is
+ * already visible with enough room to the view edge, no scrolling occurs,
+ * and false is returned.
+ */
+map.prototype.scrollRevealing = function(tileX, tileY) {
+    tLeft = this.xOffset + this.scrollSpeed;
+    tRight = this.xOffset + this.width - this.scrollSpeed;
+    while (tRight <= tLeft) {
+        // Handle narrow view
+        tLeft--;
+        tRight++;
+    }
+    tTop = this.yOffset + this.scrollSpeed;
+    tBottom = this.yOffset + this.height - this.scrollSpeed;
+    while (tBottom <= tTop) {
+        // Handle short view
+        tTop--;
+        tBottom++;
+    }
+
+    var xOffset = 0
+      , yOffset = 0;
+
+    if (tileX < tLeft) {
+        xOffset = tileX - tLeft;
+    } else if (tileX > tRight) {
+        xOffset = tileX - tRight;
+    }
+
+    if (tileY < tTop) {
+        yOffset = tileY - tTop;
+    } else if (tileY > tBottom) {
+        yOffset = tileY - tBottom;
+    }
+
+    if (xOffset || yOffset) {
+        this.scroll(xOffset, yOffset);
+        return true;
+    } else {
+        return false;
     }
 }
+
 exports.map = map;
