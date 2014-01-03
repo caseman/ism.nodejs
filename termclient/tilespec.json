@@ -21,7 +21,7 @@
 , "hill" : [143, "ᴖ", 106]
 , "mountain": [243, "▴", 247]
 , "mountain-tundra": [243, "▴", 254]
-, "mountain-ice": [51, "▴", 81]
+, "mountain-glacier": [123, "▴", 15]
 , "tundra": [254, ".", 15]
 , "hill-tundra": [254, "ᴖ", 15]
 
