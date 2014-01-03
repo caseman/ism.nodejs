@@ -28,9 +28,11 @@
 , "moistureReach": 20
 , "rainBaseline": 2
 , "rainMultiplier": 5
-, "riverRainThreshold": 2.5
-, "riverStartProbability": 0.01
-, "riverFlowFactor": 1
+, "riverRainThreshold": 1.5
+, "riverStartProbability": 0.02
+, "riverElevationThreshold": 0.5
+, "riverFlowFactor": 0.1
+, "riverGrowthFactor" : 0.065
 
 , "iceThreshold": 1.3
 , "snowThreshold": 1.5
