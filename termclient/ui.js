@@ -196,8 +196,7 @@ function map(options, mapInfo, tiles) {
     }
 
 }
-map.prototype.__proto__ = blessed.box.prototype;
-//util.inherits(map, blessed.box);
+util.inherits(map, blessed.box);
 
 map.prototype.render = function() {
     this._emit('prerender');
