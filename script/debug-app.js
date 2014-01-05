@@ -3,7 +3,7 @@ var logging = require('../lib/logging')
   , app = require('../termclient/app');
 
 logging.configure(true, true);
-logging.useStderr = true;
+logging.useFile(logging.defaultClientPath());
 
 var app = app.create();
 app.start();
