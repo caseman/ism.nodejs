@@ -1,7 +1,7 @@
 var fs = require('fs');
 var util = require('util');
-var Map = require('./lib/map').Map;
-var mapConfig = require('./map');
+var Map = require('../lib/map').Map;
+var mapConfig = require('../map-config/default.json');
 
 var TILE_COLORS = {
     "ocean": "30 50 180\n",
