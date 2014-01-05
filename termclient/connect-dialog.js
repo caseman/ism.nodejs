@@ -47,12 +47,13 @@ module.exports = function ConnectDialog(options, cb) {
 
     msgBox = blessed.text({
         parent: dialog
-      , top: dialog.height - 2
+      , top: dialog.height - 3
       , style: ui.combine(dialog.style)
       , align: 'right'
+      , valign: 'bottom'
       , right: 3
-      , width: 20
-      , height: 1
+      , width: dialog.width - 42
+      , height: 2
       , content: options.connectMsg
     });
 

@@ -14,7 +14,8 @@
     "level": "~0.18.0",
     "async": "~0.2.9",
     "blessed": "0.0.25",
-    "a-star": "~0.1.0"
+    "a-star": "~0.1.0",
+    "errno": "~0.1.0"
   },
   "devDependencies": {
     "mocha": "~1.14.0",

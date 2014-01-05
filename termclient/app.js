@@ -23,15 +23,17 @@ App = Ctor(function() {
         if (!app.options.serverHost || !app.options.serverPort) {
             app.showConnectDialog();
         } else {
-            try {
-                //var newClient = client.create(app.options.serverPort, app.options.serverHost);
-            } catch (err) {
-                app.reportError('Error connecting to server', err, function() {
-                    if (app.starting) app.showConnectDialog();
-                });
-                return;
-            }
-            //app.useClient(newClient);
+            var newClient = client.create(app.options.serverPort, app.options.serverHost);
+            newClient.once('error', function(name, err) {
+                var code = err[0] && err[0].code ? err[0].code : 'UNKNOWN'
+                  , errno = require('errno').code[code];
+                app.options.connectMsg = 'Error: ' + errno.description;
+                app.showConnectDialog();
+            });
+            newClient.once('connection', function() {
+                newClient.removeAllListeners('error');
+                app.useClient(newClient);
+            });
         }
     }
 
