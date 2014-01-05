@@ -1,31 +1,16 @@
 #!/usr/bin/env node
-var sockjsc = require('sockjs-client');
-var version = require('../package.json').version;
+var logging = require('../lib/logging')
+  , client = require('../client/client');
 
-var client = sockjsc.create('http://0.0.0.0:5557/ism');
+logging.configure(true, true);
+logging.useStderr = true;
 
-client.on('connection', function() {
-    console.log('connected');
+var myClient = client.create(5557, '0.0.0.0');
+
+myClient.on('connected', function() {
+    myClient.handshake(function() {
+        console.log('handshake successful cid =', this.cid);
+    });
 });
-
-client.on('data', function(msg) {
-    console.log('received:', msg);
-});
-
-client.on('error', function(err) {
-    console.log('error:', err);
-});
-
-client.on('close', function() {
-    console.log('connection closed');
-});
-
-function send(obj) {
-    var data = JSON.stringify(obj)
-    client.write(data);
-    console.log('sent:', data);
-}
-
-send({says:'hi', uid:'hello', clientVersion:version});
 
 
