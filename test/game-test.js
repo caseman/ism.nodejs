@@ -293,11 +293,13 @@ suite('game object placement', function() {
         assert.equal(objs[3].done, 'right');
     });
 
-    test('see a tile sends events for objects placed', function() {
+    test('see a tile sends events for tile', function() {
         var testGame = new Game(testDb());
+        testGame.tiles[2] = {5: {key:'2,5'}};
+        testGame.tiles[5] = {5: {key:'5,5'}};
         object.define('seer', {
-            sees: function (aGame, obj) {
-                this.seen[obj.uid] = true;
+            sees: function (aGame, tile) {
+                this.seen[tile.key] = true;
             }
         });
         var seers = [
@@ -306,9 +308,9 @@ suite('game object placement', function() {
         ]
         testGame.placeObject(seers[0]);
         testGame.placeObject(seers[1]);
-        testGame.iSee(seers[0], [2,5]);
-        testGame.iSee(seers[0], [5,5]);
-        testGame.iSee(seers[1], [5,5]);
+        testGame.objectSeesTile(seers[0], {key:'2,5'});
+        testGame.objectSeesTile(seers[0], {key:'5,5'});
+        testGame.objectSeesTile(seers[1], {key:'5,5'});
 
         var things = [
             object.create('seer', {location: [2,5], seen:{}}),
@@ -317,10 +319,10 @@ suite('game object placement', function() {
         testGame.placeObject(things[0]);
         testGame.placeObject(things[1]);
 
-        assert(seers[0].seen[things[0].uid]);
-        assert(!seers[1].seen[things[0].uid]);
-        assert(seers[0].seen[things[1].uid]);
-        assert(seers[1].seen[things[1].uid]);
+        assert(seers[0].seen['2,5']);
+        assert(!seers[1].seen['2,5']);
+        assert(seers[0].seen['5,5']);
+        assert(seers[1].seen['5,5']);
     });
 
 });
