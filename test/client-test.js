@@ -1,7 +1,6 @@
 var assert = require('chai').assert
   , sinon = require('sinon')
-  , events = require('events')
-  , util = require('util');
+  , events = require('events');
 
 suite('client', function() {
     var client = require('../lib/client')
@@ -10,7 +9,7 @@ suite('client', function() {
     this.beforeEach(function() {
         this.sinon = sinon.sandbox.create();
         this.sockjsMock = this.sinon.mock(sockjs);
-        this.testSockJs = new events.EventEmitter;
+        this.testSockJs = new events.EventEmitter();
         this.testSockJs.write = this.sinon.stub();
         this.sockjsCreate = this.sockjsMock.expects('create')
             .withArgs('http://ismhost:5557/ism').returns(this.testSockJs);
@@ -65,15 +64,17 @@ suite('client', function() {
         this.testSockJs.emit('close');
     });
 
-    test('emits error event on socket error', function(done) {
+    test('emits error event on socket error with description', function(done) {
+        var testError = [{code:'ETIMEDOUT'}];
         var client = this.client;
-        this.client.on('error', function(errorMsg, error) {
+        this.client.on('error', function(errorMsg, errno, err) {
             assert.strictEqual(this, client);
             assert.equal(errorMsg, 'websocketError');
-            assert.equal(error, 'testError');
+            assert.equal(errno.description, require('errno').code.ETIMEDOUT.description);
+            assert.strictEqual(err, testError);
             done();
         });
-        this.testSockJs.emit('error', 'testError');
+        this.testSockJs.emit('error', testError);
     });
 
     test('emits error event on data parse error', function(done) {

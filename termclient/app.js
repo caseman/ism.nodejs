@@ -25,9 +25,7 @@ App = Ctor(function() {
         } else {
             var newClient = client.create(app.options.serverPort, app.options.serverHost);
             newClient.once('error', function(name, err) {
-                var code = err[0] && err[0].code ? err[0].code : 'UNKNOWN'
-                  , errno = require('errno').code[code];
-                app.options.connectMsg = 'Error: ' + errno.description;
+                app.options.connectMsg = 'Error: ' + err.description;
                 app.showConnectDialog();
             });
             newClient.once('connection', function() {
