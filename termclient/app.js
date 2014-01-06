@@ -1,10 +1,9 @@
-var async = require('async')
-  , Ctor = require('../lib/ctor')
+var Ctor = require('../lib/ctor')
   , log = require('../lib/logging').log
   , client = require('../lib/client')
   , ui = require('./ui');
 
-App = Ctor(function() {
+var App = Ctor(function() {
     this.init = function(options) {
         this.options = options || {};
     }
