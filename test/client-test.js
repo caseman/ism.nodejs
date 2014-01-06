@@ -40,9 +40,9 @@ suite('client', function() {
         assert(this.client.connected);
     });
 
-    test('emits connected event', function(done) {
+    test('emits connection event', function(done) {
         var client = this.client;
-        this.client.on('connected', function() {
+        this.client.on('connection', function() {
             assert.strictEqual(this, client);
             done();
         });

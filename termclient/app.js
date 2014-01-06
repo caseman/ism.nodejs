@@ -23,12 +23,13 @@ var App = Ctor(function() {
             app.showConnectDialog();
         } else {
             var newClient = client.create(app.options.serverPort, app.options.serverHost);
-            newClient.once('error', function(name, err) {
+            var connectErrorCb = function(name, err) {
                 app.options.connectMsg = 'Error: ' + err.description;
                 app.showConnectDialog();
-            });
+            }
+            newClient.on('error', connectErrorCb);
             newClient.once('connection', function() {
-                newClient.removeAllListeners('error');
+                newClient.removeListener('error', connectErrorCb);
                 app.useClient(newClient);
             });
         }
