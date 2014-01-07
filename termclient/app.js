@@ -27,7 +27,7 @@ var App = Ctor(function() {
                 app.options.connectMsg = 'Error: ' + err.description;
                 app.showConnectDialog();
             }
-            newClient.on('error', connectErrorCb);
+            newClient.once('error', connectErrorCb);
             newClient.once('connection', function() {
                 newClient.removeListener('error', connectErrorCb);
                 app.useClient(newClient);
