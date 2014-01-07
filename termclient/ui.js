@@ -32,6 +32,17 @@ function render() {
 }
 exports.render = render;
 
+/*
+ * Create a view from a local module
+ */
+exports.show = function show(viewName) {
+    var viewCtor = require('./' + viewName);
+
+    return function() {
+        return viewCtor.apply(null, arguments);
+    }
+}
+
 function combine() {
     var result = {};
     for (var i in arguments) {

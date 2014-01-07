@@ -8,14 +8,6 @@ var App = Ctor(function() {
         this.options = options || {};
     }
 
-    this.show = function(viewName) {
-        var viewCtor = require('./' + viewName);
-
-        return function() {
-            viewCtor.apply(null, arguments);
-        }
-    }
-
     this.connect = function() {
         var app = this;
 
@@ -38,7 +30,7 @@ var App = Ctor(function() {
     this.showConnectDialog = function() {
         var app = this;
 
-        app.show('connect-dialog')(app.options, function(confirmed) {
+        ui.show('connect-dialog')(app.options, function(confirmed) {
             if (confirmed) {
                 app.connect();
             } else if (app.starting) {
@@ -47,15 +39,26 @@ var App = Ctor(function() {
         });
     }
 
+    /*
+     * Return the main app view, creating it if necessary
+     */
+    this.mainView = function() {
+        if (!this._mainView) {
+            this._mainView = ui.show('main-view')(this);
+        }
+        return this._mainView;
+    }
+
     this.useClient = function(appClient) {
         if (this.client) this.client.close();
         this.client = appClient;
+        this.mainView().emit('useClient', appClient);
         // TODO bind events
     }
 
     this.reportError = function(msg, err, cb) {
         log.error(msg, err);
-        this.show('error-dialog')(msg, err, function() {
+        ui.show('error-dialog')(msg, err, function() {
             if (err.isFatal) process.exit();
             if (typeof cb == 'function') cb();
         });
