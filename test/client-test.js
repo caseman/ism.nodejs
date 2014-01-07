@@ -130,6 +130,12 @@ suite('client', function() {
         this.replyWith(testMsg);
     });
 
+    test('close closes socket', function() {
+        this.testSockJs.close = sinon.spy();
+        this.client.close();
+        assert(this.testSockJs.close.calledOnce);
+    });
+
     test('send writes JSON to socket', function() {
         var msg = {says:'hey', params:'yeah'};
         this.client.send(msg);
