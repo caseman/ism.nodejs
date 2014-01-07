@@ -87,14 +87,15 @@ suite('client', function() {
         this.testSockJs.emit('data', "{'says':'goo");
     });
 
-    test('emits error event on server error', function(done) {
-        var client = this.client;
-        this.client.on('error', function(errorMsg) {
+    test('emits serverError event on server error', function(done) {
+        var client = this.client
+          , msg = {says:"error", error:"someServerError"};
+        this.client.on('serverError', function(errorMsg) {
             assert.strictEqual(this, client);
-            assert.equal(errorMsg, 'someServerError');
+            assert.deepEqual(errorMsg, msg);
             done();
         });
-        this.replyWith({says:"error", error:"someServerError"});
+        this.replyWith(msg);
     });
 
     test('emits msg: event', function(done) {
