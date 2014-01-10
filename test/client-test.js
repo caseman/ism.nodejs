@@ -101,7 +101,7 @@ suite('client', function() {
     test('emits msg: event', function(done) {
         var client = this.client;
         var testMsg = {says:'test', param:'foobar'};
-        this.client.on('msg:test', function(msg) {
+        this.client.on('msg test', function(msg) {
             assert.strictEqual(this, client);
             assert.deepEqual(msg, testMsg);
             done();
@@ -109,10 +109,10 @@ suite('client', function() {
         this.replyWith(testMsg);
     });
 
-    test('emits msg:unknown event for incomplete msg', function(done) {
+    test('emits "msg unknown" event for incomplete msg', function(done) {
         var client = this.client;
         var testMsg = {param:'yayaya'};
-        this.client.on('msg:unknown', function(msg) {
+        this.client.on('msg unknown', function(msg) {
             assert.strictEqual(this, client);
             assert.deepEqual(msg, testMsg);
             done();
@@ -120,10 +120,10 @@ suite('client', function() {
         this.replyWith(testMsg);
     });
 
-    test('emits msg:unknown event for incomplete msg', function(done) {
+    test('emits "msg unknown" event for incomplete msg', function(done) {
         var client = this.client;
         var testMsg = {param:'yayaya'};
-        this.client.on('msg:unknown', function(msg) {
+        this.client.on('msg unknown', function(msg) {
             assert.strictEqual(this, client);
             assert.deepEqual(msg, testMsg);
             done();

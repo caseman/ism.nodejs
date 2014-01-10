@@ -88,7 +88,7 @@ suite('object types and events', function() {
     });
 
     test('visible properties for clientCopy', function() {
-        object.define('visiblefc', {}, ['flux', 'crux']);
+        object.define('visiblefc', {}, {flux:true, crux:true});
         var obj = object.create('visiblefc', {
             createdTurn: 10
           , modifiedTurn: 10

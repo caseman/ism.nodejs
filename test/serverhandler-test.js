@@ -225,8 +225,6 @@ suite('join handler', function() {
         gameMock.expects('started').returns(false);
         gameMock.expects('chooseNationForClient').once().withArgs(this.client).returns(nation);
         this.clientMock.expects('joinGame').once().withArgs(testGame);
-        this.clientMock.expects('send').once().withArgs(
-            {says:'game', game:testGame.info, re:"579"});
 
         var handled = handle(this.server, this.client, 
             {says: 'join', game:testGame.uid, uid:"579"});
@@ -245,10 +243,6 @@ suite('join handler', function() {
         gameMock.expects('started').returns(true);
         gameMock.expects('chooseNationForClient').once().withArgs(this.client).returns(nation);
         this.clientMock.expects('joinGame').once().withArgs(testGame);
-        this.clientMock.expects('send').once()
-            .withArgs({says:'game', game:testGame.info, re:"435"});
-        this.clientMock.expects('send').once()
-            .withArgs({says:'update', objects:people});
 
         var handled = handle(this.server, this.client, 
             {says: 'join', game:testGame.uid, uid:"435"});

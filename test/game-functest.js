@@ -99,7 +99,7 @@ suite('Game persistence', function() {
                         assert.deepEqual(tile, theGame.tiles[tile.x][tile.y]);
                     })
                   , nations: dbGetAll(theGame, 'nation', nationCount, function(nation) {
-                        assert.deepEqual(nation, theGame.nations[nation.uid]);
+                        assert.deepEqual(nation, theGame.nations[nation.uid].toJSON());
                     })
                   , objects: dbGetAll(theGame, 'obj', objectCount, function(obj) {
                         assert.deepEqual(obj, theGame.objects[obj.uid]);
@@ -125,7 +125,11 @@ suite('Game persistence', function() {
                 assert.deepEqual(createdGame.map, loadedGame.map);
                 assert.deepEqual(createdGame.turn, loadedGame.turn);
                 assert.deepEqual(createdGame.tiles, loadedGame.tiles);
-                assert.deepEqual(createdGame.nations, loadedGame.nations);
+                assert.equal(createdGame.nations.length, loadedGame.nations.length);
+                for (var uid in createdGame.nations) {
+                    assert.deepEqual(createdGame.nations[uid].toJSON(), 
+                                     loadedGame.nations[uid].toJSON());
+                }
                 assert.deepEqual(createdGame.objects, loadedGame.objects);
                 done();
             });

@@ -178,7 +178,6 @@ function map(options, mapInfo, tiles) {
 
     if (options.keys && !options.ignoreKeys) {
         this.on('keypress', function(ch, key) {
-            //screen.log(JSON.stringify(ch), JSON.stringify(key));
             var dx = 0
               , dy = 0
               , vi = options.vi && (key.ctrl || key.shift);
@@ -228,18 +227,23 @@ map.prototype.render = function() {
       , tile
       , fg, bg
       , ch
-      , attr;
+      , attr
+      , tilespec;
 
     for (y = yi, ty = this.yOffset; y < yl; y++, ty++) {
         if (!lines[y]) break;
         for (x = xi, tx = this.xOffset; x < xl; x++, tx++) {
             cell = lines[y][x];
-            tile = this.tiles[(tx + mapWidth) % mapWidth][ty];
-            if (!cell || !tile) break;
+            if (!cell) break;
 
-            var tilespec = null;
-            if (tile.biome) tilespec = TILESPEC[tile.terrain + '-' + tile.biome];
-            if (!tilespec) tilespec = TILESPEC[tile.biome] || TILESPEC[tile.terrain] || [0, '?', 1];
+            tile = this.tiles[(tx + mapWidth) % mapWidth][ty];
+            if (tile) {
+                tilespec = null;
+                if (tile.biome) tilespec = TILESPEC[tile.terrain + '-' + tile.biome];
+                if (!tilespec) tilespec = TILESPEC[tile.biome] || TILESPEC[tile.terrain] || [0, '?', 1];
+            } else {
+                tilespec = TILESPEC.unexplored;
+            }
             ch = tile.startingLocation ? '⤊' : tilespec[1];
             fg = tile.startingLocation ? 0 : tilespec[2];
             bg = tilespec[0];

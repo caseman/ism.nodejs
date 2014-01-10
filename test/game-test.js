@@ -508,15 +508,6 @@ suite('game persistence', function() {
         assert.deepEqual(args[1], testNation);
     });
 
-    test('saveNation emits event', function(done) {
-        var testNation = {uid: '345987098'};
-        this.game.on('nationChanged', function(nation) {
-            assert.strictEqual(nation, testNation);
-            done();
-        });
-        this.game.saveNation(testNation);
-    });
-
     test('nationChanged saves each once later', function(done) {
         var nation1 = {uid:'529785234'}
           , nation2 = {uid:'234598743'}

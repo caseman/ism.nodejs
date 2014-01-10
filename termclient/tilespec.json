@@ -1,5 +1,6 @@
 {
   "cursor" : ["red", "◆", "black"]
+, "unexplored" : [250, "▒", 245]
 , "glacier" : [123, "⋚", 195]
 , "ocean" : [18, "~", 21]
 , "coast" : [19, "~", 21]
