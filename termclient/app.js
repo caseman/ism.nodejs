@@ -44,7 +44,7 @@ var App = Ctor(function() {
      */
     this.mainView = function() {
         if (!this._mainView) {
-            this._mainView = ui.show('main-view')(this);
+            this._mainView = ui.show('main-view')();
         }
         return this._mainView;
     }
@@ -53,7 +53,7 @@ var App = Ctor(function() {
         if (this.client) this.client.close();
         this.client = appClient;
         this.mainView().emit('useClient', appClient);
-        // TODO bind events
+        this.client.handshake(function() {});
     }
 
     this.reportError = function(msg, err, cb) {
