@@ -166,15 +166,14 @@ exports.labeledInput = labeledInput;
 
 var TILESPEC = require('./tilespec.json');
 
-function map(options, mapInfo, tiles) {
-    if (!(this instanceof map)) return new map(options, mapInfo, tiles);
+function map(options) {
+    if (!(this instanceof map)) return new map(options);
     var self = this;
     blessed.box.call(this, options);
     this.xOffset = options.xOffset || 0;
     this.yOffset = options.yOffset || 0;
     this.scrollSpeed = options.scrollSpeed || 1;
-    this.mapInfo = mapInfo;
-    this.tiles = tiles;
+    this.game = null;
 
     if (options.keys && !options.ignoreKeys) {
         this.on('keypress', function(ch, key) {
@@ -214,9 +213,10 @@ map.prototype.render = function() {
     var coords = this._getCoords(true);
     if (!coords) return;
     this.lpos = coords; // Needed for mouse support
+    if (!this.game) return coords;
 
     var lines = this.screen.lines
-      , mapWidth = this.mapInfo.width
+      , mapWidth = this.game.info.mapWidth
       , xi = coords.xi
       , xl = coords.xl
       , yi = coords.yi
@@ -280,11 +280,13 @@ map.prototype.scroll = function(dx, dy) {
  * Scroll to an absolute position, or as close a possible to it
  */
 map.prototype.scrollTo = function(xOffset, yOffset) {
-    while (xOffset < 0) xOffset += this.mapInfo.width;
-    while (xOffset >= this.mapInfo.width) xOffset -= this.mapInfo.width;
+    var width = this.game.info.mapWidth
+      , height = this.game.info.mapHeight;
+    while (xOffset < 0) xOffset += width;
+    while (xOffset >= width) xOffset -= width;
     if (yOffset < 0) yOffset = 0;
-    if (yOffset + this.height > this.mapInfo.height) {
-        yOffset = this.mapInfo.height - this.height;
+    if (yOffset + this.height > height) {
+        yOffset = height - this.height;
         if (yOffset < 0) yOffset = Math.floor(yOffset / 2);
     }
     this.xOffset = xOffset;
@@ -297,8 +299,8 @@ map.prototype.scrollTo = function(xOffset, yOffset) {
 map.prototype.tileAt = function(x, y) {
     var tx = x + this.xOffset
       , ty = y + this.yOffset
-      , mapWidth = this.mapInfo.width;
-    return this.tiles[(tx + mapWidth) % mapWidth][ty]; 
+      , mapWidth = this.game.info.mapWidth;
+    return this.game.tile((tx + mapWidth) % mapWidth, ty); 
 }
 
 /*
