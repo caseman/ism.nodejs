@@ -7,13 +7,7 @@ module.exports = function MainView() {
       , width: '100%'
       , height: '100%'
     });
-/*
-    ui.screen.on('resize', function() {
-        view.width = ui.screen.width;
-        view.height = ui.screen.height;
-        ui.render();
-    });
-*/
+
     var sidePanel = view.data.sidePanel = blessed.box({
         parent: view
       , width: 40
@@ -34,6 +28,29 @@ module.exports = function MainView() {
             bg: 3
           , fg: 'black'
         }
+    });
+
+    var mapView = view.data.mapView = ui.map({
+        parent: view
+      , right: sidePanel.width
+      , bottom: statusBar.height
+      , scrollSpeed: 4
+      , keys: true
+      , vi: true
+      , mouse: true
+    });
+
+    view.on('useClient', function(client) {
+        client.on('updatePerson', ui.render);
+        client.on('updateGame', ui.render);
+        client.on('updateNation', ui.render);
+        client.on('joinGame', function(game) {
+            mapView.game = game;
+            var location = game.nation.startLocation;
+            mapView.scrollCentering(location[0], location[1]);
+            mapView.focus();
+            ui.render();
+        });
     });
 
     return view;
