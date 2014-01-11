@@ -396,6 +396,7 @@ suite('server remote client', function() {
         var testGame = new MockGame("56234098")
           , testNation = new events.EventEmitter();
         this.client.cid = "3459806239";
+        testGame.started = sinon.stub().returns(true);
         testNation.people = [1,2,3];
         var dbMock = sinon.mock(testGame.db);
         dbMock.expects('put').withArgs(
@@ -415,6 +416,7 @@ suite('server remote client', function() {
         var testGame = new MockGame("2349879348")
           , clock = sinon.useFakeTimers()
           , testNation = new events.EventEmitter();
+        testGame.started = sinon.stub().returns(true);
         this.client.cid = "3245798734";
         testNation.uid = "5401234086";
         testNation.people = [];
