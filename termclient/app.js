@@ -14,7 +14,7 @@ var App = Ctor(function() {
         if (!app.options.serverHost || !app.options.serverPort) {
             app.showConnectDialog();
         } else {
-            var newClient = client.create(app.options.serverPort, app.options.serverHost);
+            var newClient = client.create(app.options.serverPort, app.options.serverHost, app.options.cid);
             var connectErrorCb = function(name, err) {
                 app.options.connectMsg = 'Error: ' + err.description;
                 app.showConnectDialog();
