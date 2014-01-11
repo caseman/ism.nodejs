@@ -3,6 +3,8 @@
  */
 var blessed = require('blessed')
   , util = require('util')
+  , strHash = require('string-hash')
+  , log = require('../lib/logging').log
   , screen
   , willRender = false;
 
@@ -230,22 +232,33 @@ map.prototype.render = function() {
       , attr
       , tilespec;
 
+    var unexploredChars = '⠀⠊⠐⢀⠕⠢⡈⠡⢂⢁⢄⠑⠪⢌⠢⢔'
+        unexploredBg = [253,254,253,253,254]
+        unexploredFg = [249,248,250,249,251]
+      , unexploredTile = function(x, y) {
+          var hash = strHash(x + ',' + y);
+          return [unexploredBg[hash % 5],
+                  unexploredChars[hash % unexploredChars.length],
+                  unexploredFg[hash % 5]];
+        }
+
     for (y = yi, ty = this.yOffset; y < yl; y++, ty++) {
         if (!lines[y]) break;
         for (x = xi, tx = this.xOffset; x < xl; x++, tx++) {
             cell = lines[y][x];
             if (!cell) break;
 
-            tile = this.tiles[(tx + mapWidth) % mapWidth][ty];
+            tile = this.game.tile((tx + mapWidth) % mapWidth, ty);
             if (tile) {
-                tilespec = null;
-                if (tile.biome) tilespec = TILESPEC[tile.terrain + '-' + tile.biome];
-                if (!tilespec) tilespec = TILESPEC[tile.biome] || TILESPEC[tile.terrain] || [0, '?', 1];
+                tilespec = TILESPEC[tile.type] || 
+                           TILESPEC[tile.biome] || 
+                           TILESPEC[tile.terrain] || 
+                           [0, '?', 1];
             } else {
-                tilespec = TILESPEC.unexplored;
+                tilespec = unexploredTile(tx, ty);
             }
-            ch = tile.startingLocation ? '⤊' : tilespec[1];
-            fg = tile.startingLocation ? 0 : tilespec[2];
+            ch = tilespec[1];
+            fg = tilespec[2];
             bg = tilespec[0];
             attr = this.sattr({}, fg, bg);
 
