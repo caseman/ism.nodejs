@@ -233,8 +233,8 @@ map.prototype.render = function() {
       , tilespec;
 
     var unexploredChars = '⠀⠊⠐⢀⠕⠢⡈⠡⢂⢁⢄⠑⠪⢌⠢⢔'
-        unexploredBg = [253,254,253,253,254]
-        unexploredFg = [249,248,250,249,251]
+        unexploredBg = [250,252,251,250,251]
+        unexploredFg = [249,248,249,249,250]
       , unexploredTile = function(x, y) {
           var hash = strHash(x + ',' + y);
           return [unexploredBg[hash % 5],
