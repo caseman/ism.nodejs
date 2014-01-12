@@ -1,7 +1,8 @@
 var Ctor = require('../lib/ctor')
   , log = require('../lib/logging').log
   , client = require('../lib/client')
-  , ui = require('./ui');
+  , ui = require('./ui')
+  , MainController = require('./main-controller');
 
 var App = Ctor(function() {
     this.init = function(options) {
@@ -39,20 +40,10 @@ var App = Ctor(function() {
         });
     }
 
-    /*
-     * Return the main app view, creating it if necessary
-     */
-    this.mainView = function() {
-        if (!this._mainView) {
-            this._mainView = ui.show('main-view')();
-        }
-        return this._mainView;
-    }
-
     this.useClient = function(appClient) {
         if (this.client) this.client.close();
         this.client = appClient;
-        this.mainView().emit('useClient', appClient);
+        this.mainController = new MainController(this.client);
         this.client.handshake(function() {});
     }
 

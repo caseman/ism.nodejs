@@ -2,14 +2,16 @@ var blessed = require('blessed')
   , ui = require('./ui');
 
 module.exports = function MainView() {
-    var view = blessed.box({
+    var views = {};
+
+    views.main = blessed.box({
         parent: ui.screen
       , width: '100%'
       , height: '100%'
     });
 
-    var sidePanel = view.data.sidePanel = blessed.box({
-        parent: view
+    views.sidePanel = blessed.box({
+        parent: views.main
       , width: 40
       , height: '100%'
       , right: 0
@@ -19,9 +21,9 @@ module.exports = function MainView() {
         }
     });
 
-    var statusBar = view.data.statusBar = blessed.box({
-        parent: view
-      , right: sidePanel.width
+    views.statusBar = blessed.box({
+        parent: views.main
+      , right: views.sidePanel.width
       , height: 1
       , bottom: 0
       , style: {
@@ -30,28 +32,23 @@ module.exports = function MainView() {
         }
     });
 
-    var mapView = view.data.mapView = ui.map({
-        parent: view
-      , right: sidePanel.width
-      , bottom: statusBar.height
+    views.statusText = blessed.text({
+        parent: views.statusBar
+      , left: 1
+      , right: 30
+      , height: 1
+      , style: views.statusBar.style
+    });
+
+    views.map = ui.map({
+        parent: views.main
+      , right: views.sidePanel.width
+      , bottom: views.statusBar.height
       , scrollSpeed: 4
       , keys: true
       , vi: true
       , mouse: true
     });
 
-    view.on('useClient', function(client) {
-        client.on('updatePerson', ui.render);
-        client.on('updateGame', ui.render);
-        client.on('updateNation', ui.render);
-        client.on('joinGame', function(game) {
-            mapView.game = game;
-            var location = game.nation.startLocation;
-            mapView.scrollCentering(location[0], location[1]);
-            mapView.focus();
-            ui.render();
-        });
-    });
-
-    return view;
+    return views;
 }
