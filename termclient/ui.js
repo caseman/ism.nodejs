@@ -260,8 +260,13 @@ map.prototype.render = function() {
             ch = tilespec[1];
             fg = tilespec[2];
             bg = tilespec[0];
-            attr = this.sattr({}, fg, bg);
 
+            if (tile && tile.objects[0] && tile.objects[0].type == 'person') {
+                ch = '@';
+                fg = 0;
+            }
+
+            attr = this.sattr({}, fg, bg);
             if (attr !== cell[0] || ch !== cell[1]) {
                 cell[0] = attr;
                 cell[1] = ch;
