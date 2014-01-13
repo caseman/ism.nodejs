@@ -33,7 +33,7 @@ suite('nation', function() {
 
     test('create spawns folks', function() {
         var initialPop = this.game.info.initialNationPop;
-        var testPerson = {type:'person', uid:'33242'};
+        var testPerson = {type:'person', uid:'33242', location:[5,9]};
         this.personMock.expects('create').exactly(initialPop).returns(testPerson);
         this.personMock.expects('place').exactly(initialPop).returns(true);
         this.gameMock.expects('objectChanged').atLeast(initialPop).withArgs(testPerson);

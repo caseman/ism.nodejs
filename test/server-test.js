@@ -19,6 +19,7 @@ var MockDb = function() {
 var MockGame = function(uid) {
     events.EventEmitter.call(this);
     this.uid = uid;
+    this.info = {};
     this.objects = {};
     this.db = new MockDb;
 }
@@ -359,6 +360,10 @@ suite('server remote client', function() {
     this.beforeEach(function() {
         this.conn = new MockConn;
         this.client = new server.RemoteClient(this.conn);
+        this.nation = new events.EventEmitter();
+        this.nation.people = [];
+        this.game = new MockGame("56234098");
+        this.game.started = sinon.stub();
     });
 
     function getReply(test) {
@@ -393,34 +398,29 @@ suite('server remote client', function() {
     });
 
     test('join game', function() {
-        var testGame = new MockGame("56234098")
-          , testNation = new events.EventEmitter();
-        this.client.cid = "3459806239";
-        testGame.started = sinon.stub().returns(true);
-        testNation.people = [1,2,3];
-        var dbMock = sinon.mock(testGame.db);
+        this.client.cid = "2435091231";
+        this.game.started.returns(true);
+        this.nation.people = [1,2,3];
+        var dbMock = sinon.mock(this.game.db);
         dbMock.expects('put').withArgs(
             key('player', 'client', this.client.cid)
-          , {game: testGame.uid, nation: testNation.uid});
+          , {game: this.game.uid, nation: this.nation.uid});
         var clientMock = sinon.mock(this.client);
         clientMock.expects('sendUpdate');
 
-        this.client.joinGame(testGame, testNation);
-        assert.strictEqual(this.client.game, testGame);
-        assert.strictEqual(this.client.nation, testNation);
+        this.client.joinGame(this.game, this.nation);
+        assert.strictEqual(this.client.game, this.game);
+        assert.strictEqual(this.client.nation, this.nation);
         dbMock.verify();
         clientMock.verify();
     });
 
     test('after person changes sends an update', function() {
-        var testGame = new MockGame("2349879348")
-          , clock = sinon.useFakeTimers()
-          , testNation = new events.EventEmitter();
-        testGame.started = sinon.stub().returns(true);
+        var clock = sinon.useFakeTimers();
+        this.game.started.returns(true);
+        this.nation.uid = "5401234086";
         this.client.cid = "3245798734";
-        testNation.uid = "5401234086";
-        testNation.people = [];
-        this.client.joinGame(testGame, testNation);
+        this.client.joinGame(this.game, this.nation);
 
         var peeps = [
             {uid:"4235096", type:'person'}
@@ -428,19 +428,18 @@ suite('server remote client', function() {
           , {uid:"8965892", type:'person'}
         ];
         assert(!this.client.updateTask);
-        testNation.emit('personChanged', peeps[0]);
+        this.nation.emit('personChanged', peeps[0]);
         var task = this.client.updateTask;
         assert(task);
-        testNation.emit('personChanged', peeps[1]);
+        this.nation.emit('personChanged', peeps[1]);
         assert.equal(this.client.updateTask, task);
-        testNation.emit('personChanged', peeps[2]);
+        this.nation.emit('personChanged', peeps[2]);
         assert.equal(this.client.updateTask, task);
-        testNation.emit('personChanged', peeps[0]);
+        this.nation.emit('personChanged', peeps[0]);
 
         clock.tick(this.client.UPDATE_TIMEOUT + 1);
         var msg = getReply(this);
         assert.equal(msg.says, 'update');
-        assert.equal(msg.game, testGame.info);
         assert.equal(Object.keys(msg.people).length, 3);
         assert(!this.client.updateTask);
         assert(peeps[0].uid in msg.people);
