@@ -219,6 +219,8 @@ map.prototype.render = function() {
 
     var lines = this.screen.lines
       , mapWidth = this.game.info.mapWidth
+      , cursor = this.data.cursor ? this.data.cursor.toString() : ''
+      , style = {}
       , xi = coords.xi
       , xl = coords.xl
       , yi = coords.yi
@@ -265,8 +267,12 @@ map.prototype.render = function() {
                 ch = '@';
                 fg = 0;
             }
+            if (tile && cursor == tile.key) {
+                fg = bg;
+                bg = 0;
+            }
 
-            attr = this.sattr({}, fg, bg);
+            attr = this.sattr(style, fg, bg);
             if (attr !== cell[0] || ch !== cell[1]) {
                 cell[0] = attr;
                 cell[1] = ch;

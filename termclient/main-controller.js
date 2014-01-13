@@ -8,10 +8,12 @@ module.exports = Ctor(function() {
     this.init = function(client) {
         var ctrlr = this;
         var views = this.views = mainViews();
+        this.client = client;
 
         client.on('updatePerson', ui.render);
         client.on('updateGame', ui.render);
         client.on('updateNation', ui.render);
+
         client.on('joinGame', function(game) {
             views.map.game = game;
             var location = game.nation.startLocation;
@@ -22,6 +24,15 @@ module.exports = Ctor(function() {
 
         views.main.on('mouse', function(mouse) {
             if (mouse.action == 'mousemove') ctrlr.updateStatusText(mouse);
+        });
+
+        views.main.key([','], function() {
+            ctrlr.selectIndex(ctrlr.selected !== undefined ? 
+                ctrlr.selected - 1 : client.gameState.nation.people.length - 1);
+        });
+        views.main.key(['.'], function() {
+            ctrlr.selectIndex(ctrlr.selected !== undefined ? 
+                ctrlr.selected + 1 : 0);
         });
     }
 
@@ -37,6 +48,20 @@ module.exports = Ctor(function() {
             status = 'Unexplored';
         }
         this.views.statusText.content = status;
+        ui.render();
+    }
+
+    this.people = function() {
+        var game = this.client.gameState;
+        return game.nation.people.map(function(uid) {
+            return game.people[uid];
+        });
+    }
+
+    this.selectIndex = function(index) {
+        var people = this.people();
+        this.selected = (index + people.length) % people.length;
+        this.views.map.data.cursor = people[this.selected].location;
         ui.render();
     }
 
