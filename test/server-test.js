@@ -449,4 +449,14 @@ suite('server remote client', function() {
         clock.restore();
     });
 
+    test('sends msg on turnBegins', function() {
+        this.client.cid = "234509823405";
+        this.client.joinGame(this.game, this.nation);
+        this.game.info.turnNumber = 37;
+        this.game.emit('turnBegins');
+        var msg = getReply(this);
+        assert.equal(msg.says, 'turnBegins');
+        assert.equal(msg.turn, 37);
+    });
+
 });
