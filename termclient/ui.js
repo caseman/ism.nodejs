@@ -219,7 +219,7 @@ map.prototype.render = function() {
 
     var lines = this.screen.lines
       , mapWidth = this.game.info.mapWidth
-      , cursor = this.data.cursor ? this.data.cursor.toString() : ''
+      , cursor = this.cursorPos ? this.cursorPos.toString() : ''
       , style = {}
       , xi = coords.xi
       , xl = coords.xl
@@ -380,6 +380,15 @@ map.prototype.scrollRevealing = function(tileX, tileY) {
     } else {
         return false;
     }
+}
+
+/*
+ * Set the cursor to the given tile position, scrolling to reveal it
+ * if necessary
+ */
+map.prototype.setCursor = function(tileX, tileY) {
+    this.cursorPos = [tileX, tileY];
+    this.scrollRevealing(tileX, tileY);
 }
 
 exports.map = map;

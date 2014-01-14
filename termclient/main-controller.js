@@ -25,14 +25,16 @@ module.exports = Ctor(function() {
         views.main.on('mouse', function(mouse) {
             if (mouse.action == 'mousemove') ctrlr.updateStatusText(mouse);
         });
+        views.main.on('focus', function() {views.map.focus()});
 
-        views.main.key([','], function() {
-            ctrlr.selectIndex(ctrlr.selected !== undefined ? 
-                ctrlr.selected - 1 : client.gameState.nation.people.length - 1);
+        views.map.key([','], function() {
+            var index = ctrlr.selectedPersonIndex();
+            ctrlr.selectPersonByIndex(index !== undefined 
+                ? index - 1 : client.gameState.nation.people.length - 1);
         });
-        views.main.key(['.'], function() {
-            ctrlr.selectIndex(ctrlr.selected !== undefined ? 
-                ctrlr.selected + 1 : 0);
+        views.map.key(['.'], function() {
+            var index = ctrlr.selectedPersonIndex();
+            ctrlr.selectPersonByIndex(index !== undefined ? index + 1 : 0);
         });
     }
 
@@ -51,17 +53,35 @@ module.exports = Ctor(function() {
         ui.render();
     }
 
+    /*
+     * Return the people in this player's nation sorted by their
+     * location on the map for selection purposes
+     */
     this.people = function() {
         var game = this.client.gameState;
-        return game.nation.people.map(function(uid) {
+        var people = game.nation.people.map(function(uid) {
             return game.people[uid];
+        });
+        return people.sort(function(a, b) {
+            return a.location[0] - b.location[0] || a.location[1] - b.location[1];
         });
     }
 
-    this.selectIndex = function(index) {
-        var people = this.people();
-        this.selected = (index + people.length) % people.length;
-        this.views.map.data.cursor = people[this.selected].location;
+    this.selectedPersonIndex = function() {
+        if (this.selectedPersonUid) {
+            var people = this.people();
+            for (var i = 0; i < people.length; i++) {
+                if (people[i].uid == this.selectedPersonUid) return i;
+            }
+        }
+    }
+
+    this.selectPersonByIndex = function(index) {
+        var people = this.people()
+          , map = this.views.map;
+        index = (index + people.length) % people.length;
+        this.selectedPersonUid = people[index].uid;
+        map.setCursor.apply(map, people[index].location);
         ui.render();
     }
 
