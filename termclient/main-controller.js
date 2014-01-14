@@ -10,7 +10,6 @@ module.exports = Ctor(function() {
         var views = this.views = mainViews();
         this.client = client;
 
-        client.on('updatePerson', ui.render);
         client.on('updateGame', ui.render);
         client.on('updateNation', ui.render);
 
@@ -22,7 +21,14 @@ module.exports = Ctor(function() {
             ui.render();
         });
 
-        views.main.on('mouse', function(mouse) {
+        client.on('updatePerson', function(person) {
+            if (person.uid == ctrlr.selectedPersonUid) {
+                views.map.setCursor.apply(views.map, person.location);
+            }
+            ui.render();
+        });
+
+        views.map.on('mouse', function(mouse) {
             if (mouse.action == 'mousemove') ctrlr.updateStatusText(mouse);
         });
         views.main.on('focus', function() {views.map.focus()});
@@ -36,6 +42,20 @@ module.exports = Ctor(function() {
             var index = ctrlr.selectedPersonIndex();
             ctrlr.selectPersonByIndex(index !== undefined ? index + 1 : 0);
         });
+        views.map.on('keypress', function(ch, key) {
+            if (ch && ctrlr.selectedPersonUid) {
+                var dx = 0
+                  , dy = 0;
+                dy -= ch === 'k' || ch === 'y' || ch === 'u'
+                dy += ch === 'j' || ch === 'b' || ch === 'n'
+
+                dx -= ch === 'h' || ch === 'y' || ch === 'b'
+                dx += ch === 'l' || ch === 'n' || ch === 'u'
+
+                if (dx || dy) client.movePerson(ctrlr.selectedPersonUid, dx, dy);
+            }
+        });
+
     }
 
     this.updateStatusText = function(position) {

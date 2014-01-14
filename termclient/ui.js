@@ -263,7 +263,7 @@ map.prototype.render = function() {
             fg = tilespec[2];
             bg = tilespec[0];
 
-            if (tile && tile.objects[0] && tile.objects[0].type == 'person') {
+            if (tile && tile.inView && tile.objects[0] && tile.objects[0].type == 'person') {
                 ch = '@';
                 fg = 0;
             }
