@@ -12,6 +12,7 @@ suite('object sight', function() {
             return {
                 x: x
               , y: y
+              , key: x + ',' + y
               , terrain: 'flat'
               , biome: 'grassland'
               , type: 'flat-grassland'
