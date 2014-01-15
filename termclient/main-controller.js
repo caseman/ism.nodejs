@@ -23,13 +23,15 @@ module.exports = Ctor(function() {
 
         client.on('updatePerson', function(person) {
             if (person.uid == ctrlr.selectedPersonUid) {
-                views.map.setCursor.apply(views.map, person.location);
+                ctrlr.selectPerson(person);
             }
             ui.render();
         });
 
         views.map.on('mouse', function(mouse) {
-            if (mouse.action == 'mousemove') ctrlr.updateStatusText(mouse);
+            if (mouse.action == 'mousemove') {
+                ctrlr.updateStatusTextForTile(views.map.tileAt(mouse.x, mouse.y));
+            }
         });
         views.map.on('click', function(mouse) {
             var tile = views.map.tileAt(mouse.x, mouse.y);
@@ -66,9 +68,8 @@ module.exports = Ctor(function() {
 
     }
 
-    this.updateStatusText = function(position) {
-        var tile = this.views.map.tileAt(position.x, position.y)
-          , status;
+    this.updateStatusTextForTile = function(tile) {
+        var status;
         if (tile) {
             var objects = tile.objects.map(function(obj) {return capitalize(obj.type)})
               , status = capitalize(tile.terrain);
@@ -111,10 +112,12 @@ module.exports = Ctor(function() {
     }
 
     this.selectPerson = function(person) {
-        var map = this.views.map;
+        var map = this.views.map
+          , game = this.client.gameState;
         this.selectedPersonUid = person.uid;
         map.setCursor.apply(map, person.location);
-        ui.render();
+        this.updateStatusTextForTile(
+            game.tile.apply(game, person.location));
     }
 
 });
