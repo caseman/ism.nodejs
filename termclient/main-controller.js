@@ -31,6 +31,14 @@ module.exports = Ctor(function() {
         views.map.on('mouse', function(mouse) {
             if (mouse.action == 'mousemove') ctrlr.updateStatusText(mouse);
         });
+        views.map.on('click', function(mouse) {
+            var tile = views.map.tileAt(mouse.x, mouse.y);
+            if (tile) tile.objects.forEach(function(obj) {
+                if (obj.type == 'person' && obj.nationUid == client.gameState.nation.uid) {
+                    ctrlr.selectPerson(obj);
+                }
+            });
+        });
         views.main.on('focus', function() {views.map.focus()});
 
         views.map.key([','], function() {
@@ -97,11 +105,15 @@ module.exports = Ctor(function() {
     }
 
     this.selectPersonByIndex = function(index) {
-        var people = this.people()
-          , map = this.views.map;
+        var people = this.people();
         index = (index + people.length) % people.length;
-        this.selectedPersonUid = people[index].uid;
-        map.setCursor.apply(map, people[index].location);
+        this.selectPerson(people[index]);
+    }
+
+    this.selectPerson = function(person) {
+        var map = this.views.map;
+        this.selectedPersonUid = person.uid;
+        map.setCursor.apply(map, person.location);
         ui.render();
     }
 
