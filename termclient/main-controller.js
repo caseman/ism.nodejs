@@ -43,7 +43,7 @@ module.exports = Ctor(function() {
             ctrlr.selectPersonByIndex(index !== undefined ? index + 1 : 0);
         });
         views.map.on('keypress', function(ch, key) {
-            if (ch && ctrlr.selectedPersonUid) {
+            if (ch && ctrlr.selectedPersonUid && !key.shift && !key.ctrl) {
                 var dx = 0
                   , dy = 0;
                 dy -= ch === 'k' || ch === 'y' || ch === 'u'
