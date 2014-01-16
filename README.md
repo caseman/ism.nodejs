@@ -4,6 +4,8 @@
 
 ### Build a civilisation in an ascii world.
 
+[![Screenshot](https://i.cloudup.com/2joYJkql68.png)](https://i.cloudup.com/2joYJkql68.png)
+
 ## Install
 
 ```
