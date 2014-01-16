@@ -11,7 +11,7 @@ suite('person.create', function() {
     }
 
     test('Regular joe has no bonus traits', function() {
-        assert(traitCount(regularJoe) == 0, 'should not have bonus traits');
+        assert(traitCount(regularJoe) === 0, 'should not have bonus traits');
     });
 
     test('Intelligent folks have higher intellect', function() {
@@ -116,7 +116,7 @@ suite('person.place', function() {
           , expectedPlaces = 0
           , goodBiomes = {grassland:true, plains:true, forest:true, taiga:true};
 
-        testGame.objectsAtLocation = function(loc) {return []}
+        testGame.objectsAtLocation = function() {return []}
         testGame.placeObject = function(obj, tile) {
             assert.strictEqual(obj, testPerson);
             assert(goodBiomes[tile.biome]);
@@ -153,18 +153,34 @@ suite('person.place', function() {
         assert.equal(places, expectedPlaces);
     });
 
-    test('will not cross ocean from location', function() {
+    test('will not place on tile in locations specified to avoid', function() {
         var places = 0
-          , expectedPlaces = 0;
+          , avoid = {}
 
-        testGame.objectsAtLocation = function(loc) {return []}
+        testGame.placeObject = function(obj, tile) {
+            assert.strictEqual(obj, testPerson);
+            assert(!avoid[testPerson.location]);
+        }
+
+        for (var i = 0; i < 100; i++) {
+            avoid[[i, i*2]] = true
+            var placed = person.place(testPerson, testGame, [i, i*2], avoid);
+            if (placed) places++;
+        }
+        assert(places > 0);
+    });
+
+    var createTileStrip = function(stripTerrain) {
+        var isLand = (stripTerrain != 'ocean' && stripTerrain != 'coast')
+        testGame.objectsAtLocation = function() {return []}
         testGame.tile = function(x, y) {
-            if (x == 100) {
+            if (x == 102) {
                 return {
-                    terrain: 'ocean'
+                    terrain: stripTerrain
                   , x: x
                   , y: y
-                  , isLand: false
+                  , isLand: isLand
+                  , isWater: !isLand || stripTerrain == 'river'
                 };
             } else if (x == 101) {
                 return {
@@ -184,10 +200,56 @@ suite('person.place', function() {
                 };
             }
         }
+    }
 
+    test('will not cross ocean from location', function() {
+        var places = 0
+          , expectedPlaces = 0;
+
+        createTileStrip('ocean');
         testGame.placeObject = function(obj, tile) {
             assert.strictEqual(obj, testPerson);
-            assert(tile.x > 101);
+            assert(tile.x < 101);
+            places++;
+        }
+        for (var i = 0; i < 100; i++) {
+            var placed = person.place(testPerson, testGame, [101, i*2]);
+            if (placed) expectedPlaces++;
+        }
+        assert(expectedPlaces > 0);
+        assert.equal(places, expectedPlaces);
+
+        testGame.tile = tile;
+    });
+
+    test('will not cross mountain from location', function() {
+        var places = 0
+          , expectedPlaces = 0;
+
+        createTileStrip('mountain');
+        testGame.placeObject = function(obj, tile) {
+            assert.strictEqual(obj, testPerson);
+            assert(tile.x < 101);
+            places++;
+        }
+        for (var i = 0; i < 100; i++) {
+            var placed = person.place(testPerson, testGame, [101, i*2]);
+            if (placed) expectedPlaces++;
+        }
+        assert(expectedPlaces > 0);
+        assert.equal(places, expectedPlaces);
+
+        testGame.tile = tile;
+    });
+
+    test('will not cross river from location', function() {
+        var places = 0
+          , expectedPlaces = 0;
+
+        createTileStrip('river');
+        testGame.placeObject = function(obj, tile) {
+            assert.strictEqual(obj, testPerson);
+            assert(tile.x < 101);
             places++;
         }
         for (var i = 0; i < 100; i++) {
