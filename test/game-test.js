@@ -195,38 +195,47 @@ suite('game object placement', function() {
     });
 
     test('move objects', function() {
+        var testGame = this.game;
         var objs = [{uid:'1'}, {uid:'2'}, {uid:'3'}, {uid:'4'}]
         this.game.placeObject(objs[0], [1, 1]);
         this.game.placeObject(objs[1], [1, 1]);
         this.game.placeObject(objs[2], [1, 1]);
         this.game.placeObject(objs[3], [5, 3]);
 
+        var assertObjectsAtLocation = function(location, objs) {
+            var objectsThere = testGame.objectsAtLocation(location);
+            assert.equal(objectsThere.length, objs.length);
+            objs.forEach(function(obj) {
+                assert.ok(~objectsThere.indexOf(obj), obj);
+            });
+        }
+
         this.game.placeObject(objs[1], [5, 3]);
         assert.deepEqual(this.game.objects[objs[1].uid], objs[1]);
         assert.deepEqual(objs[1].location, [5, 3]);
-        assert.deepEqual(this.game.objectsAtLocation([1, 1]), [objs[0], objs[2]]);
-        assert.deepEqual(this.game.objectsAtLocation([5, 3]), [objs[3], objs[1]]);
+        assertObjectsAtLocation([1, 1], [objs[0], objs[2]]);
+        assertObjectsAtLocation([5, 3], [objs[3], objs[1]]);
 
         this.game.placeObject(objs[2], [5, 3]);
         assert.deepEqual(this.game.objects[objs[2].uid], objs[2]);
         assert.deepEqual(objs[2].location, [5, 3]);
-        assert.deepEqual(this.game.objectsAtLocation([1, 1]), [objs[0]]);
-        assert.deepEqual(this.game.objectsAtLocation([5, 3]), [objs[3], objs[1], objs[2]]);
+        assertObjectsAtLocation([1, 1], [objs[0]]);
+        assertObjectsAtLocation([5, 3], [objs[3], objs[1], objs[2]]);
 
         this.game.placeObject(objs[3], [4, 3]);
         assert.deepEqual(this.game.objects[objs[3].uid], objs[3]);
         assert.deepEqual(objs[3].location, [4, 3]);
-        assert.deepEqual(this.game.objectsAtLocation([1, 1]), [objs[0]]);
-        assert.deepEqual(this.game.objectsAtLocation([5, 3]), [objs[1], objs[2]]);
-        assert.deepEqual(this.game.objectsAtLocation([4, 3]), [objs[3]]);
+        assertObjectsAtLocation([1, 1], [objs[0]]);
+        assertObjectsAtLocation([5, 3], [objs[1], objs[2]]);
+        assertObjectsAtLocation([4, 3], [objs[3]]);
 
         this.game.placeObject(objs[0], [1, 2]);
         assert.deepEqual(this.game.objects[objs[0].uid], objs[0]);
         assert.deepEqual(objs[0].location, [1, 2]);
-        assert.deepEqual(this.game.objectsAtLocation([1, 1]), []);
-        assert.deepEqual(this.game.objectsAtLocation([1, 2]), [objs[0]]);
-        assert.deepEqual(this.game.objectsAtLocation([5, 3]), [objs[1], objs[2]]);
-        assert.deepEqual(this.game.objectsAtLocation([4, 3]), [objs[3]]);
+        assertObjectsAtLocation([1, 1], []);
+        assertObjectsAtLocation([1, 2], [objs[0]]);
+        assertObjectsAtLocation([5, 3], [objs[1], objs[2]]);
+        assertObjectsAtLocation([4, 3], [objs[3]]);
     });
     
     test('send event to location', function() {
