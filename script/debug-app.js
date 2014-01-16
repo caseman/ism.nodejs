@@ -3,7 +3,7 @@ var logging = require('../lib/logging')
   , app = require('../termclient/app')
   , ui = require('../termclient/ui')
   , extend = require('extend')
-  , argv = require('optimist').argv;
+  , argv = require('optimist').string('cid').argv;
 
 logging.configure(true, true);
 logging.useFile(logging.defaultClientPath());
