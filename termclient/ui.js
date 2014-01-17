@@ -5,6 +5,7 @@ var blessed = require('blessed')
   , util = require('util')
   , strHash = require('string-hash')
   , log = require('../lib/logging').log
+  , darkenedColors = require('./darkened-index.json')
   , screen
   , willRender = false;
 
@@ -266,6 +267,10 @@ map.prototype.render = function() {
             if (tile && tile.inView && tile.objects[0] && tile.objects[0].type == 'person') {
                 ch = '@';
                 fg = 0;
+            }
+            if (tile && !tile.inView) {
+                fg = darkenedColors[fg];
+                bg = darkenedColors[bg];
             }
             if (tile && cursor == tile.key) {
                 fg = bg;

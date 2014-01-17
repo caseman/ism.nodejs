@@ -15,8 +15,8 @@
 , "hill-jungle" : [29, "ᴖ", 23]
 , "plains" : [136, "˔", 58]
 , "hill-plains" : [136, "ᴖ", 58]
-, "grassland" : [34, "⩛", 28]
-, "hill-grassland" : [34, "ᴖ", 28]
+, "grassland" : [34, "⩛", 22]
+, "hill-grassland" : [34, "ᴖ", 22]
 , "marsh": [95, "⩛", 30]
 
 , "hill" : [143, "ᴖ", 106]
