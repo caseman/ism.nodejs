@@ -75,10 +75,10 @@ var buttonOptions = {
 };
 
 function button(options, pressCb) {
-    var button = blessed.button(combine(buttonOptions, options));
-    button.on('press', pressCb);
-    if (button.parent === screen) render();
-    return button;
+    var bttn = blessed.button(combine(buttonOptions, options));
+    bttn.on('press', pressCb);
+    if (bttn.parent === screen) render();
+    return bttn;
 }
 exports.button = button;
 
@@ -95,21 +95,21 @@ var dialogOptions = {
 };
 
 function dialog(options, buttons, cb) {
-    var dialog = blessed.form(combine(dialogOptions, options));
-    dialog.data.isDialog = true;
+    var dialogElem = blessed.form(combine(dialogOptions, options));
+    dialogElem.data.isDialog = true;
 
     var done = function(data) {
         if (cb(data) || !data) {
-            dialog.detach();
+            dialogElem.detach();
             render();
         }
     }
-    dialog.on('submit', done);
-    dialog.key('escape', done);
+    dialogElem.on('submit', done);
+    dialogElem.key('escape', done);
 
     var dialogBttnOptions = {
-        parent: dialog
-      , top: dialog.height - 2
+        parent: dialogElem
+      , top: dialogElem.height - 2
       , left: 3
       , height: 1
       , width: 16
@@ -117,7 +117,7 @@ function dialog(options, buttons, cb) {
     var i = 1;
     var bttnCb = function() {
         if (!this.data.isCancel) {
-            dialog.submit();
+            dialogElem.submit();
         } else {
             done();
         }
@@ -129,10 +129,10 @@ function dialog(options, buttons, cb) {
         bttn.data.isCancel = (i++ == buttons.length);
     });
 
-    if (dialog.detached) screen.append(dialog);
-    dialog.focus();
+    if (dialogElem.detached) screen.append(dialogElem);
+    dialogElem.focus();
     render();
-    return dialog;
+    return dialogElem;
 }
 exports.dialog = dialog;
 
@@ -190,7 +190,7 @@ function map(options) {
 
             dx -= key.name === 'left' || key.name === 'backspace'
             dx -= vi && (key.name === 'h' || key.name === 'y' || key.name === 'b')
-            dx += key.name === 'right' 
+            dx += key.name === 'right'
             dx += vi && (key.name === 'l' || key.name === 'n' || key.name === 'u')
 
             if (dx || dy) {
@@ -236,8 +236,8 @@ map.prototype.render = function() {
       , tilespec;
 
     var unexploredChars = '⠀⠊⠐⢀⠕⠢⡈⠡⢂⢁⢄⠑⠪⢌⠢⢔'
-        unexploredBg = [250,252,251,250,251]
-        unexploredFg = [249,248,249,249,250]
+      , unexploredBg = [250,252,251,250,251]
+      , unexploredFg = [249,248,249,249,250]
       , unexploredTile = function(x, y) {
           var hash = strHash(x + ',' + y);
           return [unexploredBg[hash % 5],
@@ -253,9 +253,9 @@ map.prototype.render = function() {
 
             tile = this.game.tile((tx + mapWidth) % mapWidth, ty);
             if (tile) {
-                tilespec = TILESPEC[tile.type] || 
-                           TILESPEC[tile.biome] || 
-                           TILESPEC[tile.terrain] || 
+                tilespec = TILESPEC[tile.type] ||
+                           TILESPEC[tile.biome] ||
+                           TILESPEC[tile.terrain] ||
                            [0, '?', 1];
             } else {
                 tilespec = unexploredTile(tx, ty);
@@ -329,7 +329,7 @@ map.prototype.tileAt = function(x, y) {
     var tx = x + this.xOffset
       , ty = y + this.yOffset
       , mapWidth = this.game.info.mapWidth;
-    return this.game.tile((tx + mapWidth) % mapWidth, ty); 
+    return this.game.tile((tx + mapWidth) % mapWidth, ty);
 }
 
 /*
@@ -349,15 +349,15 @@ map.prototype.scrollCentering = function(tileX, tileY) {
  * and false is returned.
  */
 map.prototype.scrollRevealing = function(tileX, tileY) {
-    tLeft = this.xOffset + this.scrollSpeed;
-    tRight = this.xOffset + this.width - this.scrollSpeed;
+    var tLeft = this.xOffset + this.scrollSpeed;
+    var tRight = this.xOffset + this.width - this.scrollSpeed;
     while (tRight <= tLeft) {
         // Handle narrow view
         tLeft--;
         tRight++;
     }
-    tTop = this.yOffset + this.scrollSpeed;
-    tBottom = this.yOffset + this.height - this.scrollSpeed;
+    var tTop = this.yOffset + this.scrollSpeed;
+    var tBottom = this.yOffset + this.height - this.scrollSpeed;
     while (tBottom <= tTop) {
         // Handle short view
         tTop--;
