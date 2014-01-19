@@ -2,22 +2,23 @@ var blessed = require('blessed')
   , fs = require('fs')
   , path = require('path')
   , ui = require('./ui')
-  , version = require('../package.json').version;
+  , prefs = require('../lib/prefs')
+  , version = require('../package.json').version
 
 module.exports = function TitleView() {
-    var views = {};
+    var views = {}
 
     var main = views.main = blessed.box({
         parent: ui.screen
-      , width: '100%'
+      , right: 25
       , height: '100%'
-      , bg: 17
-    });
+      , bg: 0
+    })
 
     views.version = blessed.text({
         parent: views.main
       , height: 1
-      , fg: 27
+      , fg: 88
       , bg: main.style.bg
       , padding: {left: 1}
       , content: version
@@ -27,8 +28,9 @@ module.exports = function TitleView() {
         parent: views.main
       , shrink : true
       , height: 3
-      , left: 15
+      , left: 'center'
       , top: 'center'
+      , wrap: false
       , padding: {
            top: 1
           , bottom: 1
@@ -43,7 +45,7 @@ module.exports = function TitleView() {
             bg: 52
           , fg: 230
         }
-    });
+    })
 
     function showAttribution() {
         views.attribution = blessed.text({
@@ -51,8 +53,9 @@ module.exports = function TitleView() {
           , top: views.logo.top + views.logo.height + 2
           , height: 2
           , width: 50
-          , left: 19
+          , left: 'center'
           , align: 'center'
+          , wrap: false
           , style: {fg: 'white', bg: main.style.bg, bold:true}
           , content: 'A Game by Casey Duncan\nwith help from friends and contributors'
         })
@@ -61,13 +64,14 @@ module.exports = function TitleView() {
 
     fs.readFile(path.join(__dirname, 'logo.txt'), {encoding: 'utf-8'},
         function(err, data) {
-            if (err) throw err;
-            var lines = data.split('\n'),
-                shown = 0;
+            if (err) throw err
+            var lines = data.split('\n')
+              , shown = 0;
             (function showLine() {
                 if (shown++ < lines.length) {
                     var chopped = lines.map(function(line) {return line.slice(0,shown*3)})
                     views.logo.content = chopped.slice(0,shown).join('\n')
+                    views.logo.width = Math.max(shown * 3, 6)
                     views.logo.height = Math.max(shown + 3, 6)
                     ui.screen.render()
                     setTimeout(showLine, 20)
@@ -76,15 +80,70 @@ module.exports = function TitleView() {
                 }
             })()
         }
-    );
+    )
 
-/*
-    (function slideUp() {
-        if (views.logo.top > 4) {
-            views.logo.top -= 1
-            setTimeout(slideUp, 500);
-        }
-    })()
-*/
-    return views;
+    var menu = views.menu = blessed.box({
+        parent: ui.screen
+      , width: 25
+      , right: 0
+      , padding: 1
+      , style: {bg: 234}
+    })
+
+    var buttonCount = 0
+
+    function button(name, content) {
+        var bttn = blessed.button({
+            parent: menu
+          , height: 1
+          , bottom: buttonCount++ * 2 + 1
+          , left: 1
+          , right: 1
+          , name: name
+          , content: content
+          , parseTags: true
+          , align: 'center'
+          , style: {
+                bg: 234
+              , fg: 15
+              , hover: {bg: 229, fg: 234}
+            }
+        })
+        blessed.text({
+            parent: menu
+          , height: 1
+          , bottom: buttonCount * 2
+          , left: 1
+          , right: 1
+          , content: '───────────────────────'
+          , style: {
+                bg: 234
+              , fg: 237
+          }
+        })
+        bttn.on('click', function() {
+            menu.emit('click ' + bttn.name)
+        })
+        return bttn
+    }
+
+    views.exitButton = button('exitButton', 'E{underline}x{/underline}it')
+    views.remoteButton = button('hostButton', '{underline}H{/underline}ost Games')
+    views.remoteButton = button('joinButton', '{underline}J{/underline}oin Remote Game')
+    views.localButton = button('localButton', 'Start {underline}L{/underline}ocal Game')
+    if (prefs.get('games')) {
+        views.resumeButton = button('resumeButton', '{underline}R{/underline}esume Game')
+    }
+
+    views.medallion = blessed.box({
+        parent: menu
+      , shrink: true
+      , left: 2
+      , right: 1
+      , wrap: false
+      , content: fs.readFileSync(path.join(__dirname, 'double-eagle.txt'), {encoding: 'utf-8'})
+      , style: {fg: 221, bg: 234}
+    })
+
+    return views
 }
