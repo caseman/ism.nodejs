@@ -1,11 +1,24 @@
 {
   "name": "ism",
-  "version": "0.3.0",
-  "description": "ism ===",
-  "main": "client.js",
+  "version": "0.4.0",
+  "description": "Turn-based multiplayer nation building strategy game",
+  "main": "ism.js",
+  "keywords": [
+    "ism",
+    "game",
+    "strategy",
+    "turn-based",
+    "civ",
+    "empire",
+    "sandbox",
+    "multiplayer"
+  ],
+  "files": [
+    "./lib",
+    "./termclient",
+    "./map-config"
+  ],
   "dependencies": {
-    "keypress": "~0.2.1",
-    "charm": "~0.1.2",
     "noisejs": "~2.1.0",
     "optimist": "~0.6.0",
     "JSONStream": "~0.7.1",
@@ -36,9 +49,14 @@
     "url": "git://github.com/caseman/ism.git"
   },
   "bin": {
-    "ism": "client/client.js"
+    "ism": "./termclient.js",
+    "ism-server": "./server.js"
   },
-  "author": "",
+  "contributors": [
+    {"name": "Casey Duncan", "email": "casey.duncan@gmail.com"},
+    {"name": "Peter Braden"},
+    {"name": "Niall O'Higgins"}
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/caseman/ism/issues"
