@@ -3,6 +3,7 @@ var util = require('util');
 var events = require('events');
 var sinon = require('sinon');
 var key = require('../lib/db').key;
+var tmp = require('tmp');
 
 var MockConn = function() {
     events.EventEmitter.call(this);
@@ -169,18 +170,46 @@ suite('server', function() {
             this.server, this.client, {"says": "yay", "uid": "897"}));
     });
 
-    test('start server', function() {
-        var http = require('http');
-        var createServer = http.createServer;
-        var sinon = this.sinon;
-        var createServerStub = sinon.stub(http, 'createServer', function() {
-            var server = createServer();
-            server.listen = sinon.spy();
-            return server;
+    test('start server', function(done) {
+        var test = this;
+        tmp.dir({unsafeCleanup: true}, function(err, tmpDir) {
+            var http = require('http');
+            var createServer = http.createServer;
+            var sinon = test.sinon;
+            sinon.stub(http, 'createServer', function() {
+                var server = createServer();
+                server.listen = sinon.spy();
+                server.address = sinon.stub().returns({port: 5557});
+                return server;
+            });
+            test.server.db.location = tmpDir + '/db';
+            test.server.start(1234, '1.2.3.4');
+            assert(test.server.httpServer.listen.calledOnce, 'listen was called');
+            assert(test.server.httpServer.listen.calledWith(1234, '1.2.3.4'));
+            done();
         });
-        this.server.start(1234, '1.2.3.4');
-        assert(this.server.httpServer.listen.calledOnce, 'listen was called');
-        assert(this.server.httpServer.listen.calledWith(1234, '1.2.3.4'));
+    });
+
+    test('start server writes info', function(done) {
+        var test = this;
+        tmp.dir({unsafeCleanup: true}, function(err, tmpDir) {
+            var http = require('http');
+            var createServer = http.createServer;
+            var sinon = test.sinon;
+            sinon.stub(http, 'createServer', function() {
+                var server = createServer();
+                server.listen = sinon.spy();
+                server.address = sinon.stub().returns({port: 6789});
+                return server;
+            });
+            test.server.db.location = tmpDir + '/db';
+            test.server.start(6789, '1.2.3.4', function() {
+                var info = server.info(test.server.db.location);
+                assert.strictEqual(info.pid, process.pid);
+                assert.strictEqual(info.port, 6789);
+                done()
+            });
+        });
     });
 
     test('register client with cid', function() {
