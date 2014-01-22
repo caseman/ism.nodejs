@@ -132,11 +132,11 @@ module.exports = function TitleView() {
     }
 
     views.exitButton = button('exitButton', 'E{underline}x{/underline}it', ['x', 'escape'])
-    views.remoteButton = button('hostButton', '{underline}H{/underline}ost Games', ['h'])
-    views.remoteButton = button('joinButton', '{underline}J{/underline}oin Remote Game', ['j'])
-    views.localButton = button('localButton', 'Start {underline}L{/underline}ocal Game', ['l'])
+    views.remoteButton = button('hostButton', '{underline}H{/underline}ost Games', 'h')
+    views.remoteButton = button('joinButton', '{underline}J{/underline}oin Remote Game', 'j')
+    views.localButton = button('localButton', 'Start {underline}L{/underline}ocal Game', 'l')
     if (prefs.get('games')) {
-        views.resumeButton = button('resumeButton', '{underline}R{/underline}esume Game', ['r'])
+        views.resumeButton = button('resumeButton', '{underline}R{/underline}esume Game', 'r')
     }
 
     views.medallion = blessed.box({
