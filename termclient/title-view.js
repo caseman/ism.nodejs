@@ -13,6 +13,7 @@ module.exports = function TitleView() {
       , right: 25
       , height: '100%'
       , bg: 0
+      , keys: true
     })
 
     views.version = blessed.text({
@@ -92,7 +93,7 @@ module.exports = function TitleView() {
 
     var buttonCount = 0
 
-    function button(name, content) {
+    function button(name, content, key) {
         var bttn = blessed.button({
             parent: menu
           , height: 1
@@ -124,15 +125,18 @@ module.exports = function TitleView() {
         bttn.on('click', function() {
             menu.emit('click ' + bttn.name)
         })
+        main.key(key, function() {
+            menu.emit('click ' + bttn.name)
+        })
         return bttn
     }
 
-    views.exitButton = button('exitButton', 'E{underline}x{/underline}it')
-    views.remoteButton = button('hostButton', '{underline}H{/underline}ost Games')
-    views.remoteButton = button('joinButton', '{underline}J{/underline}oin Remote Game')
-    views.localButton = button('localButton', 'Start {underline}L{/underline}ocal Game')
+    views.exitButton = button('exitButton', 'E{underline}x{/underline}it', ['x', 'escape'])
+    views.remoteButton = button('hostButton', '{underline}H{/underline}ost Games', ['h'])
+    views.remoteButton = button('joinButton', '{underline}J{/underline}oin Remote Game', ['j'])
+    views.localButton = button('localButton', 'Start {underline}L{/underline}ocal Game', ['l'])
     if (prefs.get('games')) {
-        views.resumeButton = button('resumeButton', '{underline}R{/underline}esume Game')
+        views.resumeButton = button('resumeButton', '{underline}R{/underline}esume Game', ['r'])
     }
 
     views.medallion = blessed.box({
