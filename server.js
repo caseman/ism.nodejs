@@ -7,7 +7,7 @@ var db = require('./lib/db')
     .default('h', '0.0.0.0')
     .alias('p', 'port')
     .describe('p', 'port number to listen on')
-    .default('p', 5557) 
+    .default('p', 5557)
     .alias('v', 'verbose')
     .describe('v', 'More verbose logging of client connections')
     .boolean('v')
@@ -38,11 +38,15 @@ if (argv.help) {
     process.exit();
 }
 
-var logging = require('./lib/logging');
-logging.configure(argv.verbose || argv.debug, argv.debug);
+require('./lib/logging').configure({
+    verbose: argv.verbose
+  , debug: argv.debug
+});
 
 var Server = require('./lib/server').Server
   , db = db.open(argv.database)
   , ism = new Server(db);
-ism.start(argv.port, argv.host);
+ism.start(argv.port, argv.host, function(info) {
+    process.title = 'ism server ' + info.host + ':' + info.port
+})
 
