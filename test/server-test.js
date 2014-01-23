@@ -198,15 +198,17 @@ suite('server', function() {
             var sinon = test.sinon;
             sinon.stub(http, 'createServer', function() {
                 var server = createServer();
-                server.listen = sinon.spy();
-                server.address = sinon.stub().returns({port: 6789});
+                server.listen = sinon.stub().yields();
+                server.address = sinon.stub().returns({address: '0.1.2.3', port: 6789});
                 return server;
             });
+            test.sinon.stub(process, 'kill').returns(true);
             test.server.db.location = tmpDir + '/db';
             test.server.start(6789, '1.2.3.4', function() {
                 var info = server.info(test.server.db.location);
                 assert.strictEqual(info.pid, process.pid);
                 assert.strictEqual(info.port, 6789);
+                assert.strictEqual(info.host, '0.1.2.3');
                 done()
             });
         });
