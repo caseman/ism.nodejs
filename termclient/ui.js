@@ -4,7 +4,7 @@
 var blessed = require('blessed')
   , util = require('util')
   , strHash = require('string-hash')
-  , log = require('../lib/logging').log
+  //, log = require('../lib/logging').log
   , darkenedColors = require('./darkened-index.json')
   , screen
   , willRender = false;
@@ -166,6 +166,43 @@ function labeledInput(options, defaultValue) {
     return input;
 }
 exports.labeledInput = labeledInput;
+
+var progressOptions = {
+    top: 'center'
+  , left: 'center'
+  , width: 52
+  , height: 6
+  , border: {type:'line', bg: 0}
+  , style: {
+        bg: 0
+      , label: {bg: 0}
+      , bar: {bg: 18}
+    }
+};
+
+function progress(options) {
+    options = combine(progressOptions, options)
+    var progressBox = blessed.box(options)
+      , bar = blessed.box({
+            width: 0
+          , height: 2
+          , left: 2
+          , top: 2
+          , style: options.style.bar
+        })
+    progressBox.setProgress = function(progress) {
+        if (progress > 100) progress = 100
+        var width = Math.round(progress * (progressBox.width - 4) / 100)
+        if (width > 0) {
+            if (!bar.parent) progressBox.append(bar)
+            bar.width = width
+            render()
+        }
+    }
+    render()
+    return progressBox
+}
+exports.progress = progress
 
 var TILESPEC = require('./tilespec.json');
 
