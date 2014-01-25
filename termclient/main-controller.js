@@ -72,7 +72,7 @@ module.exports = Ctor(function() {
         var status;
         if (tile) {
             var objects = tile.objects.map(function(obj) {return capitalize(obj.type)})
-              , status = capitalize(tile.terrain);
+            status = capitalize(tile.terrain);
             if (tile.biome) status = capitalize(tile.biome) + ', ' + status;
             if (objects.length) status += ' (' + objects.join(', ') + ')';
         } else {
