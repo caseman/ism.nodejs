@@ -33,8 +33,11 @@ if (argv.help) {
 }
 
 var logging = require('./lib/logging')
-logging.configure(argv.verbose || argv.debug, argv.debug)
-logging.useFile(path.join(path.dirname(argv.prefs), 'client.log'))
+logging.configure({
+    verbose: argv.verbose
+  , debug: argv.debug
+  , filePath: path.join(path.dirname(argv.prefs), 'client.log')
+})
 
 prefs.usePath(argv.prefs)
 
