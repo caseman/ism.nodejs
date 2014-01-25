@@ -58,7 +58,7 @@ module.exports = function TitleView() {
           , align: 'center'
           , wrap: false
           , style: {fg: 'white', bg: main.style.bg, bold:true}
-          , content: 'A Game by Casey Duncan\nwith help from friends and contributors'
+          , content: 'Ism: a game by Casey Duncan\nwith help from friends and contributors'
         })
         ui.render()
     }
