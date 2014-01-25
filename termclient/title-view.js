@@ -9,8 +9,7 @@ module.exports = function TitleView() {
     var views = {}
 
     var main = views.main = blessed.box({
-        parent: ui.screen
-      , right: 25
+        right: 25
       , height: '100%'
       , bg: 0
       , keys: true
