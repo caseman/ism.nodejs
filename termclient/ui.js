@@ -36,6 +36,13 @@ function render() {
 exports.render = render;
 
 /*
+ * Clear the screen by removing all child nodes
+ */
+exports.clearScreen = function clearScreen() {
+    while (screen.children.length > 0) screen.children[0].detach()
+}
+
+/*
  * Create a view from a local module
  */
 exports.show = function show(viewName) {
