@@ -41,4 +41,6 @@ logging.configure({
 
 prefs.usePath(argv.prefs)
 
-require('./termclient/app').start()
+var app = require('./termclient/app')
+  , termApp = app.create()
+termApp.showTitle()
