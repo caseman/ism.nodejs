@@ -1,7 +1,7 @@
 var blessed = require('blessed')
   , ui = require('./ui');
 
-module.exports = function ConnectDialog(options, cb) {
+module.exports = function ConnectDialog(options, errorMsg, cb) {
     var msgBox, hostInput, portInput
       , dialog = ui.dialog({
           label: ' Connect to Ism Server '
@@ -19,12 +19,12 @@ module.exports = function ConnectDialog(options, cb) {
                     msgBox.content = 'Port not specified.';
                     portInput.focus();
                 } else {
-                    options.serverHost = data.host;
-                    options.serverPort = data.port;
+                    options.host = data.host;
+                    options.port = data.port;
                     cb(true);
                     return true;
                 }
-                msgBox.render();
+                ui.render();
             } else {
                 cb(false);
                 return true;
@@ -37,13 +37,13 @@ module.exports = function ConnectDialog(options, cb) {
         , top: 2
         , name: 'host'
         }
-      , options.serverHost || '127.0.0.1');
+      , options.host || '');
 
     portInput = ui.labeledInput({
           parent: dialog
         , top: 4
         , name: 'port'
-      }, options.serverPort || '5557');
+      }, options.port || '5557');
 
     msgBox = blessed.text({
         parent: dialog
@@ -54,10 +54,10 @@ module.exports = function ConnectDialog(options, cb) {
       , right: 3
       , width: dialog.width - 42
       , height: 2
-      , content: options.connectMsg
+      , content: errorMsg
     });
 
-    dialog.render();
+    ui.render();
     hostInput.focus();
 
     return dialog;
