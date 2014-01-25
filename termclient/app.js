@@ -58,10 +58,12 @@ var App = Ctor(function() {
         });
     }
 
-    this.start = function() {
-        this.starting = true;
-        ui.initScreen();
-        this.connect();
+    this.showTitle = function() {
+        ui.clearScreen()
+        if (!this.titleController) {
+            this.titleController = require('./title-controller')(this)
+        }
+        this.titleController.show()
     }
 
 });
