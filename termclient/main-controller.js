@@ -1,7 +1,5 @@
 var Ctor = require('../lib/ctor')
   , ui = require('./ui')
-  , extend = require('extend')
-  , log = require('../lib/logging').log
   , mainViews = require('./main-view');
 
 module.exports = Ctor(function() {
@@ -46,7 +44,7 @@ module.exports = Ctor(function() {
 
         views.map.key([','], function() {
             var index = ctrlr.selectedPersonIndex();
-            ctrlr.selectPersonByIndex(index !== undefined 
+            ctrlr.selectPersonByIndex(index !== undefined
                 ? index - 1 : client.gameState.nation.people.length - 1);
         });
         views.map.key(['.'], function() {
