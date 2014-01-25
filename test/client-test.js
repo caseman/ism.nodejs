@@ -241,4 +241,38 @@ suite('client', function() {
         assert.equal(sent.clientVersion, version);
     });
 
+    test('createGame mixes map params', function() {
+        this.client.createGame(['small'])
+        var smallParams = require('../map-config/small.json')
+          , defaultParams = require('../map-config/default.json')
+        var sent = this.getSent();
+        assert.equal(sent.says, 'createGame');
+        for (var key in defaultParams) {
+            var expected = smallParams[key] || defaultParams[key]
+            assert.strictEqual(sent.mapParams[key], expected)
+        }
+    })
+
+    test('createGame calls progress callback', function(done) {
+        this.client.createGame([], null, function(progress) {
+            assert.strictEqual(progress, 99)
+            done()
+        })
+        var sent = this.getSent();
+        this.client.emit('msg working', {progress: 33, re:sent.uid + 'xxx'})
+        this.client.emit('msg working', {progress: 99, re:sent.uid})
+    })
+
+    test('createGame returns game info', function(done) {
+        var expected = {such:'game'}
+        this.client.createGame([], function(err, info) {
+            assert.strictEqual(err, null);
+            assert.deepEqual(info, expected)
+            done()
+        })
+        var sent = this.getSent();
+        assert.equal(sent.says, 'createGame');
+        this.replyWith({says:'createGame', game:expected, re:sent.uid});
+    })
+
 });
