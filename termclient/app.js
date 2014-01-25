@@ -7,44 +7,47 @@ var Ctor = require('../lib/ctor')
 var App = Ctor(function() {
     this.init = function(options) {
         this.options = options || {};
+        if (!ui.screen) ui.initScreen()
     }
 
-    this.connect = function() {
+    this.connect = function(serverInfo, cb) {
         var app = this;
 
-        if (!app.options.serverHost || !app.options.serverPort) {
-            app.showConnectDialog();
+        if (!serverInfo.host || !serverInfo.port) {
+            app.showConnectDialog(serverInfo, '', cb);
         } else {
-            var newClient = client.create(app.options.serverPort, app.options.serverHost, app.options.cid);
+            var newClient = client.create(serverInfo);
             var connectErrorCb = function(name, err) {
-                app.options.connectMsg = 'Error: ' + err.description;
-                app.showConnectDialog();
+                app.showConnectDialog(serverInfo, 'Error: ' + err.description, cb);
             }
             newClient.once('error', connectErrorCb);
             newClient.once('connection', function() {
                 newClient.removeListener('error', connectErrorCb);
-                app.useClient(newClient);
+                app.useClient(newClient, function() {
+                    if (cb) cb(null, newClient)
+                })
             });
         }
     }
 
-    this.showConnectDialog = function() {
+    this.showConnectDialog = function(serverInfo, errorMsg, cb) {
+            log.info(serverInfo)
         var app = this;
 
-        ui.show('connect-dialog')(app.options, function(confirmed) {
+        ui.show('connect-dialog')(serverInfo, errorMsg, function(confirmed) {
             if (confirmed) {
-                app.connect();
-            } else if (app.starting) {
-                process.exit();
+                app.connect(serverInfo, cb);
+            } else {
+                cb('cancelled')
             }
         });
     }
 
-    this.useClient = function(appClient) {
+    this.useClient = function(appClient, cb) {
         if (this.client) this.client.close();
         this.client = appClient;
         this.mainController = new MainController(this.client);
-        this.client.handshake(function() {});
+        this.client.handshake(cb || function() {})
     }
 
     this.reportError = function(msg, err, cb) {
