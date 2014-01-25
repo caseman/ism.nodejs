@@ -14,6 +14,7 @@ module.exports = Ctor(function() {
         client.on('updateNation', ui.render);
 
         client.on('joinGame', function(game) {
+            if (!views.main.parent) ui.screen.append(views.main);
             views.map.game = game;
             var location = game.nation.startLocation;
             views.map.scrollCentering(location[0], location[1]);
@@ -52,6 +53,10 @@ module.exports = Ctor(function() {
             var index = ctrlr.selectedPersonIndex();
             ctrlr.selectPersonByIndex(index !== undefined ? index + 1 : 0);
         });
+        views.map.key('escape', function() {
+            views.main.detach();
+            ui.render()
+        })
         views.map.on('keypress', function(ch, key) {
             if (ch && ctrlr.selectedPersonUid && !key.shift && !key.ctrl) {
                 var dx = 0

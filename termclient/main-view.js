@@ -5,8 +5,7 @@ module.exports = function MainView() {
     var views = {};
 
     views.main = blessed.box({
-        parent: ui.screen
-      , width: '100%'
+        width: '100%'
       , height: '100%'
     });
 
