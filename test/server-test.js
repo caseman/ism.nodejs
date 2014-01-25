@@ -437,7 +437,7 @@ suite('server remote client', function() {
             key('player', 'client', this.client.cid)
           , {game: this.game.uid, nation: this.nation.uid});
         var clientMock = sinon.mock(this.client);
-        clientMock.expects('sendUpdate');
+        clientMock.expects('scheduleUpdate');
 
         this.client.joinGame(this.game, this.nation);
         assert.strictEqual(this.client.game, this.game);
@@ -451,6 +451,7 @@ suite('server remote client', function() {
         this.game.started.returns(true);
         this.nation.uid = "5401234086";
         this.client.cid = "3245798734";
+        assert(!this.client.updateTask);
         this.client.joinGame(this.game, this.nation);
 
         var peeps = [
@@ -458,7 +459,6 @@ suite('server remote client', function() {
           , {uid:"0923487", type:'person'}
           , {uid:"8965892", type:'person'}
         ];
-        assert(!this.client.updateTask);
         this.nation.emit('personChanged', peeps[0]);
         var task = this.client.updateTask;
         assert(task);

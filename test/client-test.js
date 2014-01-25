@@ -13,7 +13,7 @@ suite('client', function() {
         this.testSockJs.write = this.sinon.stub();
         this.sockjsCreate = this.sockjsMock.expects('create')
             .withArgs('http://ismhost:5557/ism').returns(this.testSockJs);
-        this.client = client.create(5557, 'ismhost');
+        this.client = client.create({port:5557, host:'ismhost'});
         this.client.connected = true;
         this.replyWith = function(msg) {
             this.testSockJs.emit('data', JSON.stringify(msg));
@@ -218,12 +218,11 @@ suite('client', function() {
     });
 
     test('handshake sets cid', function(done) {
-        var test = this;
         assert(!this.client.cid);
 
-        this.client.handshake(function() {
-            assert.strictEqual(this, test.client);
-            assert.equal(this.cid, '3498579834');
+        this.client.handshake(function(err, cid) {
+            assert.strictEqual(err, null);
+            assert.strictEqual(cid, '3498579834');
             done();
         });
 
