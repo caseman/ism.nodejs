@@ -38,7 +38,7 @@ var App = Ctor(function() {
             if (confirmed) {
                 app.connect(serverInfo, cb);
             } else {
-                cb('cancelled')
+                if (cb) cb('cancelled')
             }
         });
     }
