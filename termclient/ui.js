@@ -59,7 +59,7 @@ function combine() {
         var arg = arguments[i];
         for (var name in arg) {
             var val = arg[name];
-            if (typeof val == 'object' && name != 'parent') {
+            if (typeof val == 'object' && !util.isArray(val) && name != 'parent') {
                 val = combine(result[name] || {}, val);
             }
             result[name] = val;
