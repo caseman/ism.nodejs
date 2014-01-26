@@ -211,6 +211,45 @@ function progress(options) {
 }
 exports.progress = progress
 
+var listOptions = {
+    top: 'center'
+  , left: 'center'
+  , width: 62
+  , height: 24
+  , mouse: true
+  , keys: true
+  , vi: true
+  , style: {
+        bg: 17
+      , label: {bg: 17}
+    }
+}
+
+function listDialog(options, cb) {
+    options = combine(listOptions, options)
+    var selected = 0
+    var finished = function(data) {
+        dialogBox.detach()
+        render()
+        cb(data ? selected : null)
+    }
+    var dialogBox = dialog(options, ['Resume', 'Cancel'], finished)
+    var listBox = blessed.list(combine(options, {
+        parent: dialogBox
+      , left: 2
+      , top: 2
+      , right: 2
+      , bottom: 4
+      , width: undefined
+      , height: undefined
+      , label: undefined
+    }))
+    listBox.on('cancel', finished)
+    listBox.on('select', function(item, index) {selected = index})
+    return dialogBox
+}
+exports.listDialog = listDialog
+
 var TILESPEC = require('./tilespec.json');
 
 function map(options) {
