@@ -43,7 +43,7 @@ module.exports = function ConnectDialog(options, errorMsg, cb) {
           parent: dialog
         , top: 4
         , name: 'port'
-      }, options.port || '5557');
+      }, options.port ? options.port.toString() : '5557');
 
     msgBox = blessed.text({
         parent: dialog
