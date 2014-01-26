@@ -446,6 +446,18 @@ suite('server remote client', function() {
         clientMock.verify();
     });
 
+    test('join game sets up next update', function() {
+        this.client.cid = "562348192734";
+        this.game.started.returns(false);
+        this.nation.people = [1,2,3];
+        assert.deepEqual(this.client.nextUpdate, {});
+        this.client.joinGame(this.game, this.nation);
+        var nextUpdate = this.client.nextUpdate;
+        assert.deepEqual(nextUpdate.game, this.game.info);
+        assert.deepEqual(nextUpdate.nation, this.nation);
+        assert.deepEqual(Object.keys(nextUpdate.people), this.nation.people);
+    });
+
     test('after person changes sends an update', function() {
         var clock = sinon.useFakeTimers();
         this.game.started.returns(true);
