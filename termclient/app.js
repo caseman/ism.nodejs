@@ -2,6 +2,7 @@ var Ctor = require('../lib/ctor')
   , log = require('../lib/logging').log
   , client = require('../lib/client')
   , ui = require('./ui')
+  , prefs = require('../lib/prefs')
   , MainController = require('./main-controller');
 
 var App = Ctor(function() {
@@ -47,7 +48,31 @@ var App = Ctor(function() {
         if (this.client) this.client.close();
         this.client = appClient;
         this.mainController = new MainController(this.client);
+        var updateGames = function(gameInfo) {
+            var games = prefs.get('games') || {}
+            games[appClient.cid] = {
+                cid: appClient.cid
+              , host: appClient.serverHost
+              , port: appClient.serverPort
+              , gameInfo: gameInfo
+            }
+            prefs.save('games', games)
+        }
+        appClient.on('joinGame', function(gameState) {updateGames(gameState.info)})
+        appClient.on('updateGame', updateGames)
         this.client.handshake(cb || function() {})
+    }
+
+    this.previousGamesByTime = function() {
+        var games = prefs.get('games')
+        if (!games) return []
+        var gamesArray = Object.keys(games).map(function(cid) {
+            return games[cid]
+        })
+        return gamesArray.sort(function(a, b) {
+            return new Date(b.gameInfo.turnTime || b.gameInfo.created)
+                -  new Date(a.gameInfo.turnTime || a.gameInfo.created)
+        });
     }
 
     this.reportError = function(msg, err, cb) {
