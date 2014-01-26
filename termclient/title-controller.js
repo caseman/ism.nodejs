@@ -13,6 +13,7 @@ var Title = Ctor(function() {
 
         views.menu.on('click exitButton', process.exit);
         views.menu.on('click startLocalButton', this.playLocalGame.bind(this))
+        views.menu.on('click resumeGameButton', this.resumeGame.bind(this))
     }
 
     this.show = function() {
@@ -71,6 +72,43 @@ var Title = Ctor(function() {
                   , err
                   , function() {ctrlr.app.showTitle()}
                 )
+            }
+        })
+    }
+
+    this.showGamesList = function(cb) {
+        var games = this.app.previousGamesByTime()
+        var gameTitles = games.map(function(game) {
+            var date = new Date(game.gameInfo.turnTime || game.gameInfo.created)
+              , title = date.toDateString() + ' ' + date.getHours() + ':' + date.getMinutes()
+            if (game.gameInfo.turnNumber) title += ' turn:' + game.gameInfo.turnNumber
+            title += (game.host == '127.0.0.1') ? ' (local)' : ' ' + game.host
+            return title
+        })
+        var dialog = ui.listDialog({
+            label: ' Select a Game '
+          , items: gameTitles
+        }, function(index) {cb(null, index)})
+        ui.screen.append(dialog)
+        dialog.focus()
+        return games
+    }
+
+    this.resumeGame = function() {
+        var ctrlr = this
+        this.showGamesList(function(err, index) {
+            if (index === null) return
+            var game = ctrlr.app.previousGamesByTime()[index]
+            if (!game) return
+            if (game.host == '127.0.0.1' || game.host == 'localhost') {
+                server.useLocal(prefs.path() || prefs.defaultPath(), function(err, serverInfo) {
+                    if (!err) {
+                        serverInfo.cid = game.cid
+                        ctrlr.app.connect(serverInfo)
+                    }
+                })
+            } else {
+                ctrlr.app.connect(game)
             }
         })
     }
