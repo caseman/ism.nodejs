@@ -15,6 +15,7 @@
   ],
   "files": [
     "./lib",
+    "./data",
     "./termclient",
     "./map-config"
   ],

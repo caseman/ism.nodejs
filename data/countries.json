@@ -1,0 +1,1232 @@
+[
+  {
+    "name": "Afghanistan",
+    "enName": "Afghanistan",
+    "demonym": "Afghan",
+    "language": "Pashto"
+  },
+  {
+    "name": "Albania",
+    "enName": "Albania",
+    "demonym": "Albanian",
+    "language": "Albanian"
+  },
+  {
+    "name": "Algeria",
+    "enName": "Algeria",
+    "demonym": "Algerian",
+    "language": "Arabic"
+  },
+  {
+    "name": "American Samoa",
+    "enName": "American Samoa",
+    "demonym": "American Samoan",
+    "language": "English"
+  },
+  {
+    "name": "Andorra",
+    "enName": "Andorra",
+    "demonym": "Andorran",
+    "language": "Catalan"
+  },
+  {
+    "name": "Angola",
+    "enName": "Angola",
+    "demonym": "Angolan",
+    "language": "Portuguese"
+  },
+  {
+    "name": "Anguilla",
+    "enName": "Anguilla",
+    "demonym": "Anguillian",
+    "language": "English"
+  },
+  {
+    "name": "Argentina",
+    "enName": "Argentina",
+    "demonym": "Argentinean",
+    "language": "Spanish"
+  },
+  {
+    "name": "Armenia",
+    "enName": "Armenia",
+    "demonym": "Armenian",
+    "language": "Armenian"
+  },
+  {
+    "name": "Aruba",
+    "enName": "Aruba",
+    "demonym": "Aruban",
+    "language": "Dutch"
+  },
+  {
+    "name": "Australia",
+    "enName": "Australia",
+    "demonym": "Australian",
+    "language": "English"
+  },
+  {
+    "name": "Austria",
+    "enName": "Austria",
+    "demonym": "Austrian",
+    "language": "German"
+  },
+  {
+    "name": "Azerbaijan",
+    "enName": "Azerbaijan",
+    "demonym": "Azerbaijani",
+    "language": "Azerbaijani"
+  },
+  {
+    "name": "Bahamas",
+    "enName": "Bahamas",
+    "demonym": "Bahamian",
+    "language": "English"
+  },
+  {
+    "name": "Bahrain",
+    "enName": "Bahrain",
+    "demonym": "Bahraini",
+    "language": "Arabic"
+  },
+  {
+    "name": "Bangladesh",
+    "enName": "Bangladesh",
+    "demonym": "Bangladeshi",
+    "language": "Bangla"
+  },
+  {
+    "name": "Barbados",
+    "enName": "Barbados",
+    "demonym": "Barbadian",
+    "language": "English"
+  },
+  {
+    "name": "Belarus",
+    "enName": "Belarus",
+    "demonym": "Belarusian",
+    "language": "Belarusian"
+  },
+  {
+    "name": "Belgium",
+    "enName": "Belgium",
+    "demonym": "Belgian",
+    "language": "Dutch"
+  },
+  {
+    "name": "Belize",
+    "enName": "Belize",
+    "demonym": "Belizean",
+    "language": "English"
+  },
+  {
+    "name": "Benin",
+    "enName": "Benin",
+    "demonym": "Beninese",
+    "language": "French"
+  },
+  {
+    "name": "Bermuda",
+    "enName": "Bermuda",
+    "demonym": "Bermudian",
+    "language": "English"
+  },
+  {
+    "name": "Bhutan",
+    "enName": "Bhutan",
+    "demonym": "Bhutanese",
+    "language": "Dzongkha"
+  },
+  {
+    "name": "Bolivia",
+    "enName": "Bolivia",
+    "demonym": "Bolivian",
+    "language": "Spanish"
+  },
+  {
+    "name": "Bonaire",
+    "enName": "Bonaire",
+    "demonym": "Dutch",
+    "language": "Dutch"
+  },
+  {
+    "name": "Botswana",
+    "enName": "Botswana",
+    "demonym": "Motswana",
+    "language": "English"
+  },
+  {
+    "name": "Brazil",
+    "enName": "Brazil",
+    "demonym": "Brazilian",
+    "language": "Portuguese"
+  },
+  {
+    "name": "Brunei",
+    "enName": "Brunei",
+    "demonym": "Bruneian",
+    "language": "Malay"
+  },
+  {
+    "name": "Bulgaria",
+    "enName": "Bulgaria",
+    "demonym": "Bulgarian",
+    "language": "Bulgarian"
+  },
+  {
+    "name": "Burkina Faso",
+    "enName": "Burkina Faso",
+    "demonym": "Burkinabe",
+    "language": "French"
+  },
+  {
+    "name": "Burundi",
+    "enName": "Burundi",
+    "demonym": "Burundian",
+    "language": "Kirundi"
+  },
+  {
+    "name": "Cambodia",
+    "enName": "Cambodia",
+    "demonym": "Cambodian",
+    "language": "Khmer"
+  },
+  {
+    "name": "Cameroon",
+    "enName": "Cameroon",
+    "demonym": "Cameroonian",
+    "language": "French"
+  },
+  {
+    "name": "Canada",
+    "enName": "Canada",
+    "demonym": "Canadian",
+    "language": "English"
+  },
+  {
+    "name": "Cape Verde",
+    "enName": "Cape Verde",
+    "demonym": "Cape Verdian",
+    "language": "Portuguese"
+  },
+  {
+    "name": "République centrafricaine",
+    "enName": "Central African Republic",
+    "demonym": "Central African",
+    "language": "Sango"
+  },
+  {
+    "name": "Chad",
+    "enName": "Chad",
+    "demonym": "Chadian",
+    "language": "French"
+  },
+  {
+    "name": "Chile",
+    "enName": "Chile",
+    "demonym": "Chilean",
+    "language": "Spanish"
+  },
+  {
+    "name": "China",
+    "enName": "China",
+    "demonym": "Chinese",
+    "language": "Standard Chinese"
+  },
+  {
+    "name": "Colombia",
+    "enName": "Colombia",
+    "demonym": "Colombian",
+    "language": "Spanish"
+  },
+  {
+    "name": "Comoros",
+    "enName": "Comoros",
+    "demonym": "Comoran",
+    "language": "Comorian"
+  },
+  {
+    "name": "Costa Rica",
+    "enName": "Costa Rica",
+    "demonym": "Costa Rican",
+    "language": "Spanish"
+  },
+  {
+    "name": "Côte d'Ivoire",
+    "enName": "Côte d'Ivoire",
+    "demonym": "Ivorian",
+    "language": "French"
+  },
+  {
+    "name": "Croatia",
+    "enName": "Croatia",
+    "demonym": "Croatian",
+    "language": "Croatian"
+  },
+  {
+    "name": "Cuba",
+    "enName": "Cuba",
+    "demonym": "Cuban",
+    "language": "Spanish"
+  },
+  {
+    "name": "Curaçao",
+    "enName": "Curaçao",
+    "demonym": "Dutch",
+    "language": "Dutch"
+  },
+  {
+    "name": "Cyprus",
+    "enName": "Cyprus",
+    "demonym": "Cypriot",
+    "language": "Greek"
+  },
+  {
+    "name": "Denmark",
+    "enName": "Denmark",
+    "demonym": "Danish",
+    "language": "Danish"
+  },
+  {
+    "name": "Djibouti",
+    "enName": "Djibouti",
+    "demonym": "Djibouti",
+    "language": "French"
+  },
+  {
+    "name": "Dominica",
+    "enName": "Dominica",
+    "demonym": "Dominican",
+    "language": "English"
+  },
+  {
+    "name": "Ecuador",
+    "enName": "Ecuador",
+    "demonym": "Ecuadorean",
+    "language": "Spanish"
+  },
+  {
+    "name": "Egypt",
+    "enName": "Egypt",
+    "demonym": "Egyptian",
+    "language": "Egyptian Arabic"
+  },
+  {
+    "name": "El Salvador",
+    "enName": "El Salvador",
+    "demonym": "Salvadoran",
+    "language": "Castilian"
+  },
+  {
+    "name": "Equatorial Guinea",
+    "enName": "Equatorial Guinea",
+    "demonym": "Equatorial Guinean",
+    "language": "Spanish"
+  },
+  {
+    "name": "Eritrea",
+    "enName": "Eritrea",
+    "demonym": "Eritrean",
+    "language": "Tigrinya"
+  },
+  {
+    "name": "Estonia",
+    "enName": "Estonia",
+    "demonym": "Estonian",
+    "language": "Estonian"
+  },
+  {
+    "name": "Ethiopia",
+    "enName": "Ethiopia",
+    "demonym": "Ethiopian",
+    "language": "Amharic"
+  },
+  {
+    "name": "Fiji",
+    "enName": "Fiji",
+    "demonym": "Fijian",
+    "language": "English"
+  },
+  {
+    "name": "Finland",
+    "enName": "Finland",
+    "demonym": "Finnish",
+    "language": "Finnish"
+  },
+  {
+    "name": "France",
+    "enName": "France",
+    "demonym": "French",
+    "language": "French"
+  },
+  {
+    "name": "French Polynesia",
+    "enName": "French Polynesia",
+    "demonym": "French Polynesian",
+    "language": "French"
+  },
+  {
+    "name": "Gabon",
+    "enName": "Gabon",
+    "demonym": "Gabonese",
+    "language": "French"
+  },
+  {
+    "name": "Gambia",
+    "enName": "Gambia",
+    "demonym": "Gambian",
+    "language": "English"
+  },
+  {
+    "name": "Georgia",
+    "enName": "Georgia",
+    "demonym": "Georgian",
+    "language": "Georgian"
+  },
+  {
+    "name": "Germany",
+    "enName": "Germany",
+    "demonym": "German",
+    "language": "German"
+  },
+  {
+    "name": "Ghana",
+    "enName": "Ghana",
+    "demonym": "Ghanaian",
+    "language": "English"
+  },
+  {
+    "name": "Gibraltar",
+    "enName": "Gibraltar",
+    "demonym": "Gibraltar",
+    "language": "English"
+  },
+  {
+    "name": "Greece",
+    "enName": "Greece",
+    "demonym": "Greek",
+    "language": "Greek"
+  },
+  {
+    "name": "Greenland",
+    "enName": "Greenland",
+    "demonym": "Greenlandic",
+    "language": "Greenlandic"
+  },
+  {
+    "name": "Grenada",
+    "enName": "Grenada",
+    "demonym": "Grenadian",
+    "language": "English"
+  },
+  {
+    "name": "Guadeloupe",
+    "enName": "Guadeloupe",
+    "demonym": "Guadeloupian",
+    "language": "French"
+  },
+  {
+    "name": "Guam",
+    "enName": "Guam",
+    "demonym": "Guamanian",
+    "language": "English"
+  },
+  {
+    "name": "Guatemala",
+    "enName": "Guatemala",
+    "demonym": "Guatemalan",
+    "language": "Spanish"
+  },
+  {
+    "name": "Guinea",
+    "enName": "Guinea",
+    "demonym": "Guinean",
+    "language": "French"
+  },
+  {
+    "name": "Guyana",
+    "enName": "Guyana",
+    "demonym": "Guyanese",
+    "language": "English"
+  },
+  {
+    "name": "Haiti",
+    "enName": "Haiti",
+    "demonym": "Haitian",
+    "language": "French"
+  },
+  {
+    "name": "Honduras",
+    "enName": "Honduras",
+    "demonym": "Honduran",
+    "language": "Spanish"
+  },
+  {
+    "name": "Hong Kong",
+    "enName": "Hong Kong",
+    "demonym": "Chinese",
+    "language": "English"
+  },
+  {
+    "name": "Hungary",
+    "enName": "Hungary",
+    "demonym": "Hungarian",
+    "language": "Hungarian"
+  },
+  {
+    "name": "Iceland",
+    "enName": "Iceland",
+    "demonym": "Icelander",
+    "language": "Icelandic"
+  },
+  {
+    "name": "India",
+    "enName": "India",
+    "demonym": "Indian",
+    "language": "Hindi"
+  },
+  {
+    "name": "Indonesia",
+    "enName": "Indonesia",
+    "demonym": "Indonesian",
+    "language": "Indonesian"
+  },
+  {
+    "name": "Iran",
+    "enName": "Iran",
+    "demonym": "Iranian",
+    "language": "Persian"
+  },
+  {
+    "name": "Iraq",
+    "enName": "Iraq",
+    "demonym": "Iraqi",
+    "language": "Arabic"
+  },
+  {
+    "name": "Ireland",
+    "enName": "Ireland",
+    "demonym": "Irish",
+    "language": "Irish"
+  },
+  {
+    "name": "Mannin",
+    "enName": "Isle of Man",
+    "demonym": "Manx",
+    "language": "English"
+  },
+  {
+    "name": "Israel",
+    "enName": "Israel",
+    "demonym": "Israeli",
+    "language": "Hebrew"
+  },
+  {
+    "name": "Italy",
+    "enName": "Italy",
+    "demonym": "Italian",
+    "language": "Italian"
+  },
+  {
+    "name": "Jamaica",
+    "enName": "Jamaica",
+    "demonym": "Jamaican",
+    "language": "Jamaican English"
+  },
+  {
+    "name": "Japan",
+    "enName": "Japan",
+    "demonym": "Japanese",
+    "language": "Japanese"
+  },
+  {
+    "name": "Jordan",
+    "enName": "Jordan",
+    "demonym": "Jordanian",
+    "language": "Arabic"
+  },
+  {
+    "name": "Kazakhstan",
+    "enName": "Kazakhstan",
+    "demonym": "Kazakhstani",
+    "language": "Kazakh"
+  },
+  {
+    "name": "Kenya",
+    "enName": "Kenya",
+    "demonym": "Kenyan",
+    "language": "Swahili"
+  },
+  {
+    "name": "Kiribati",
+    "enName": "Kiribati",
+    "demonym": "I-Kiribati",
+    "language": "English"
+  },
+  {
+    "name": "Kuwait",
+    "enName": "Kuwait",
+    "demonym": "Kuwaiti",
+    "language": "Arabic"
+  },
+  {
+    "name": "Kyrgyzstan",
+    "enName": "Kyrgyzstan",
+    "demonym": "Kirghiz",
+    "language": "Kyrgyz"
+  },
+  {
+    "name": "Laos",
+    "enName": "Laos",
+    "demonym": "Laotian",
+    "language": "Lao"
+  },
+  {
+    "name": "Latvia",
+    "enName": "Latvia",
+    "demonym": "Latvian",
+    "language": "Latvian"
+  },
+  {
+    "name": "Lebanon",
+    "enName": "Lebanon",
+    "demonym": "Lebanese",
+    "language": "Arabic"
+  },
+  {
+    "name": "Lesotho",
+    "enName": "Lesotho",
+    "demonym": "Mosotho",
+    "language": "Sesotho"
+  },
+  {
+    "name": "Liberia",
+    "enName": "Liberia",
+    "demonym": "Liberian",
+    "language": "English"
+  },
+  {
+    "name": "Libya",
+    "enName": "Libya",
+    "demonym": "Libyan",
+    "language": "Arabic"
+  },
+  {
+    "name": "Liechtenstein",
+    "enName": "Liechtenstein",
+    "demonym": "Liechtensteiner",
+    "language": "German"
+  },
+  {
+    "name": "Lithuania",
+    "enName": "Lithuania",
+    "demonym": "Lithuanian",
+    "language": "Lithuanian"
+  },
+  {
+    "name": "Luxembourg",
+    "enName": "Luxembourg",
+    "demonym": "Luxembourger",
+    "language": "French"
+  },
+  {
+    "name": "Macau",
+    "enName": "Macau",
+    "demonym": "Chinese",
+    "language": "Traditional Chinese"
+  },
+  {
+    "name": "Macedonia",
+    "enName": "Macedonia",
+    "demonym": "Macedonian",
+    "language": "Macedonian"
+  },
+  {
+    "name": "Madagascar",
+    "enName": "Madagascar",
+    "demonym": "Malagasy",
+    "language": "Malagasy"
+  },
+  {
+    "name": "Malawi",
+    "enName": "Malawi",
+    "demonym": "Malawian",
+    "language": "Chichewa"
+  },
+  {
+    "name": "Malaysia",
+    "enName": "Malaysia",
+    "demonym": "Malaysian",
+    "language": "Malaysian"
+  },
+  {
+    "name": "Maldives",
+    "enName": "Maldives",
+    "demonym": "Maldivan",
+    "language": "Maldivian"
+  },
+  {
+    "name": "Mali",
+    "enName": "Mali",
+    "demonym": "Malian",
+    "language": "French"
+  },
+  {
+    "name": "Malta",
+    "enName": "Malta",
+    "demonym": "Maltese",
+    "language": "Maltese"
+  },
+  {
+    "name": "Martinique",
+    "enName": "Martinique",
+    "demonym": "French",
+    "language": "French"
+  },
+  {
+    "name": "Mauritania",
+    "enName": "Mauritania",
+    "demonym": "Mauritanian",
+    "language": "Arabic"
+  },
+  {
+    "name": "Mauritius",
+    "enName": "Mauritius",
+    "demonym": "Mauritian",
+    "language": "French"
+  },
+  {
+    "name": "Mayotte",
+    "enName": "Mayotte",
+    "demonym": "French",
+    "language": "French"
+  },
+  {
+    "name": "Mexico",
+    "enName": "Mexico",
+    "demonym": "Mexican",
+    "language": "Spanish"
+  },
+  {
+    "name": "Micronesia",
+    "enName": "Micronesia",
+    "demonym": "Micronesian",
+    "language": "English"
+  },
+  {
+    "name": "Moldova",
+    "enName": "Moldova",
+    "demonym": "Moldovan",
+    "language": "Moldovan"
+  },
+  {
+    "name": "Monaco",
+    "enName": "Monaco",
+    "demonym": "Monegasque",
+    "language": "French"
+  },
+  {
+    "name": "Mongolia",
+    "enName": "Mongolia",
+    "demonym": "Mongolian",
+    "language": "Mongolian"
+  },
+  {
+    "name": "Montenegro",
+    "enName": "Montenegro",
+    "demonym": "Montenegrin",
+    "language": "Montenegrin"
+  },
+  {
+    "name": "Montserrat",
+    "enName": "Montserrat",
+    "demonym": "Montserratian",
+    "language": "English"
+  },
+  {
+    "name": "Morocco",
+    "enName": "Morocco",
+    "demonym": "Moroccan",
+    "language": "Arabic"
+  },
+  {
+    "name": "Mozambique",
+    "enName": "Mozambique",
+    "demonym": "Mozambican",
+    "language": "Portuguese"
+  },
+  {
+    "name": "Myanmar",
+    "enName": "Myanmar",
+    "demonym": "Myanmarian",
+    "language": "Burmese"
+  },
+  {
+    "name": "Namibia",
+    "enName": "Namibia",
+    "demonym": "Namibian",
+    "language": "English"
+  },
+  {
+    "name": "Nauru",
+    "enName": "Nauru",
+    "demonym": "Nauruan",
+    "language": "Nauruan"
+  },
+  {
+    "name": "Nepal",
+    "enName": "Nepal",
+    "demonym": "Nepalese",
+    "language": "Nepali"
+  },
+  {
+    "name": "Netherlands",
+    "enName": "Netherlands",
+    "demonym": "Dutch",
+    "language": "Dutch"
+  },
+  {
+    "name": "New Caledonia",
+    "enName": "New Caledonia",
+    "demonym": "New Caledonian",
+    "language": "French"
+  },
+  {
+    "name": "New Zealand",
+    "enName": "New Zealand",
+    "demonym": "New Zealander",
+    "language": "English"
+  },
+  {
+    "name": "Nicaragua",
+    "enName": "Nicaragua",
+    "demonym": "Nicaraguan",
+    "language": "Spanish"
+  },
+  {
+    "name": "Niger",
+    "enName": "Niger",
+    "demonym": "Nigerian",
+    "language": "French"
+  },
+  {
+    "name": "Nigeria",
+    "enName": "Nigeria",
+    "demonym": "Nigerian",
+    "language": "English"
+  },
+  {
+    "name": "Niue",
+    "enName": "Niue",
+    "demonym": "Niuean",
+    "language": "Niuean"
+  },
+  {
+    "name": "North Korea",
+    "enName": "North Korea",
+    "demonym": "North Korean",
+    "language": "Korean"
+  },
+  {
+    "name": "Norway",
+    "enName": "Norway",
+    "demonym": "Norwegian",
+    "language": "Norwegian"
+  },
+  {
+    "name": "Oman",
+    "enName": "Oman",
+    "demonym": "Omani",
+    "language": "Arabic"
+  },
+  {
+    "name": "Pakistan",
+    "enName": "Pakistan",
+    "demonym": "Pakistani",
+    "language": "English"
+  },
+  {
+    "name": "Palau",
+    "enName": "Palau",
+    "demonym": "Palauan",
+    "language": "English"
+  },
+  {
+    "name": "Palestine",
+    "enName": "Palestine",
+    "demonym": "Palestinian",
+    "language": "Arabic"
+  },
+  {
+    "name": "Panama",
+    "enName": "Panama",
+    "demonym": "Panamanian",
+    "language": "Spanish"
+  },
+  {
+    "name": "Paraguay",
+    "enName": "Paraguay",
+    "demonym": "Paraguayan",
+    "language": "Spanish"
+  },
+  {
+    "name": "Peru",
+    "enName": "Peru",
+    "demonym": "Peruvian",
+    "language": "Spanish"
+  },
+  {
+    "name": "Philippines",
+    "enName": "Philippines",
+    "demonym": "Filipino",
+    "language": "Filipino"
+  },
+  {
+    "name": "Poland",
+    "enName": "Poland",
+    "demonym": "Polish",
+    "language": "Polish"
+  },
+  {
+    "name": "Portugal",
+    "enName": "Portugal",
+    "demonym": "Portuguese",
+    "language": "Portuguese"
+  },
+  {
+    "name": "Puerto Rico",
+    "enName": "Puerto Rico",
+    "demonym": "Puerto Rican",
+    "language": "Spanish"
+  },
+  {
+    "name": "Qatar",
+    "enName": "Qatar",
+    "demonym": "Qatari",
+    "language": "Arabic"
+  },
+  {
+    "name": "Република Косово",
+    "enName": "Republic of Kosovo",
+    "demonym": "Kosovar",
+    "language": "Albanian"
+  },
+  {
+    "name": "Réunion",
+    "enName": "Réunion",
+    "demonym": "French",
+    "language": "French"
+  },
+  {
+    "name": "Romania",
+    "enName": "Romania",
+    "demonym": "Romanian",
+    "language": "Romanian"
+  },
+  {
+    "name": "Russia",
+    "enName": "Russia",
+    "demonym": "Russian",
+    "language": "Russian"
+  },
+  {
+    "name": "Rwanda",
+    "enName": "Rwanda",
+    "demonym": "Rwandan",
+    "language": "Kinyarwanda"
+  },
+  {
+    "name": "Saint Helena",
+    "enName": "Saint Helena",
+    "demonym": "Saint Helenian",
+    "language": "English"
+  },
+  {
+    "name": "Saint Lucia",
+    "enName": "Saint Lucia",
+    "demonym": "Saint Lucian",
+    "language": "English"
+  },
+  {
+    "name": "Samoa",
+    "enName": "Samoa",
+    "demonym": "Samoan",
+    "language": "Samoan"
+  },
+  {
+    "name": "San Marino",
+    "enName": "San Marino",
+    "demonym": "Sammarinese",
+    "language": "Italian"
+  },
+  {
+    "name": "Saudi Arabia",
+    "enName": "Saudi Arabia",
+    "demonym": "Saudi Arabian",
+    "language": "Arabic"
+  },
+  {
+    "name": "Senegal",
+    "enName": "Senegal",
+    "demonym": "Senegalese",
+    "language": "French"
+  },
+  {
+    "name": "Serbia",
+    "enName": "Serbia",
+    "demonym": "Serbian",
+    "language": "Serbian"
+  },
+  {
+    "name": "Seychelles",
+    "enName": "Seychelles",
+    "demonym": "Seychellois",
+    "language": "French"
+  },
+  {
+    "name": "Sierra Leone",
+    "enName": "Sierra Leone",
+    "demonym": "Sierra Leonean",
+    "language": "English"
+  },
+  {
+    "name": "Singapore",
+    "enName": "Singapore",
+    "demonym": "Singaporean",
+    "language": "English"
+  },
+  {
+    "name": "Sint Maarten",
+    "enName": "Sint Maarten",
+    "demonym": "Dutch",
+    "language": "Dutch"
+  },
+  {
+    "name": "Slovakia",
+    "enName": "Slovakia",
+    "demonym": "Slovak",
+    "language": "Slovak"
+  },
+  {
+    "name": "Slovenia",
+    "enName": "Slovenia",
+    "demonym": "Slovene",
+    "language": "Slovene"
+  },
+  {
+    "name": "Somalia",
+    "enName": "Somalia",
+    "demonym": "Somali",
+    "language": "Somali"
+  },
+  {
+    "name": "South Africa",
+    "enName": "South Africa",
+    "demonym": "South African",
+    "language": "Afrikaans"
+  },
+  {
+    "name": "South Korea",
+    "enName": "South Korea",
+    "demonym": "South Korean",
+    "language": "Korean"
+  },
+  {
+    "name": "South Sudan",
+    "enName": "South Sudan",
+    "demonym": "South Sudanese",
+    "language": "English"
+  },
+  {
+    "name": "Spain",
+    "enName": "Spain",
+    "demonym": "Spanish",
+    "language": "Spanish"
+  },
+  {
+    "name": "Sri Lanka",
+    "enName": "Sri Lanka",
+    "demonym": "Sri Lankan",
+    "language": "Sinhala"
+  },
+  {
+    "name": "Sudan",
+    "enName": "Sudan",
+    "demonym": "Sudanese",
+    "language": "Arabic"
+  },
+  {
+    "name": "Suriname",
+    "enName": "Suriname",
+    "demonym": "Surinamer",
+    "language": "Dutch"
+  },
+  {
+    "name": "Swaziland",
+    "enName": "Swaziland",
+    "demonym": "Swazi",
+    "language": "Swazi"
+  },
+  {
+    "name": "Sweden",
+    "enName": "Sweden",
+    "demonym": "Swedish",
+    "language": "Swedish"
+  },
+  {
+    "name": "Switzerland",
+    "enName": "Switzerland",
+    "demonym": "Swiss",
+    "language": "German"
+  },
+  {
+    "name": "Syria",
+    "enName": "Syria",
+    "demonym": "Syrian",
+    "language": "Arabic"
+  },
+  {
+    "name": "Taiwan",
+    "enName": "Taiwan",
+    "demonym": "Taiwanese",
+    "language": "Standard Chinese"
+  },
+  {
+    "name": "Tajikistan",
+    "enName": "Tajikistan",
+    "demonym": "Tadzhik",
+    "language": "Tajik"
+  },
+  {
+    "name": "Tanzania",
+    "enName": "Tanzania",
+    "demonym": "Tanzanian",
+    "language": "Swahili"
+  },
+  {
+    "name": "Thailand",
+    "enName": "Thailand",
+    "demonym": "Thai",
+    "language": "Thai"
+  },
+  {
+    "name": "Togo",
+    "enName": "Togo",
+    "demonym": "Togolese",
+    "language": "French"
+  },
+  {
+    "name": "Tokelau",
+    "enName": "Tokelau",
+    "demonym": "Tokelauan",
+    "language": "Tokelauan"
+  },
+  {
+    "name": "Tonga",
+    "enName": "Tonga",
+    "demonym": "Tongan",
+    "language": "Tongan"
+  },
+  {
+    "name": "Tunisia",
+    "enName": "Tunisia",
+    "demonym": "Tunisian",
+    "language": "Arabic"
+  },
+  {
+    "name": "Turkey",
+    "enName": "Turkey",
+    "demonym": "Turkish",
+    "language": "Turkish"
+  },
+  {
+    "name": "Turkmenistan",
+    "enName": "Turkmenistan",
+    "demonym": "Turkmen",
+    "language": "Turkmen"
+  },
+  {
+    "name": "Tuvalu",
+    "enName": "Tuvalu",
+    "demonym": "Tuvaluan",
+    "language": "Tuvaluan"
+  },
+  {
+    "name": "Uganda",
+    "enName": "Uganda",
+    "demonym": "Ugandan",
+    "language": "English"
+  },
+  {
+    "name": "Ukraine",
+    "enName": "Ukraine",
+    "demonym": "Ukrainian",
+    "language": "Ukrainian"
+  },
+  {
+    "name": "United Kingdom",
+    "enName": "United Kingdom",
+    "demonym": "British",
+    "language": "English"
+  },
+  {
+    "name": "United States",
+    "enName": "United States",
+    "demonym": "American",
+    "language": "English"
+  },
+  {
+    "name": "Uruguay",
+    "enName": "Uruguay",
+    "demonym": "Uruguayan",
+    "language": "Spanish"
+  },
+  {
+    "name": "Uzbekistan",
+    "enName": "Uzbekistan",
+    "demonym": "Uzbekistani",
+    "language": "Uzbek"
+  },
+  {
+    "name": "Vanuatu",
+    "enName": "Vanuatu",
+    "demonym": "Ni-Vanuatu",
+    "language": "Bislama"
+  },
+  {
+    "name": "Venezuela",
+    "enName": "Venezuela",
+    "demonym": "Venezuelan",
+    "language": "Spanish"
+  },
+  {
+    "name": "Vietnam",
+    "enName": "Vietnam",
+    "demonym": "Vietnamese",
+    "language": "Vietnamese"
+  },
+  {
+    "name": "Western Sahara",
+    "enName": "Western Sahara",
+    "demonym": "Sahrawi",
+    "language": "Berber"
+  },
+  {
+    "name": "Yemen",
+    "enName": "Yemen",
+    "demonym": "Yemeni",
+    "language": "Arabic"
+  },
+  {
+    "name": "Zambia",
+    "enName": "Zambia",
+    "demonym": "Zambian",
+    "language": "English"
+  },
+  {
+    "name": "Zimbabwe",
+    "enName": "Zimbabwe",
+    "demonym": "Zimbabwean",
+    "language": "Chewa"
+  }
+]
