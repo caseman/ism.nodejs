@@ -82,15 +82,23 @@ The mouse is supported, though all functions are available via the keyboard.
 
 ### Keyboard Controls
 
-*ESC*: Return to title screen
-*,*: Select previous person
-*.*: Select next person
+`ESC`: Return to title screen
 
-*h*: Move left
-*l*: Move right
-*j*: Move down
-*k*: Move up
-*y*, *u*, *b*, *n*: Move diagonally
+`,`: Select previous person
+
+`.`: Select next person
+
+
+`h`: Move left
+
+`l`: Move right
+
+`j`: Move down
+
+`k`: Move up
+
+`y` `u` `b` `n`: Move diagonally
+
 
 Hold down `CTRL` or `SHIFT` with the movement keys to scroll. You can also
 scroll using the arrow keys.
