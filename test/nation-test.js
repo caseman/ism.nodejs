@@ -8,7 +8,7 @@ suite('nation', function() {
 
     this.beforeEach(function() {
         this.sinon = sinon.sandbox.create();
-        this.game = new game.Game;
+        this.game = new game.Game();
         this.game.info = {initialNationPop: 4, turnNumber: 99};
         this.game.db = {put: function(){}};
         this.gameMock = this.sinon.mock(this.game);
@@ -55,6 +55,32 @@ suite('nation', function() {
         assert.deepEqual(testNation.people, [testPerson.uid]);
         assert.equal(testNation.lastSpawn, this.game.info.turnNumber);
     });
+
+    test('random name', function() {
+        for (var i = 0; i < 100; i++) {
+            var name = nation.randomName()
+            assert(name.name);
+            assert(name.enName);
+            assert(name.demonym);
+            assert(name.language);
+        }
+    })
+
+    test('random names unique for game', function() {
+        var seen = {}
+          , nations = {}
+        this.game.nations = nations;
+        for (var i = 0; i < 100; i++) {
+            var name = nation.randomName(this.game);
+            assert(!seen[name.enName], name.enName);
+            seen[name.enName] = true;
+            nations[i] = {
+                name: name.enName
+              , originalName: name.enName
+              , demonym: name.demonym
+            }
+        }
+    })
 
 });
 
