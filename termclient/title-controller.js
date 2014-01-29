@@ -85,12 +85,10 @@ var Title = Ctor(function() {
             title += (game.host == '127.0.0.1') ? ' (local)' : ' ' + game.host
             return title
         })
-        var dialog = ui.listDialog({
+        ui.listDialog({
             label: ' Select a Game '
           , items: gameTitles
         }, function(index) {cb(null, index)})
-        ui.screen.append(dialog)
-        dialog.focus()
         return games
     }
 
