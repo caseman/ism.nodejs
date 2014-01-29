@@ -16,6 +16,7 @@ module.exports = Ctor(function() {
             views.map.game = game;
             var location = game.nation.startLocation;
             views.map.scrollCentering(location[0], location[1]);
+            views.main.focus();
             views.map.focus();
             ui.render();
         });
@@ -40,7 +41,10 @@ module.exports = Ctor(function() {
                 }
             });
         });
-        views.main.on('focus', function() {views.map.focus()});
+
+        var detach = function() {
+            ui.detach(views.main);
+        }
 
         views.map.key([','], function() {
             var index = ctrlr.selectedPersonIndex();
@@ -51,10 +55,8 @@ module.exports = Ctor(function() {
             var index = ctrlr.selectedPersonIndex();
             ctrlr.selectPersonByIndex(index !== undefined ? index + 1 : 0);
         });
-        views.map.key('escape', function() {
-            views.main.detach();
-            ui.render()
-        })
+        views.map.key('escape', detach)
+        views.main.key('escape', detach)
         views.map.on('keypress', function(ch, key) {
             if (ch && ctrlr.selectedPersonUid && !key.shift && !key.ctrl) {
                 var dx = 0

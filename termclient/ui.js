@@ -43,6 +43,16 @@ exports.clearScreen = function clearScreen() {
 }
 
 /*
+ * Detach a view first restoring focus
+ */
+function detach(view) {
+    while (screen.focused && screen.focused !== view) screen.rewindFocus()
+    view.detach()
+    render()
+}
+exports.detach = detach
+
+/*
  * Create a view from a local module
  */
 exports.show = function show(viewName) {
@@ -106,10 +116,7 @@ function dialog(options, buttons, cb) {
     dialogElem.data.isDialog = true;
 
     var done = function(data) {
-        if (cb(data) || !data) {
-            dialogElem.detach();
-            render();
-        }
+        if (cb(data) || !data) detach(dialogElem)
     }
     dialogElem.on('submit', done);
     dialogElem.key('escape', done);
@@ -229,8 +236,7 @@ function listDialog(options, cb) {
     options = combine(listOptions, options)
     var selected = 0
     var finished = function(data) {
-        dialogBox.detach()
-        render()
+        detach(dialogBox)
         cb(data ? selected : null)
     }
     var dialogBox = dialog(options, ['Resume', 'Cancel'], finished)
@@ -246,6 +252,7 @@ function listDialog(options, cb) {
     }))
     listBox.on('cancel', finished)
     listBox.on('select', function(item, index) {selected = index})
+    listBox.focus()
     return dialogBox
 }
 exports.listDialog = listDialog
