@@ -4,7 +4,7 @@
 var blessed = require('blessed')
   , util = require('util')
   , strHash = require('string-hash')
-  //, log = require('../lib/logging').log
+  , log = require('../lib/logging').log
   , darkenedColors = require('./darkened-index.json')
   , screen
   , willRender = false;
@@ -234,13 +234,13 @@ var listOptions = {
 
 function listDialog(options, cb) {
     options = combine(listOptions, options)
-    var selected = 0
+    var listBox
     var finished = function(data) {
         detach(dialogBox)
-        cb(data ? selected : null)
+        cb(data ? listBox.selected : null)
     }
     var dialogBox = dialog(options, ['Resume', 'Cancel'], finished)
-    var listBox = blessed.list(combine(options, {
+    listBox = blessed.list(combine(options, {
         parent: dialogBox
       , left: 2
       , top: 2
@@ -251,7 +251,7 @@ function listDialog(options, cb) {
       , label: undefined
     }))
     listBox.on('cancel', finished)
-    listBox.on('select', function(item, index) {selected = index})
+    listBox.on('select', finished)
     listBox.focus()
     return dialogBox
 }
