@@ -1,4 +1,4 @@
-[![Build Status](https://ism.stridercd.com/caseman/ism/badge)](https://ism.stridercd.com/caseman/ism/)
+[![Build Status](http://ism.stridercd.com/caseman/ism/badge)](https://ism.stridercd.com/caseman/ism/)
 
 # ism
 
