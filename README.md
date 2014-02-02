@@ -13,9 +13,8 @@ Some features include:
 - Full mouse and keyboard controls
 - Lots of crazy ideas in development :)
 
-![Title Screen](http://www.dropbox.com/s/v64b9h9rcli7ogg/Screenshot%202014-02-02%2012.13.12.png)
-
-![Main Screen](http://www.dropbox.com/s/fbhkniymwe7smzo/Screenshot%202014-02-02%2012.10.05.png)
+[![Title Screen](http://caseman.github.io/ism/screenshots/title-screen.png)](http://caseman.github.io/ism/screenshots/title-screen.png)
+[![Main Screen](http://caseman.github.io/ism/screenshots/main-screen.png)](http://caseman.github.io/ism/screenshots/main-screen.png)
 
 ## Install
 
