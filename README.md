@@ -14,6 +14,7 @@ Some features include:
 - Lots of crazy ideas in development :)
 
 [![Screenshot](https://www.dropbox.com/s/v64b9h9rcli7ogg/Screenshot%202014-02-02%2012.13.12.png)]https://www.dropbox.com/s/v64b9h9rcli7ogg/Screenshot%202014-02-02%2012.13.12.png)
+
 [![Screenshot](https://www.dropbox.com/s/fbhkniymwe7smzo/Screenshot%202014-02-02%2012.10.05.png)](https://www.dropbox.com/s/fbhkniymwe7smzo/Screenshot%202014-02-02%2012.10.05.png)
 
 ## Install
