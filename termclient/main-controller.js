@@ -1,12 +1,14 @@
 var Ctor = require('../lib/ctor')
   , ui = require('./ui')
-  , mainViews = require('./main-view');
+  , mainViews = require('./main-view')
+  , SideController = require('./side-controller')
 
 module.exports = Ctor(function() {
     this.init = function(client) {
         var ctrlr = this;
         var views = this.views = mainViews();
         this.client = client;
+        this.sideController = new SideController(this);
 
         client.on('updateGame', ui.render);
         client.on('updateNation', ui.render);
@@ -123,6 +125,7 @@ module.exports = Ctor(function() {
         map.setCursor.apply(map, person.location);
         this.updateStatusTextForTile(
             game.tile.apply(game, person.location));
+        this.sideController.personSelected(person);
     }
 
 });
