@@ -60,9 +60,8 @@ suite('nation', function() {
         for (var i = 0; i < 100; i++) {
             var name = nation.randomName()
             assert(name.name);
-            assert(name.enName);
             assert(name.demonym);
-            assert(name.language);
+            assert(name.cities);
         }
     })
 
@@ -70,13 +69,13 @@ suite('nation', function() {
         var seen = {}
           , nations = {}
         this.game.nations = nations;
-        for (var i = 0; i < 100; i++) {
+        for (var i = 0; i < 20; i++) {
             var name = nation.randomName(this.game);
-            assert(!seen[name.enName], name.enName);
-            seen[name.enName] = true;
+            assert(!seen[name.name], name.name);
+            seen[name.name] = true;
             nations[i] = {
-                name: name.enName
-              , originalName: name.enName
+                name: name.name
+              , originalName: name.name
               , demonym: name.demonym
             }
         }
