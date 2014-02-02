@@ -44,7 +44,7 @@ suite('nation', function() {
     });
 
     test('spawn creates person and saves', function() {
-        var testNation = nation.create(this.game, {startingLocation: [5,10], people:[]});
+        var testNation = nation.create(this.game, {startLocation: [5,10], people:[]});
         var testPerson = {type:'person', uid:'2578'};
         this.game.info = {turnNumber: 99};
         this.personMock.expects('create').once().returns(testPerson);
@@ -54,6 +54,17 @@ suite('nation', function() {
         assert.equal(testPerson.nationUid, testNation.uid);
         assert.deepEqual(testNation.people, [testPerson.uid]);
         assert.equal(testNation.lastSpawn, this.game.info.turnNumber);
+    });
+
+    test('name, originalName, demonym gets assigned', function() {
+        this.sinon.stub(person, 'create');
+        this.sinon.stub(person, 'place');
+        this.game.nations = {};
+        var testNation = nation.create(this.game, {startLocation: [15,10]});
+        assert.notEqual(testNation.name, nation.Nation.defaults.name);
+        assert.notEqual(testNation.originalName, nation.Nation.defaults.originalName);
+        assert.strictEqual(testNation.name, testNation.originalName);
+        assert.notEqual(testNation.demonym, nation.Nation.defaults.demonym);
     });
 
     test('random name', function() {
