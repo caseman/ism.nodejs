@@ -7,11 +7,12 @@ module.exports = function MainView() {
     views.main = blessed.box({
         width: '100%'
       , height: '100%'
+      , keys: true
     });
 
     views.sidePanel = blessed.box({
         parent: views.main
-      , width: 40
+      , width: 30
       , height: '100%'
       , right: 0
       , style: {
