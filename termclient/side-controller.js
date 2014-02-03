@@ -60,6 +60,45 @@ module.exports = Ctor(function() {
           , style: panel.style
         })
         client.on('updatePerson', this.updatePersonPanel.bind(this))
+
+        blessed.text({
+            parent: panel
+          , bottom: 2
+          , height: 1
+          , left: 1
+          , right: 1
+          , content: '▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂'
+          , style: {
+              fg: 130
+            , bg: 'blue'
+          }
+        })
+        this.endTurnBttn = blessed.button({
+            parent: panel
+          , height: 1
+          , bottom: 1
+          , left: 1
+          , right: 1
+          , content: 'End Turn'
+          , align: 'center'
+          , style: {
+              fg: 15
+            , bg: 130
+          }
+        })
+        blessed.text({
+            parent: panel
+          , bottom: 0
+          , height: 1
+          , left: 1
+          , right: 1
+          , content: '▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇'
+          , style: {
+              fg: 'blue'
+            , bg: 130
+          }
+        })
+
         ui.render()
     }
 
