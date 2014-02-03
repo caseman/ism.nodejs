@@ -210,8 +210,7 @@ suite('createGame handler', function() {
 
 suite('join handler', function() {
     var handle = require('../lib/serverhandler').handle
-      , game = require('../lib/game')
-      , map = require('../lib/map');
+      , game = require('../lib/game');
 
     this.beforeEach(before);
     this.afterEach(after);
