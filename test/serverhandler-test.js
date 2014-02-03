@@ -284,3 +284,70 @@ suite('join handler', function() {
 
 });
 
+suite('end turn handler', function() {
+    var handle = require('../lib/serverhandler').handle
+      , game = require('../lib/game');
+
+    this.beforeEach(before);
+    this.afterEach(after);
+
+    test('ends turn last without waiting', function() {
+        var testGame = new game.Game(null, "63089219")
+          , gameMock = this.sinon.mock(testGame);
+        this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
+        gameMock.expects('beginNextTurn').once()
+        testGame.nations = {
+            "1": {uid:"1", player: {type: "remote", turnCompleted: null}}
+          , "2": {uid:"2", player: {type: null, turnCompleted: null}}
+        }
+        testGame.info.turnNumber = 1;
+        this.client.nation = testGame.nations['1'];
+        this.client.game = testGame;
+        this.clientMock.expects('send').once().withArgs(
+            {says:'endTurn', wait:false, re:'368'});
+
+        var handled = handle(this.server, this.client,
+            {says: 'endTurn', uid:"368"});
+        assert(handled);
+        assert.strictEqual(testGame.nations['1'].player.turnCompleted, 1)
+        assert.strictEqual(testGame.nations['2'].player.turnCompleted, null)
+    });
+
+    test('ends turn with pending players and waits', function() {
+        var testGame = new game.Game(null, "63089219")
+          , gameMock = this.sinon.mock(testGame);
+        this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
+        gameMock.expects('beginNextTurn').never()
+        testGame.nations = {
+            "1": {uid:"1", player: {type: "remote", turnCompleted: 6}}
+          , "2": {uid:"2", player: {type: "weird", turnCompleted: 6}}
+        }
+        testGame.info.turnNumber = 7;
+        this.client.nation = testGame.nations['1'];
+        this.client.game = testGame;
+        this.clientMock.expects('send').once().withArgs(
+            {says:'endTurn', wait:true, re:'233'});
+
+        var handled = handle(this.server, this.client,
+            {says: 'endTurn', uid:"233"});
+        assert(handled);
+        assert.strictEqual(testGame.nations['1'].player.turnCompleted, 7)
+        assert.strictEqual(testGame.nations['2'].player.turnCompleted, 6)
+    });
+
+    test('requires a registered client', function() {
+        var testGame = new game.Game(null, "2345098")
+          , gameMock = this.sinon.mock(testGame);
+        this.client.cid = undefined;
+        gameMock.expects('beginNextTurn').never()
+        testGame.nations = {
+            "1": {uid:"1", player: {type: "remote", turnCompleted: 8}}
+          , "2": {uid:"2", player: {type: "weird", turnCompleted: 8}}
+        }
+        assert.throws(function() {
+            handle(this.server, this.client, {says:'endTurn', wait:true, re:'355'});
+        });
+        assert.strictEqual(testGame.nations['1'].player.turnCompleted, 8)
+        assert.strictEqual(testGame.nations['2'].player.turnCompleted, 8)
+    });
+});
