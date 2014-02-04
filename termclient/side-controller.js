@@ -98,6 +98,15 @@ module.exports = Ctor(function() {
             , bg: 130
           }
         })
+        this.endTurnBttn.on('click', client.endTurn.bind(client))
+        client.on('waitForNextTurn', function() {
+            ctrlr.endTurnBttn.content = 'Waiting for Players'
+            ui.render()
+        })
+        client.on('turnBegins', function() {
+            ctrlr.endTurnBttn.content = 'End Turn'
+            ui.render()
+        })
 
         ui.render()
     }
