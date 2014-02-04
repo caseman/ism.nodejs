@@ -39,7 +39,7 @@ module.exports = Ctor(function() {
             var tile = views.map.tileAt(mouse.x, mouse.y);
             if (tile) tile.objects.forEach(function(obj) {
                 if (obj.type == 'person' && obj.nationUid == client.gameState.nation.uid) {
-                    ctrlr.selectPerson(obj);
+                    ctrlr.selectPerson(client.gameState.people[obj.uid]);
                 }
             });
         });
