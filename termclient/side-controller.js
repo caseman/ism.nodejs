@@ -50,6 +50,7 @@ module.exports = Ctor(function() {
           , top: 3
           , height: 1
           , width: '100%'
+          , tags: true
           , style: panel.style
         })
         this.personStamina = blessed.text({
@@ -57,6 +58,7 @@ module.exports = Ctor(function() {
           , top: 4
           , height: 1
           , width: '100%'
+          , tags: true
           , style: panel.style
         })
         client.on('updatePerson', this.updatePersonPanel.bind(this))
@@ -116,7 +118,11 @@ module.exports = Ctor(function() {
             this.personName.content = (person.name || 'Person')
             this.personTraits.content = Object.keys(person.bonusTraits).join(', ')
             this.personHealth.content = 'hp: ' + person.hp + '/' + person.maxHp
-            this.personStamina.content = 'st: ' + person.stamina + '/' + person.maxStamina
+            if (person.stamina > 0) {
+                this.personStamina.content = 'st: ' + person.stamina + '/' + person.maxStamina
+            } else {
+                this.personStamina.content = 'st: {red-bg}' + person.stamina + '/' + person.maxStamina + '{/red-bg}'
+            }
             ui.render()
         }
     }
