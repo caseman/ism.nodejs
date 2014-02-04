@@ -302,9 +302,9 @@ suite('end turn handler', function() {
         }
         testGame.info.turnNumber = 1;
         this.client.nation = testGame.nations['1'];
+        this.client.nation.changed = sinon.stub();
+        gameMock.expects('nationChanged').once().withArgs(this.client.nation);
         this.client.game = testGame;
-        this.clientMock.expects('send').once().withArgs(
-            {says:'endTurn', wait:false, re:'368'});
 
         var handled = handle(this.server, this.client,
             {says: 'endTurn', uid:"368"});
@@ -324,9 +324,9 @@ suite('end turn handler', function() {
         }
         testGame.info.turnNumber = 7;
         this.client.nation = testGame.nations['1'];
+        this.client.nation.changed = sinon.stub();
+        gameMock.expects('nationChanged').once().withArgs(this.client.nation);
         this.client.game = testGame;
-        this.clientMock.expects('send').once().withArgs(
-            {says:'endTurn', wait:true, re:'233'});
 
         var handled = handle(this.server, this.client,
             {says: 'endTurn', uid:"233"});
