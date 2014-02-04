@@ -35,6 +35,11 @@
     "cities": ["Babylon"]
   },
   {
+    "name": "Bohemia",
+    "demonym": "Bohemian",
+    "cities": ["Prague", "Saaz", "Pisek", "Busweis", "Berkeley"]
+  },
+  {
     "name": "Cimmeria",
     "demonym": "Cimmerian",
     "cities": []
@@ -65,8 +70,8 @@
     "cities": ["Edinburgh", "Dublin", "Cardiff", "Nantes", "Glasgow", "Aberdeen", "Belfast"]
   },
   {
-    "name": "Greece",
-    "demonym": "Greek",
+    "name": "Macedonia",
+    "demonym": "Macedonian",
     "cities": ["Athens", "Sparta", "Corinth", "Syracuse", "Thebes", "Delphi", "Arkos", "Olympia", "Nemea", "Alexandria"]
   },
   {
@@ -122,7 +127,7 @@
   {
     "name": "Mede",
     "demonym": "Median",
-    "cities": ["Media"]
+    "cities": ["Media", "Kangavar"]
   },
   {
     "name": "Mino",
@@ -135,9 +140,14 @@
     "cities": ["Trondheim", "Uppsala", "Hedeby", "Skiringssal", "Birka", "Roskilde", "Oslo", "Reykjavik", "København", "Hladir"]
   },
   {
+    "name": "Parthia",
+    "demonym": "Parthian",
+    "cities": ["Hadhaiyab", "Arzanene", "Tambrax", "Charax", "Susa", "Hecatompylos", "Ctesiphon"]
+  },
+  {
     "name": "Persia",
     "demonym": "Persian",
-    "cities": ["Persepolis", "Parsagadae"]
+    "cities": ["Persepolis", "Parsagadae", "Edessa"]
   },
   {
     "name": "Phonecia",
@@ -188,6 +198,11 @@
     "name": "Sumeria",
     "demonym": "Sumerian",
     "cities": ["Ur", "Nippur"]
+  },
+  {
+    "name": "Sythia",
+    "demonym": "Sythian",
+    "cities": ["Olbia", "Chersonnesos", "Panticapaeum", "Tanais"]
   },
   {
     "name": "Zapotec",
