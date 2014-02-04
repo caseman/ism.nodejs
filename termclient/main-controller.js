@@ -10,7 +10,10 @@ module.exports = Ctor(function() {
         this.client = client;
         this.sideController = new SideController(this);
 
-        client.on('updateGame', ui.render);
+        client.on('updateGame', function(gameInfo) {
+            ctrlr.views.timeText.content = 'turn: ' + gameInfo.turnNumber;
+            ui.render();
+        })
         client.on('updateNation', ui.render);
 
         client.on('joinGame', function(game) {

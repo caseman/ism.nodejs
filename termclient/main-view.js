@@ -40,6 +40,13 @@ module.exports = function MainView() {
       , style: views.statusBar.style
     });
 
+    views.timeText = blessed.text({
+        parent: views.statusBar
+      , right: 10
+      , height: 1
+      , style: views.statusBar.style
+    });
+
     views.map = ui.map({
         parent: views.main
       , right: views.sidePanel.width
