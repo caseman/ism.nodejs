@@ -63,7 +63,7 @@ module.exports = Ctor(function() {
         })
         client.on('updatePerson', this.updatePersonPanel.bind(this))
 
-        blessed.text({
+        this.endTurnBttnTop = blessed.text({
             parent: panel
           , bottom: 2
           , height: 1
@@ -77,6 +77,7 @@ module.exports = Ctor(function() {
         })
         this.endTurnBttn = blessed.button({
             parent: panel
+          , mouse: true
           , height: 1
           , bottom: 1
           , left: 1
@@ -88,7 +89,7 @@ module.exports = Ctor(function() {
             , bg: 130
           }
         })
-        blessed.text({
+        this.endTurnBttnBot = blessed.text({
             parent: panel
           , bottom: 0
           , height: 1
@@ -101,15 +102,41 @@ module.exports = Ctor(function() {
           }
         })
         this.endTurnBttn.on('click', client.endTurn.bind(client))
-        client.on('waitForNextTurn', function() {
-            ctrlr.endTurnBttn.content = 'Waiting for Players'
-            ui.render()
+        this.endTurnBttn.on('mouseover', function() {
+            ctrlr.endTurnBttnColor(15, 0)
         })
-        client.on('turnBegins', function() {
-            ctrlr.endTurnBttn.content = 'End Turn'
-            ui.render()
-        })
+        this.endTurnBttn.on('mouseout', this.updateEndTurnButton.bind(this))
 
+        client.on('waitForNextTurn', this.updateEndTurnButton.bind(this))
+        client.on('turnBegins', this.updateEndTurnButton.bind(this))
+        client.on('updatePerson', this.updateEndTurnButton.bind(this))
+        client.on('joinGame', this.updateEndTurnButton.bind(this))
+
+        ui.render()
+    }
+
+    this.updateEndTurnButton = function() {
+        if (this.main.client.waiting) {
+            this.endTurnBttn.content = 'Waiting for Players'
+            this.endTurnBttnColor(243)
+        } else {
+            this.endTurnBttn.content = 'End Turn'
+            var people = this.main.client.gameState.people
+            for (var uid in people) {
+                if (people[uid].stamina > 0) {
+                    this.endTurnBttnColor(130)
+                    return
+                }
+            }
+            this.endTurnBttnColor(34)
+        }
+    }
+
+    this.endTurnBttnColor = function(color, textColor) {
+        this.endTurnBttnTop.style.fg = color
+        this.endTurnBttn.style.bg = color
+        this.endTurnBttn.style.fg = textColor !== undefined ? textColor : 15
+        this.endTurnBttnBot.style.bg = color
         ui.render()
     }
 
