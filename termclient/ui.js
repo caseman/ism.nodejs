@@ -434,12 +434,17 @@ map.prototype.scrollCentering = function(tileX, tileY) {
  * and false is returned.
  */
 map.prototype.scrollRevealing = function(tileX, tileY) {
-    var tLeft = this.xOffset + this.scrollSpeed;
-    var tRight = this.xOffset + this.width - this.scrollSpeed;
+    var mapWidth = this.game.info.mapWidth;
+    var tLeft = (this.xOffset + this.scrollSpeed) % mapWidth;
+    var tRight = tLeft + this.width - this.scrollSpeed * 2;
     while (tRight <= tLeft) {
         // Handle narrow view
         tLeft--;
         tRight++;
+    }
+    if (tLeft < mapWidth && tRight >= mapWidth && tileX < tLeft) {
+        // Handle x wraparound in view
+        tileX += mapWidth
     }
     var tTop = this.yOffset + this.scrollSpeed;
     var tBottom = this.yOffset + this.height - this.scrollSpeed;
