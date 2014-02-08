@@ -1,4 +1,5 @@
 var Ctor = require('../lib/ctor')
+  , string = require('../lib/string')
   , ui = require('./ui')
   , mainViews = require('./main-view')
   , SideController = require('./side-controller')
@@ -81,9 +82,9 @@ module.exports = Ctor(function() {
     this.updateStatusTextForTile = function(tile) {
         var status;
         if (tile) {
-            var objects = tile.objects.map(function(obj) {return capitalize(obj.type)})
-            status = capitalize(tile.terrain);
-            if (tile.biome) status = capitalize(tile.biome) + ', ' + status;
+            var objects = tile.objects.map(function(obj) {return string.capitalize(obj.type)})
+            status = string.capitalize(tile.terrain);
+            if (tile.biome) status = string.capitalize(tile.biome) + ', ' + status;
             if (objects.length) status += ' (' + objects.join(', ') + ')';
         } else {
             status = 'Unexplored';
@@ -132,9 +133,4 @@ module.exports = Ctor(function() {
     }
 
 });
-
-function capitalize(s) {
-    if (!s) return '';
-    return s[0].toLocaleUpperCase() + s.slice(1).toLocaleLowerCase();
-}
 
