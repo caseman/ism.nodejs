@@ -1,33 +1,38 @@
 {
-  "cursor" : ["red", "◆", "black"]
-, "unexplored" : [250, "▒", 245]
-, "glacier" : [123, "⋚", 195]
-, "ocean" : [18, "~", 21]
-, "coast" : [19, "~", 21]
-, "river" : [26, "~", 33]
-, "hill-river" : [26, "ᴖ", 33]
+  "glacier": {"bg":123, "fg":195, "ch":"⋚"}
+, "ocean": {"bg":18, "fg":21, "ch":"~"}
+, "coast": {"bg":19, "fg":21, "ch":"~"}
+, "river": {"bg":26, "fg":33, "ch":"~"}
+, "hill-river": {"bg":26, "fg":33, "ch":"ᴖ"}
 
-, "forest" : [28, "⥉", 22]
-, "hill-forest" : [28, "ᴖ", 22]
-, "taiga" : [108, "⥉", 254]
-, "hill-taiga" : [108, "ᴖ", 254]
-, "jungle" : [29, "❢", 23]
-, "hill-jungle" : [29, "ᴖ", 23]
-, "plains" : [136, "˔", 58]
-, "hill-plains" : [136, "ᴖ", 58]
-, "grassland" : [34, "⩛", 22]
-, "hill-grassland" : [34, "ᴖ", 22]
-, "marsh": [95, "⩛", 30]
+, "forest": {"bg":28, "fg":22, "ch":"⥉"}
+, "hill-forest": {"bg":28, "fg":22, "ch":"ᴖ"}
+, "taiga": {"bg":108, "fg":254, "ch":"⥉"}
+, "hill-taiga": {"bg":108, "fg":254, "ch":"ᴖ"}
+, "jungle": {"bg":29, "fg":23, "ch":"❢"}
+, "hill-jungle": {"bg":29, "fg":23, "ch":"ᴖ"}
+, "plains": {"bg":136, "fg":58, "ch":"˔"}
+, "hill-plains": {"bg":136, "fg":58, "ch":"ᴖ"}
+, "grassland": {"bg":34, "fg":22, "ch":"⩛"}
+, "hill-grassland": {"bg":34, "fg":22, "ch":"ᴖ"}
+, "marsh": {"bg":95, "fg":30, "ch":"⩛"}
 
-, "hill" : [143, "ᴖ", 106]
-, "mountain": [243, "▴", 247]
-, "mountain-tundra": [243, "▴", 254]
-, "mountain-glacier": [123, "▴", 15]
-, "tundra": [254, ".", 15]
-, "hill-tundra": [254, "ᴖ", 15]
+, "hill": {"bg":143, "fg":106, "ch":"ᴖ"}
+, "mountain": {"bg":243, "fg":247, "ch":"▴"}
+, "mountain-tundra": {"bg":243, "fg":254, "ch":"▴"}
+, "mountain-glacier": {"bg":123, "fg":15, "ch":"▴"}
+, "tundra": {"bg":254, "fg":15, "ch":"."}
+, "hill-tundra": {"bg":254, "fg":15, "ch":"ᴖ"}
 
-, "desert" : [179, ".", 3]
-, "hill-desert" : [179, "ᴖ", 3]
+, "desert": {"bg":179, "fg":3, "ch":"."}
+, "hill-desert": {"bg":179, "fg":3, "ch":"ᴖ"}
+
+, "sticks": {"fg":95, "ch":"∦"}
+, "logs": {"fg":95, "ch":"⫴"}
+, "grass": {"fg":22, "ch":"⩚"}
+, "hay": {"fg":3, "ch":"⩚"}
+
+, "tent": {"fg":230, "ch":"◭"}
 }
 
 

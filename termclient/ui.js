@@ -4,7 +4,8 @@
 var blessed = require('blessed')
   , util = require('util')
   , strHash = require('string-hash')
-  , log = require('../lib/logging').log
+  , extend = require('extend')
+  //, log = require('../lib/logging').log
   , darkenedColors = require('./darkened-index.json')
   , screen
   , willRender = false;
@@ -320,19 +321,17 @@ map.prototype.render = function() {
       , tx, ty
       , cell
       , tile
-      , fg, bg
-      , ch
       , attr
-      , tilespec;
+      , spec;
 
     var unexploredChars = '⠀⠊⠐⢀⠕⠢⡈⠡⢂⢁⢄⠑⠪⢌⠢⢔'
       , unexploredBg = [250,252,251,250,251]
       , unexploredFg = [249,248,249,249,250]
       , unexploredTile = function(x, y) {
           var hash = strHash(x + ',' + y);
-          return [unexploredBg[hash % 5],
-                  unexploredChars[hash % unexploredChars.length],
-                  unexploredFg[hash % 5]];
+          return {bg: unexploredBg[hash % 5],
+                  fg: unexploredFg[hash % 5],
+                  ch: unexploredChars[hash % unexploredChars.length]};
         }
 
     for (y = yi, ty = this.yOffset; y < yl; y++, ty++) {
@@ -343,34 +342,30 @@ map.prototype.render = function() {
 
             tile = this.game.tile((tx + mapWidth) % mapWidth, ty);
             if (tile) {
-                tilespec = TILESPEC[tile.type] ||
-                           TILESPEC[tile.biome] ||
-                           TILESPEC[tile.terrain] ||
-                           [0, '?', 1];
+                spec = extend({bg:0, fg:1, ch:'?'}
+                            , TILESPEC[tile.terrain]
+                            , TILESPEC[tile.biome]
+                            , TILESPEC[tile.type])
+                if (tile.inView && tile.objects[0] && tile.objects[0].type == 'person') {
+                    spec.ch = '@';
+                    spec.fg = 0;
+                }
+                if (!tile.inView) {
+                    spec.fg = darkenedColors[spec.fg];
+                    spec.bg = darkenedColors[spec.bg];
+                }
+                if (cursor == tile.key) {
+                    spec.fg = spec.bg;
+                    spec.bg = 0;
+                }
             } else {
-                tilespec = unexploredTile(tx, ty);
-            }
-            ch = tilespec[1];
-            fg = tilespec[2];
-            bg = tilespec[0];
-
-            if (tile && tile.inView && tile.objects[0] && tile.objects[0].type == 'person') {
-                ch = '@';
-                fg = 0;
-            }
-            if (tile && !tile.inView) {
-                fg = darkenedColors[fg];
-                bg = darkenedColors[bg];
-            }
-            if (tile && cursor == tile.key) {
-                fg = bg;
-                bg = 0;
+                spec = unexploredTile(tx, ty);
             }
 
-            attr = this.sattr(style, fg, bg);
-            if (attr !== cell[0] || ch !== cell[1]) {
+            attr = this.sattr(style, spec.fg, spec.bg);
+            if (attr !== cell[0] || spec.ch !== cell[1]) {
                 cell[0] = attr;
-                cell[1] = ch;
+                cell[1] = spec.ch;
                 lines[y].dirty = true;
             }
         }
