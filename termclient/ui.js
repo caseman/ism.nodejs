@@ -233,14 +233,15 @@ var listOptions = {
     }
 }
 
-function listDialog(options, cb) {
+function listDialog(options, buttons, cb) {
     options = combine(listOptions, options)
     var listBox
     var finished = function(data) {
         detach(dialogBox)
-        cb(data ? listBox.selected : null)
+        if (data) data.selected = listBox.selected
+        cb(data)
     }
-    var dialogBox = dialog(options, ['Resume', 'Cancel'], finished)
+    var dialogBox = dialog(options, buttons, finished)
     listBox = blessed.list(combine(options, {
         parent: dialogBox
       , left: 2

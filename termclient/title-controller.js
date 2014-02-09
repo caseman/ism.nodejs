@@ -14,6 +14,7 @@ var Title = Ctor(function() {
         views.menu.on('click exitButton', process.exit);
         views.menu.on('click startLocalButton', this.playLocalGame.bind(this))
         views.menu.on('click resumeGameButton', this.resumeGame.bind(this))
+        views.menu.on('click joinRemoteButton', this.joinGame.bind(this))
     }
 
     this.show = function() {
@@ -76,27 +77,34 @@ var Title = Ctor(function() {
         })
     }
 
-    this.showGamesList = function(cb) {
-        var games = this.app.previousGamesByTime()
-        var gameTitles = games.map(function(game) {
-            var date = new Date(game.gameInfo.turnTime || game.gameInfo.created)
+    this.formatGameTitles = function(games) {
+        return games.map(function(game) {
+            var info = game.gameInfo || game
+            var date = new Date(info.turnTime || info.created)
               , title = date.toDateString() + ' ' + date.getHours() + ':' + date.getMinutes()
-            if (game.gameInfo.turnNumber) title += ' turn:' + game.gameInfo.turnNumber
-            title += (game.host == '127.0.0.1') ? ' (local)' : ' ' + game.host
+            if (info.turnNumber) title += ' turn:' + info.turnNumber
+            if (game.host) title += (game.host == '127.0.0.1') ? ' (local)' : ' ' + game.host
             return title
         })
+    }
+
+    this.showGamesList = function(games, buttons, cb) {
         ui.listDialog({
-            label: ' Select a Game '
-          , items: gameTitles
-        }, function(index) {cb(null, index)})
+              label: ' Select a Game '
+            , items: this.formatGameTitles(games)
+          }
+          , buttons
+          , function(result) {cb(null, result)}
+        )
         return games
     }
 
     this.resumeGame = function() {
         var ctrlr = this
-        this.showGamesList(function(err, index) {
-            if (index === null) return
-            var game = ctrlr.app.previousGamesByTime()[index]
+        var games = ctrlr.app.previousGamesByTime()
+        this.showGamesList(games, ['Resume', 'Cancel'], function(err, result) {
+            if (err || !result) return
+            var game = games[result.selected]
             if (!game) return
             if (game.host == '127.0.0.1' || game.host == 'localhost') {
                 server.useLocal(prefs.path() || prefs.defaultPath(), function(err, serverInfo) {
@@ -107,6 +115,33 @@ var Title = Ctor(function() {
                 })
             } else {
                 ctrlr.app.connect(game)
+            }
+        })
+    }
+
+    this.showRemoteGames = function(client) {
+        var ctrlr = this
+        client.listGames(function(err, games) {
+            ctrlr.showGamesList(games, ['Join', 'Create Game', 'Cancel']
+              , function(err, result) {
+                    if (err || !result) return
+                    if (result.Join) {
+                        var game = games[result.selected]
+                        if (game) client.joinGame(game.uid)
+                    }
+                }
+            )
+        })
+    }
+
+    this.joinGame = function() {
+        var ctrlr = this
+          , lastServer = prefs.get('lastServer') || {}
+        this.app.showConnectDialog(lastServer, null, function(err, client) {
+            if (!err) {
+                ctrlr.client = client
+                prefs.save('lastServer', {host: client.serverHost, port: client.serverPort})
+                ctrlr.showRemoteGames(client)
             }
         })
     }
