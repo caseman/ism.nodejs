@@ -61,6 +61,13 @@ module.exports = Ctor(function() {
           , tags: true
           , style: panel.style
         })
+        this.personEquip = blessed.text({
+            parent: this.personPanel
+          , top: 6
+          , height: 3
+          , tags: true
+          , style: panel.style
+        })
         client.on('updatePerson', this.updatePersonPanel.bind(this))
 
         this.endTurnBttnTop = blessed.text({
@@ -150,6 +157,8 @@ module.exports = Ctor(function() {
             } else {
                 this.personStamina.content = 'st: {red-bg}' + person.stamina + '/' + person.maxStamina + '{/red-bg}'
             }
+            var itemDescr = person.items.length ? person.items.join(', ') : '(none)'
+            this.personEquip.content = 'Items: ' + itemDescr
             ui.render()
         }
     }
