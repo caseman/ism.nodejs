@@ -32,7 +32,6 @@ var App = Ctor(function() {
     }
 
     this.showConnectDialog = function(serverInfo, errorMsg, cb) {
-            log.info(serverInfo)
         var app = this;
 
         ui.show('connect-dialog')(serverInfo, errorMsg, function(confirmed) {
