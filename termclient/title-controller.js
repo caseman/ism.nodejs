@@ -38,43 +38,48 @@ var Title = Ctor(function() {
         })
     }
 
-    this.playLocalGame = function() {
+    this.errorHandler = function(actionName) {
         var ctrlr = this
-          , action
-        async.waterfall([
-            function startServer(cb) {
-                action = 'starting the server'
-                server.useLocal(prefs.path() || prefs.defaultPath(), cb)
-            }
-          , function connect(serverInfo, cb) {
-                action = 'connecting to the server'
-                ctrlr.app.connect(serverInfo, cb)
-            }
-          , function createGame(client, cb) {
-                action = 'creating the map'
-                ctrlr.client = client
-                ctrlr.createGame(['small'], cb)
-            }
-          , function playGame(gameInfo, cb) {
-                action = 'joining it'
-                ctrlr.client.joinGame(gameInfo.uid)
-                ctrlr.client.startGame(gameInfo.uid)
-                cb(null)
-            }
-        ]
-        , function(err) {
+        return function(err) {
             if (err == 'cancelled') {
                 ctrlr.app.showTitle()
             } else if (err) {
                 log.error('Error starting local game', err)
                 log.error((new Error()).stack)
                 ui.errorDialog(
-                    'Could not start the game due to an error while ' + action + '.'
+                    'Could not ' + actionName +
+                    ' the game due to an error while ' + ctrlr.currentAction + '.'
                   , err
                   , function() {ctrlr.app.showTitle()}
                 )
             }
-        })
+        }
+    }
+
+    this.playLocalGame = function() {
+        var ctrlr = this
+        async.waterfall([
+            function startServer(cb) {
+                ctrlr.currentAction = 'starting the server'
+                server.useLocal(prefs.path() || prefs.defaultPath(), cb)
+            }
+          , function connect(serverInfo, cb) {
+                ctrlr.currentAction = 'connecting to the server'
+                ctrlr.app.connect(serverInfo, cb)
+            }
+          , function createGame(client, cb) {
+                ctrlr.currentAction = 'creating the map'
+                ctrlr.client = client
+                ctrlr.createGame(['small'], cb)
+            }
+          , function playGame(gameInfo, cb) {
+                ctrlr.currentAction = 'joining it'
+                ctrlr.client.joinGame(gameInfo.uid)
+                ctrlr.client.startGame(gameInfo.uid)
+                cb()
+            }
+        ]
+        , this.errorHandler('start'))
     }
 
     this.formatGameTitles = function(games) {
@@ -121,17 +126,37 @@ var Title = Ctor(function() {
 
     this.showRemoteGames = function(client) {
         var ctrlr = this
-        client.listGames(function(err, games) {
-            ctrlr.showGamesList(games, ['Join', 'Create Game', 'Cancel']
-              , function(err, result) {
-                    if (err || !result) return
-                    if (result.Join) {
-                        var game = games[result.selected]
-                        if (game) client.joinGame(game.uid)
-                    }
+          , joinBttn = 'Join'
+          , createBttn = 'Create Game'
+        async.waterfall([
+            function(cb) {
+                this.currentAction = 'listing games'
+                client.listGames(cb)
+            }
+          , function(games, cb) {
+                ctrlr.showGamesList(games, [joinBttn, createBttn, 'Cancel']
+                  , function(err, dialogResult) {cb(err, dialogResult, games)}
+                )
+            }
+          , function(dialogResult, games, cb) {
+                if (dialogResult[joinBttn]) {
+                    cb(null, games[dialogResult.selected])
+                } else if (dialogResult[createBttn]) {
+                    this.currentAction = 'creating the map'
+                    ctrlr.createGame(['small'], cb)
+                } else {
+                    cb('cancelled')
                 }
-            )
-        })
+            }
+          , function(gameInfo, cb) {
+                this.currentAction = 'joining it'
+                ctrlr.client.joinGame(gameInfo.uid)
+                ctrlr.client.startGame(gameInfo.uid)
+                cb()
+            }
+        ]
+        , this.errorHandler('join')
+        )
     }
 
     this.joinGame = function() {
