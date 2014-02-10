@@ -13,7 +13,7 @@
 , "hillComplexity": 8
 , "hillThreshold": 0.21
 , "mountainFaultThreshold": 0.08
-, "mountainRuggednessThreshold": 0.4
+, "mountainRuggednessThreshold": 0.3
 
 , "faultScale": 16
 , "faultComplexity": 3
