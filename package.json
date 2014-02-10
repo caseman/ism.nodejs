@@ -1,6 +1,6 @@
 {
   "name": "ism",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Turn-based multiplayer nation building strategy game",
   "main": "ism.js",
   "keywords": [
