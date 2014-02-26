@@ -13,6 +13,34 @@ suite('object types and events', function() {
         });
     });
 
+    test('create from spec', function() {
+        object.define({
+            type: 'spectest'
+          , properties: {foo: 1}
+        });
+        var obj1 = object.create('spectest');
+        assert.equal(obj1.type, 'spectest', 'Object should have a type');
+        assert(obj1.uid, 'Object should have a uid');
+        assert.strictEqual(obj1.foo, 1);
+
+        var obj2 = object.create('spectest', { foo:23, bar: 11 });
+        assert.equal(obj2.type, 'spectest', 'Object should have a type');
+        assert(obj2.uid, 'Object should have a uid');
+        assert.strictEqual(obj2.foo, 23);
+        assert.strictEqual(obj2.bar, 11);
+    });
+
+    test('spec for object', function() {
+        var spec = {
+            type: 'speccy'
+          , properties: {foo: 1}
+        };
+        object.define(spec);
+        var obj = object.create('speccy');
+        assert.deepEqual(object.spec(obj), spec);
+        assert.deepEqual(object.spec('speccy'), spec);
+    });
+
     test('create object with type', function() {
         object.define('test', {});
         var obj = object.create('test');
@@ -67,6 +95,19 @@ suite('object types and events', function() {
             object.sendEvent('gawrsh', []);
         });
     });
+
+    test('inherits handlers from parent type', function() {
+        object.define('parent', { pevent: function(val) { this.pevent = val }});
+        object.define(
+            { type: 'child' , parentType: 'parent' }
+          , { cevent: function(val) { this.cevent = val }}
+        );
+        var obj = object.create('child');
+        object.sendEvent('pevent', [obj], 'PARENT!');
+        object.sendEvent('cevent', [obj], 'CHILD!');
+        assert.strictEqual(obj.pevent, 'PARENT!');
+        assert.strictEqual(obj.cevent, 'CHILD!');
+     });
 
     test('default properties for clientCopy', function() {
         object.define('defaultfc', {});
