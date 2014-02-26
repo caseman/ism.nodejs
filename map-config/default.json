@@ -37,6 +37,6 @@
 , "iceThreshold": 1.3
 , "snowThreshold": 1.5
 , "marshDensity": 0.15
-, "forestDensity": 0.6
+, "forestDensity": 0.85
 
 }
