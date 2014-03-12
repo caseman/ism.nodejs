@@ -2,6 +2,12 @@ var ui = require('../termclient/ui');
 
 ui.initScreen();
 
-ui.dialog({label:'This is a Test'}, ['OK', 'Cancel'], function(wat) {
-    console.log(wat);
-});
+var progressView = ui.progress({parent: ui.screen, label: 'Creating Game'})
+function prog(p) {
+    progressView.setProgress(p)
+    if (p < 100) setTimeout(function() {prog(p + 1)}, 100)
+}
+prog(0)
+
+ui.screen.key('escape', process.exit)
+
