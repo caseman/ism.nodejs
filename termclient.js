@@ -9,6 +9,8 @@ var prefs = require('./lib/prefs')
     .describe('debug', 'Debug logging of all client/server activity')
     .boolean('debug')
     .describe('version', 'Output the software version and exit')
+    .boolean('append')
+    .describe('append', 'Append to log file instead of truncating it at startup')
     .boolean('version')
     .describe('prefs', 'Path to prefs file (will be created if necessary)')
 
@@ -37,6 +39,7 @@ logging.configure({
     verbose: argv.verbose
   , debug: argv.debug
   , filePath: path.join(path.dirname(argv.prefs), 'client.log')
+  , append: argv.append
 })
 
 prefs.usePath(argv.prefs)
