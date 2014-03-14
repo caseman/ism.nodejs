@@ -41,11 +41,52 @@ suite('object types and events', function() {
         assert.deepEqual(object.spec('speccy'), spec);
     });
 
+    test('object with spec isA', function() {
+        object.define({ type: 'baz' });
+        object.define({ type: 'bar', parentType: 'baz' });
+        object.define({ type: 'foo', parentType: 'bar' });
+        object.define({ type: 'spam', parentType: 'baz' });
+        var foo = object.create('foo');
+        assert(object.isA(foo, 'foo'));
+        assert(object.isA(foo, 'bar'));
+        assert(object.isA(foo, 'baz'));
+        assert(!object.isA(foo, 'spam'));
+        var bar = object.create('bar');
+        assert(!object.isA(bar, 'foo'));
+        assert(object.isA(bar, 'bar'));
+        assert(object.isA(bar, 'baz'));
+        assert(!object.isA(bar, 'spam'));
+        var spam = object.create('spam');
+        assert(!object.isA(spam, 'foo'));
+        assert(!object.isA(spam, 'bar'));
+        assert(object.isA(spam, 'baz'));
+        assert(object.isA(spam, 'spam'));
+    });
+
+    test('isA with recursive spec', function() {
+        object.define({ type: 'foo', parentType: 'bar' });
+        object.define({ type: 'bar', parentType: 'baz' });
+        object.define({ type: 'baz', parentType: 'foo' });
+        object.define({ type: 'spam' });
+        var foo = object.create('foo');
+        assert(object.isA(foo, 'foo'));
+        assert(object.isA(foo, 'bar'));
+        assert(object.isA(foo, 'baz'));
+        assert(!object.isA(foo, 'spam'));
+    });
+
     test('create object with type', function() {
         object.define('test', {});
         var obj = object.create('test');
         assert.equal(obj.type, 'test', 'Object should have a type');
         assert(obj.uid, 'Object should have a uid');
+    });
+
+    test('object with type isA', function() {
+        object.define('blarg');
+        var obj = object.create('blarg');
+        assert(object.isA(obj, 'blarg'));
+        assert(!object.isA(obj, 'flarg'));
     });
 
     test('create object with properties', function() {
