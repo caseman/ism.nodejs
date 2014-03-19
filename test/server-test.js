@@ -7,8 +7,8 @@ var tmp = require('tmp');
 
 var MockConn = function() {
     events.EventEmitter.call(this);
-    this.remoteAddress = '1.2.3.4',
-    this.remotePort = 5557,
+    this.remoteAddress = '1.2.3.4';
+    this.remotePort = 5557;
     this.write = sinon.stub();
 }
 util.inherits(MockConn, events.EventEmitter);
@@ -22,7 +22,7 @@ var MockGame = function(uid) {
     this.uid = uid;
     this.info = {};
     this.objects = {};
-    this.db = new MockDb;
+    this.db = new MockDb();
 }
 util.inherits(MockGame, events.EventEmitter);
 
@@ -33,10 +33,10 @@ suite('server', function() {
     this.beforeEach(function() {
         var test = this;
         this.sinon = sinon.sandbox.create();
-        db = new MockDb;
+        var db = new MockDb();
         this.dbMock = this.sinon.mock(db);
         this.server = new server.Server(db);
-        this.conn = new MockConn;
+        this.conn = new MockConn();
         this.createClientStub = this.sinon.stub(server, 'createRemoteClient', function(conn) {
             test.client = new server.RemoteClient(conn);
             return test.client;
@@ -263,7 +263,7 @@ suite('server', function() {
     });
 
     test('require registered with registered client', function() {
-        var cid = this.server.registerClient(this.client);
+        this.server.registerClient(this.client);
         this.server.requireRegisteredClient(this.client)
     });
 
@@ -278,7 +278,6 @@ suite('server', function() {
     test('loads game from db on demand', function(done) {
         var game = require('../lib/game')
           , server = this.server
-          , client = this.client
           , testGame = {uid:"349808"};
         this.sinon.stub(game, 'load', function(db, uid, cb) {
             assert.strictEqual(db, server.db);
@@ -310,8 +309,8 @@ suite('server', function() {
         var game = require('../lib/game')
           , testGame = {uid:"345987345", nations:{}}
           , testNation = {uid:"342598061"}
-          , loadStub = this.sinon.stub(game, 'load')
           , cid = "2398234980";
+        this.sinon.stub(game, 'load')
         testGame.nations[testNation.uid] = testNation;
         this.server.addGame(testGame);
         this.dbMock.expects('get')
@@ -368,8 +367,8 @@ suite('server', function() {
     test('game for client id no matching nation', function(done) {
         var game = require('../lib/game')
           , testGame = {uid:"4350601", nations:{}}
-          , loadStub = this.sinon.stub(game, 'load')
           , cid = "345096012";
+        this.sinon.stub(game, 'load')
         this.server.addGame(testGame);
         this.dbMock.expects('get')
             .withArgs(key('player','client', cid))
@@ -389,10 +388,10 @@ suite('server remote client', function() {
     var server = require('../lib/server');
 
     this.beforeEach(function() {
-        this.conn = new MockConn;
+        this.conn = new MockConn();
         this.client = new server.RemoteClient(this.conn);
         this.nation = new events.EventEmitter();
-        this.nation.people = [];
+        this.nation.units = [];
         this.game = new MockGame("56234098");
         this.game.started = sinon.stub();
     });
@@ -431,7 +430,7 @@ suite('server remote client', function() {
     test('join game', function() {
         this.client.cid = "2435091231";
         this.game.started.returns(true);
-        this.nation.people = [1,2,3];
+        this.nation.units = [1,2,3];
         var dbMock = sinon.mock(this.game.db);
         dbMock.expects('put').withArgs(
             key('player', 'client', this.client.cid)
@@ -449,16 +448,16 @@ suite('server remote client', function() {
     test('join game sets up next update', function() {
         this.client.cid = "562348192734";
         this.game.started.returns(false);
-        this.nation.people = [1,2,3];
+        this.nation.units = [1,2,3];
         assert.deepEqual(this.client.nextUpdate, {});
         this.client.joinGame(this.game, this.nation);
         var nextUpdate = this.client.nextUpdate;
         assert.deepEqual(nextUpdate.game, this.game.info);
         assert.deepEqual(nextUpdate.nation, this.nation);
-        assert.deepEqual(Object.keys(nextUpdate.people), this.nation.people);
+        assert.deepEqual(Object.keys(nextUpdate.units), this.nation.units);
     });
 
-    test('after person changes sends an update', function() {
+    test('after unit changes sends an update', function() {
         var clock = sinon.useFakeTimers();
         this.game.started.returns(true);
         this.nation.uid = "5401234086";
@@ -467,27 +466,27 @@ suite('server remote client', function() {
         this.client.joinGame(this.game, this.nation);
 
         var peeps = [
-            {uid:"4235096", type:'person'}
-          , {uid:"0923487", type:'person'}
-          , {uid:"8965892", type:'person'}
+            {uid:"4235096", type:'unit'}
+          , {uid:"0923487", type:'unit'}
+          , {uid:"8965892", type:'unit'}
         ];
-        this.nation.emit('personChanged', peeps[0]);
+        this.nation.emit('unitChanged', peeps[0]);
         var task = this.client.updateTask;
         assert(task);
-        this.nation.emit('personChanged', peeps[1]);
+        this.nation.emit('unitChanged', peeps[1]);
         assert.equal(this.client.updateTask, task);
-        this.nation.emit('personChanged', peeps[2]);
+        this.nation.emit('unitChanged', peeps[2]);
         assert.equal(this.client.updateTask, task);
-        this.nation.emit('personChanged', peeps[0]);
+        this.nation.emit('unitChanged', peeps[0]);
 
         clock.tick(this.client.UPDATE_TIMEOUT + 1);
         var msg = getReply(this);
         assert.equal(msg.says, 'update');
-        assert.equal(Object.keys(msg.people).length, 3);
+        assert.equal(Object.keys(msg.units).length, 3);
         assert(!this.client.updateTask);
-        assert(peeps[0].uid in msg.people);
-        assert(peeps[1].uid in msg.people);
-        assert(peeps[2].uid in msg.people);
+        assert(peeps[0].uid in msg.units);
+        assert(peeps[1].uid in msg.units);
+        assert(peeps[2].uid in msg.units);
 
         clock.restore();
     });
