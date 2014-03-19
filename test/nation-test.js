@@ -1,7 +1,8 @@
 var assert = require('assert')
   , sinon = require('sinon')
   , game = require('../lib/game')
-  , person = require('../lib/person');
+  , object = require('../lib/object')
+  , unit = require('../lib/unit');
 
 suite('nation', function() {
     var nation = require('../lib/nation');
@@ -12,18 +13,19 @@ suite('nation', function() {
         this.game.info = {initialNationPop: 4, turnNumber: 99};
         this.game.db = {put: function(){}};
         this.gameMock = this.sinon.mock(this.game);
-        this.personMock = this.sinon.mock(person);
+        this.unitMock = this.sinon.mock(unit);
+        this.objectMock = this.sinon.mock(object);
     });
 
     this.afterEach(function() {
         this.gameMock.verify();
-        this.personMock.verify();
+        this.unitMock.verify();
+        this.objectMock.verify();
         this.sinon.restore();
     });
 
     test('create saves nation', function() {
-        this.sinon.stub(person, 'create');
-        this.sinon.stub(person, 'place');
+        this.sinon.stub(unit, 'place');
         var saveNation = this.gameMock.expects('saveNation').once();
         var testNation = nation.create(this.game, {startLocation: [0,0]});
         assert(testNation.uid);
@@ -33,32 +35,31 @@ suite('nation', function() {
 
     test('create spawns folks', function() {
         var initialPop = this.game.info.initialNationPop;
-        var testPerson = {type:'person', uid:'33242', location:[5,9]};
-        this.personMock.expects('create').exactly(initialPop).returns(testPerson);
-        this.personMock.expects('place').exactly(initialPop).returns(true);
-        this.gameMock.expects('objectChanged').atLeast(initialPop).withArgs(testPerson);
+        var testUnit = {type:'unit', uid:'33242', location:[5,9]};
+        this.objectMock.expects('create').exactly(initialPop).returns(testUnit);
+        this.unitMock.expects('place').exactly(initialPop).returns(true);
+        this.gameMock.expects('objectChanged').atLeast(initialPop).withArgs(testUnit);
         this.gameMock.expects('nationChanged').atLeast(1);
 
         var testNation = nation.create(this.game, {startLocation: [5,10]});
-        assert.equal(testNation.people.length, initialPop);
+        assert.equal(testNation.units.length, initialPop);
     });
 
-    test('spawn creates person and saves', function() {
-        var testNation = nation.create(this.game, {startLocation: [5,10], people:[]});
-        var testPerson = {type:'person', uid:'2578'};
+    test('spawn creates unit and saves', function() {
+        var testNation = nation.create(this.game, {startLocation: [5,10], units:[]});
+        var testUnit = {type:'unit', uid:'2578'};
         this.game.info = {turnNumber: 99};
-        this.personMock.expects('create').once().returns(testPerson);
-        this.personMock.expects('place').once().returns(true);
-        this.gameMock.expects('objectChanged').once().withArgs(testPerson);
+        this.objectMock.expects('create').once().returns(testUnit);
+        this.unitMock.expects('place').once().returns(true);
+        this.gameMock.expects('objectChanged').once().withArgs(testUnit);
         testNation.spawn(this.game, testNation, [8,9]);
-        assert.equal(testPerson.nationUid, testNation.uid);
-        assert.deepEqual(testNation.people, [testPerson.uid]);
-        assert.equal(testNation.lastSpawn, this.game.info.turnNumber);
+        assert.equal(testUnit.nationUid, testNation.uid);
+        assert.deepEqual(testNation.units, [testUnit.uid]);
     });
 
     test('name, originalName, demonym gets assigned', function() {
-        this.sinon.stub(person, 'create');
-        this.sinon.stub(person, 'place');
+        this.sinon.stub(object, 'create');
+        this.sinon.stub(unit, 'place');
         this.game.nations = {};
         var testNation = nation.create(this.game, {startLocation: [15,10]});
         assert.notEqual(testNation.name, nation.Nation.defaults.name);
