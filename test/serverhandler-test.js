@@ -3,8 +3,8 @@ var sinon = require('sinon');
 var Server = require('../lib/server').Server;
 
 var MockConn = function() {
-    this.remoteAddress = '1.2.3.4',
-    this.remotePort = 5557,
+    this.remoteAddress = '1.2.3.4';
+    this.remotePort = 5557;
     this.close = sinon.stub();
 }
 
@@ -20,7 +20,7 @@ var before = function() {
     var db = {get: sinon.spy()};
     this.server = new Server(db);
     this.serverMock = this.sinon.mock(this.server);
-    this.conn = new MockConn;
+    this.conn = new MockConn();
     this.client = new MockClient(this.conn);
     this.clientMock = this.sinon.mock(this.client);
 }
@@ -55,7 +55,7 @@ suite('hi handler', function() {
         this.clientMock.expects('sendError').never();
         var send = this.clientMock.expects('send').once();
 
-        var handled = handle(this.server, this.client, 
+        var handled = handle(this.server, this.client,
             {says:'hi', clientVersion:version, uid:'012'});
         assert(handled);
         assert(!this.conn.close.called, 'Connection should not be closed');
@@ -90,7 +90,7 @@ suite('hi handler', function() {
         this.clientMock.expects('send').once()
             .withArgs({says:'hi', cid:this.client.cid, re:'357'});
 
-        var handled = handle(this.server, this.client, 
+        var handled = handle(this.server, this.client,
             {says:'hi', clientVersion:version, cid:this.client.cid, uid:'357'});
         assert(handled);
         assert(!this.conn.close.called, 'Connection should not be closed');
@@ -156,7 +156,7 @@ suite('createGame handler', function() {
         this.clientMock.expects('send').once()
             .withArgs({says:'createGame', re:'261', game:testGame.info});
 
-        var handled = handle(this.server, this.client, 
+        var handled = handle(this.server, this.client,
             {says:'createGame', uid:'261', mapParams:mapParams});
         assert(handled);
         assert.strictEqual(this.server.games[testGame.uid], testGame);
@@ -190,12 +190,10 @@ suite('createGame handler', function() {
     */
 
     test('has an error', function() {
-        var testGame = {info:{uid: 999}}
-          , mapParams = {width: 100, height: 100};
         this.sinon.stub(game, 'create', function(db, map, params, cb) {
             cb(new Error('owww'));
         });
-        this.sinon.stub(map, 'create', function(params, progressCb) {
+        this.sinon.stub(map, 'create', function() {
             return {};
         });
 
@@ -225,7 +223,7 @@ suite('join handler', function() {
         gameMock.expects('chooseNationForClient').once().withArgs(this.client).returns(nation);
         this.clientMock.expects('joinGame').once().withArgs(testGame);
 
-        var handled = handle(this.server, this.client, 
+        var handled = handle(this.server, this.client,
             {says: 'join', game:testGame.uid, uid:"579"});
         assert(handled);
     });
@@ -243,7 +241,7 @@ suite('join handler', function() {
         gameMock.expects('chooseNationForClient').once().withArgs(this.client).returns(nation);
         this.clientMock.expects('joinGame').once().withArgs(testGame);
 
-        var handled = handle(this.server, this.client, 
+        var handled = handle(this.server, this.client,
             {says: 'join', game:testGame.uid, uid:"435"});
         assert(handled);
     });
@@ -271,10 +269,9 @@ suite('join handler', function() {
     });
 
     test('has an error', function() {
-        var testGame = new game.Game(null, "2345979")
-          , gameMock = this.sinon.mock(testGame);
+        var testGame = new game.Game(null, "2345979");
         this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
-        this.serverMock.expects('game').once().withArgs(testGame.uid).yields(new Error, null);
+        this.serverMock.expects('game').once().withArgs(testGame.uid).yields(new Error(), null);
         var msg = {says: 'join', game:testGame.uid, uid:"4587"};
         this.clientMock.expects('sendError').once().withArgs('unexpectedError', msg);
 
