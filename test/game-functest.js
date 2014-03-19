@@ -53,6 +53,19 @@ var dbGetAll = function(game, subKey, expectedCount, assertion) {
     }
 }
 
+function deepEqual(obj1, obj2) {
+    try {
+        assert.deepEqual(obj1, obj2);
+    } catch(e) {
+        console.log('-----');
+        console.log(obj1);
+        console.log('-----');
+        console.log(obj2);
+        console.log('-----');
+        throw new Error('deepEqual assertion failed');
+    }
+}
+
 suite('Game persistence', function() {
     var map = new Map(mapConfig);
     // Map is very small, force some start locations
@@ -84,31 +97,31 @@ suite('Game persistence', function() {
             assert.equal(theGame.tiles[0].length, 16);
             var nationCount = Object.keys(theGame.nations).length;
             assert.equal(nationCount, map.startLocations.length);
-            var peopleCount = Object.keys(theGame.nations).reduce(
+            var unitCount = Object.keys(theGame.nations).reduce(
                 function(count, uid) {
-                    return count + theGame.nations[uid].people.length;
+                    return count + theGame.nations[uid].units.length;
                 }
               , 0);
             var objectCount = Object.keys(theGame.objects).length;
-            assert.equal(objectCount, peopleCount);
+            assert.equal(objectCount, unitCount);
 
             async.series({
                     info: dbGet(theGame, 'info')
                   , map: dbGet(theGame, 'map')
                   , tiles: dbGetAll(theGame, 'tile', 16*16, function(tile) {
-                        assert.deepEqual(tile, theGame.tiles[tile.x][tile.y]);
+                        deepEqual(tile, theGame.tiles[tile.x][tile.y]);
                     })
                   , nations: dbGetAll(theGame, 'nation', nationCount, function(nation) {
-                        assert.deepEqual(nation, theGame.nations[nation.uid].toJSON());
+                        deepEqual(nation, theGame.nations[nation.uid].toJSON());
                     })
                   , objects: dbGetAll(theGame, 'obj', objectCount, function(obj) {
-                        assert.deepEqual(obj, theGame.objects[obj.uid]);
+                        deepEqual(obj, theGame.objects[obj.uid]);
                     })
                 }
               , function(err, data) {
                     assert(!err, err);
-                    assert.deepEqual(data.info, theGame.info);
-                    assert.deepEqual(data.map, theGame.map);
+                    deepEqual(data.info, theGame.info);
+                    deepEqual(data.map, theGame.map);
                     done();
                 }
             );
@@ -121,16 +134,16 @@ suite('Game persistence', function() {
             assert(!createErr, createErr);
             game.load(db, createdGame.uid, function(loadErr, loadedGame) {
                 assert(!loadErr, loadErr);
-                assert.deepEqual(createdGame.info, loadedGame.info);
-                assert.deepEqual(createdGame.map, loadedGame.map);
-                assert.deepEqual(createdGame.turn, loadedGame.turn);
-                assert.deepEqual(createdGame.tiles, loadedGame.tiles);
+                deepEqual(createdGame.info, loadedGame.info);
+                deepEqual(createdGame.map, loadedGame.map);
+                deepEqual(createdGame.turn, loadedGame.turn);
+                deepEqual(createdGame.tiles, loadedGame.tiles);
                 assert.equal(createdGame.nations.length, loadedGame.nations.length);
                 for (var uid in createdGame.nations) {
-                    assert.deepEqual(createdGame.nations[uid].toJSON(), 
-                                     loadedGame.nations[uid].toJSON());
+                    deepEqual(createdGame.nations[uid].toJSON(),
+                              loadedGame.nations[uid].toJSON());
                 }
-                assert.deepEqual(createdGame.objects, loadedGame.objects);
+                deepEqual(createdGame.objects, loadedGame.objects);
                 done();
             });
         });
