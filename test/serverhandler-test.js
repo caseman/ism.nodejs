@@ -234,9 +234,9 @@ suite('join handler', function() {
         var testGame = new game.Game(null, "2345098")
           , gameMock = this.sinon.mock(testGame)
           , nation = {uid:"23495873"}
-          , people = [{uid:1}, {uid:2}, {uid:3}];
-        nation.people = [1, 2, 3];
-        testGame.objects = {1:people[0], 2:people[1], 3:people[2]};
+          , units = [{uid:1}, {uid:2}, {uid:3}];
+        nation.units = [1, 2, 3];
+        testGame.objects = {1:units[0], 2:units[1], 3:units[2]};
         this.serverMock.expects('requireRegisteredClient').once().withArgs(this.client);
         this.serverMock.expects('game').once().withArgs(testGame.uid).yields(null, testGame);
         gameMock.expects('started').returns(true);
