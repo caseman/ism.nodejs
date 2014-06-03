@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ISM</title>
+  <script src="js/sprite.js"></script>
+  <script src="js/map.js"></script>
+  <script type="text/javascript">
+  function ajax(url, cb) {
+      var xmlhttp = new XMLHttpRequest();
+
+      xmlhttp.onreadystatechange = function() {
+          if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+              cb(JSON.parse(xmlhttp.responseText));
+          }
+      }
+      xmlhttp.open("GET", url, true);
+      xmlhttp.send();
+  }
+  </script>
+  <script>
+    function initMap() {
+      mapCanvas = document.getElementById('map');
+      ctx = mapCanvas.getContext('2d');
+      ajax('test.map', function(mapData) {
+        map = new TileMap(ctx, 32, 16, mapData[0]);
+        setTimeout(map.draw.bind(map), 500);
+      });
+    }
+  </script>
+</head>
+
+<body onload="initMap();">
+  <canvas id="map" width="3000" height="3000">
+    ISM requires a browser that supports canvas.<br>
+    Try Google Chrome, or Firefox.
+  </canvas>
+</body>
+
+</html>
+
