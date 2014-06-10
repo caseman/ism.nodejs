@@ -25,11 +25,16 @@ function TileMap(ctx, tileWidth, tileHeight, mapData) {
            , tileHalfHeight * y ];
   }
 
+  var randChoice = function(arr) {
+    if (arr === undefined || typeof arr === 'string') return arr;
+    return arr[Math.random() * arr.length | 0];
+  }
+
   var drawTile = this.drawTile = function(x, y, spec) {
-    var sprite = Math.random() * 3.999 | 0;
+    var sprite = Math.random() * 4 | 0;
     if (spec.img !== undefined) {
       tc.globalCompositeOperation = 'source-over';
-      tc.fillStyle = spec.fg || 'black';
+      tc.fillStyle = randChoice(spec.fg) || 'black';
       tc.fillRect(0, 0, tileCanvas.width, tileCanvas.height);
       tc.globalCompositeOperation = 'destination-in';
       terrainSprites.draw(tc, sprite, spec.img, 1, 0, 32, 32);
@@ -41,7 +46,7 @@ function TileMap(ctx, tileWidth, tileHeight, mapData) {
     ctx.lineTo(tilePos[0] + tileHalfWidth + 1, tilePos[1]);
     ctx.lineTo(tilePos[0], tilePos[1] + tileHalfHeight + 1);
     ctx.closePath();
-    ctx.fillStyle = spec.bg || 'white';
+    ctx.fillStyle = randChoice(spec.bg) || 'white';
     ctx.fill();
 
     if (spec.img !== undefined) {
@@ -62,18 +67,19 @@ function TileMap(ctx, tileWidth, tileHeight, mapData) {
 
   var terrainSpec = {
       glacier: 'turquoise'
-    , ocean: {fg:'#36a', bg:'#139', img:0, shadow:0.25}
-    , coast: {fg:'#69d', bg:'#24d', img:0, shadow:0.25}
+    , ocean: {fg:['#36a','#38a','#25b'], bg:'#139', img:0, shadow:0.25}
+    , coast: {fg:['#7ae','#69d','#48b'], bg:['#24d','#23c','#14e'], img:0, shadow:0.25}
     , river: {fg:'#ccf', bg:'#36e', img:0, shadow:0.4}
-    , grassland: {fg:'#2c5', bg:'rgb(50,75,20)', img:7}
-    , plains: {fg:'rgb(255, 250, 100)', bg:'rgb(130,110,60)', img:6}
-    , desert: {fg:'rgb(170, 160, 120)', bg:'rgb(230,215,180)', img:5}
-    , jungle: {fg:'#184', bg:'#143', img:3, shadow:0.7}
-    , marsh: {fg:'#6a5', bg:'#735', img:2, shadow:0.5}
+    , grassland: {fg:'#6a4', bg:['#463','#353','#452'], img:7}
+    , plains: {fg:'#ab7', bg:['#662','#552','#452','#562'], img:6}
+    , desert: {fg:['#b97','#ba6','#cb8'], bg:'#dda', img:5}
+    , jungle: {fg:['#164','#063','#272'], bg:'#143', img:3, shadow:0.7}
+    , marsh: {fg:['#9b9','#8a4','#7a7'], bg:'#735', img:2, shadow:0.5}
     , tundra: {fg:'#fff', bg:'#eef', img:6, shadow:0.25}
-    , taiga: {fg:'#186', bg:'#a99', img:8, shadow:0.7}
-    , forest: {fg:'green', bg:'rgb(125,105,50)', img:4, shadow:0.6}
-    , mountain: {fg:'#aaa', bg:'#553', img:1, shadow:0.7}
+    , taiga: {fg:['#186','#285','#175'], bg:'#997', img:8, shadow:0.7}
+    , forest: {fg:['#062','#074','#272'], bg:'rgb(125,105,50)', img:4, shadow:0.6}
+    , mountain: {fg:['#aaa','#cbc','#999'], bg:'#553', img:1, shadow:0.7}
+    , 'mountain-tundra': {fg:['#eef','#eee','#dde'], bg:'#553', img:1, shadow:0.7}
   }
 
   var spriteMap = {
