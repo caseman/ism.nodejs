@@ -71,11 +71,15 @@ function TileMap(ctx, tileWidth, tileHeight, mapData) {
     , coast: {fg:['#7ae','#69d','#48b'], bg:['#24d','#23c','#14e'], img:0, shadow:0.25}
     , river: {fg:'#ccf', bg:'#36e', img:0, shadow:0.4}
     , grassland: {fg:'#5b4', bg:['#463','#353','#452'], img:7}
+    , 'hill-grassland': {fg:'#6c5', bg:'#583', img:9, shadow:0.7}
     , plains: {fg:'#db6', bg:['#552','#652','#663'], img:6}
+    , 'hill-plains': {fg:['#cc6','#db5'], bg:'#874', img:9, shadow:0.7}
     , desert: {fg:['#b97','#ba6','#cb8'], bg:'#dda', img:5}
+    , 'hill-desert': {fg:['#b97','#ba6','#cb8'], bg:'#dda', img:9, shadow:0.6}
     , jungle: {fg:['#164','#063','#272'], bg:'#143', img:3, shadow:0.7}
     , marsh: {fg:['#9b9','#8a4','#7a7'], bg:'#735', img:2, shadow:0.5}
     , tundra: {fg:'#fff', bg:'#eef', img:6, shadow:0.25}
+    , 'hill-tundra': {fg:'#fff', bg:'#ccd', img:9, shadow:0.7}
     , taiga: {fg:['#186','#285','#175'], bg:'#997', img:8, shadow:0.7}
     , forest: {fg:['#062','#073','#272'], bg:'rgb(125,105,50)', img:4, shadow:0.6}
     , mountain: {fg:['#aaa','#cbc','#999'], bg:'#553', img:1, shadow:0.7}
@@ -122,6 +126,6 @@ function TileMap(ctx, tileWidth, tileHeight, mapData) {
   }
 
   this.draw = function() {
-    this.drawTiles(0, 0, 50, 200); //mapData.width, mapData.height);
+    this.drawTiles(0, 0, 100, 300); //mapData.width, mapData.height);
   }
 }
