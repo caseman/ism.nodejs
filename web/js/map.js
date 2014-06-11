@@ -66,7 +66,7 @@ function TileMap(ctx, tileWidth, tileHeight, mapData) {
   var PIx2 = Math.PI * 2;
 
   var terrainSpec = {
-      glacier: 'turquoise'
+      glacier: {fg:'#cff', bg:['#7dd','#7ee','#9dd'], img:10, shadow:0.1}
     , ocean: {fg:['#36a','#38a','#25b'], bg:'#139', img:0, shadow:0.25}
     , coast: {fg:['#7ae','#69d','#48b'], bg:['#24d','#23c','#14e'], img:0, shadow:0.25}
     , river: {fg:'#ccf', bg:'#36e', img:0, shadow:0.4}
@@ -78,7 +78,7 @@ function TileMap(ctx, tileWidth, tileHeight, mapData) {
     , 'hill-desert': {fg:['#b97','#ba6','#cb8'], bg:'#dda', img:9, shadow:0.6}
     , jungle: {fg:['#164','#063','#272'], bg:'#143', img:3, shadow:0.7}
     , marsh: {fg:['#9b9','#8a4','#7a7'], bg:'#735', img:2, shadow:0.5}
-    , tundra: {fg:'#fff', bg:'#eef', img:6, shadow:0.25}
+    , tundra: {fg:['#fff','#eee','#edd'], bg:'#eef', img:6, shadow:0.25}
     , 'hill-tundra': {fg:'#fff', bg:'#ccd', img:9, shadow:0.7}
     , taiga: {fg:['#186','#285','#175'], bg:'#997', img:8, shadow:0.7}
     , forest: {fg:['#062','#073','#272'], bg:'rgb(125,105,50)', img:4, shadow:0.6}
